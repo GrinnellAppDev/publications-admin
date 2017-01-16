@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "jsx": "react",
+        "jsxFactory": "h",
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "removeComments": false,
+        "noImplicitAny": false,
+        "target": "es5"
+    },
+    "compileOnSave": false,
+    "filesGlob": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+    ]
+}
