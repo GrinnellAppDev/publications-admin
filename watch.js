@@ -15,11 +15,13 @@ import debounce from "debounce";
 
 import webpackConfig, {paths} from "./webpack.config.babel";
 
-const port = Number(process.argv[2]) || 5000;
+const proxyPort = Number(process.argv[2]) || 3000;
+const expressPort = proxyPort + 10;
 
 const browserSyncServer = browserSync.create();
 browserSyncServer.init({
-    proxy: `localhost:${port}`,
+    proxy: `localhost:${expressPort}`,
+    port: proxyPort,
     open: false,
 });
 
@@ -31,10 +33,10 @@ function restartExpressServer() {
     });
 
     if (listener) listener.close();
-    listener = require(paths.serverFile).app.default.listen(port, console.error);
+    listener = require(paths.serverFile).app.default.listen(expressPort, console.error);
 
     browserSyncServer.reload();
 }
 
 process.chdir(paths.build);
-webpack(webpackConfig).watch({}, debounce(restartExpressServer, 1000));
+webpack(webpackConfig).watch({}, debounce(restartExpressServer, 500));

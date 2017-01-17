@@ -6,7 +6,7 @@
         "lint": "tslint src/*",
         "build": "NODE_ENV=production webpack",
         "serve": "babel-node watch.js",
-        "serve:build": "yarn run build || npm run build && cd build && node server/index.js 5000"
+        "serve:build": "yarn run build || npm run build && cd build && node server/index.js"
     },
     "dependencies": {
         "@types/consolidate": "^0.0.31",
