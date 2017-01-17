@@ -8,6 +8,8 @@
         "experimentalDecorators": true,
         "removeComments": false,
         "noImplicitAny": false,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
         "target": "es5",
         "lib": [
             "dom",
