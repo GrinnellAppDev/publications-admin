@@ -5,8 +5,9 @@
     "scripts": {
         "lint": "tslint src/*",
         "build": "NODE_ENV=production webpack",
+        "build:deploy": "rm -rf build/node_modules && yarn run build || npm run build && yarn install --modules-folder build/node_modules --prod || npm install -C build --prod",
         "serve": "babel-node watch.js",
-        "serve:build": "yarn run build || npm run build && cd build && node server/index.js"
+        "serve:build": "cd build && NODE_ENV=production node server/index.js"
     },
     "dependencies": {
         "@types/consolidate": "^0.0.31",

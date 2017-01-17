@@ -12,8 +12,8 @@ import * as express from "express";
 import {resolve} from "path";
 import {mustache} from "consolidate";
 
-import {h} from "preact";
 import * as render from "preact-render-to-string";
+import ClientApp from "../client/app";
 
 import logger from "./logger";
 
@@ -26,8 +26,7 @@ app.use(logger);
 app.use("/assets", express.static(resolve("client")));
 app.get("/", (req, resp) => {
     const initialState = null;
-    const root = h(require("assets").app.default, {initialState});
-    resp.render("index.html", {renderedDOM: render(root)});
+    resp.render("index.html", {renderedDOM: render(ClientApp({initialState}))});
 });
 
 app.use((request, response) => {

@@ -33,7 +33,7 @@ function restartExpressServer() {
     });
 
     if (listener) listener.close();
-    listener = require(paths.serverFile).app.default.listen(expressPort, console.error);
+    listener = require(paths.serverOutputFile).app.default.listen(expressPort, console.error);
 
     browserSyncServer.reload();
 }

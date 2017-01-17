@@ -12,25 +12,19 @@ const isProduction = process.env.NODE_ENV === "production";
 const src = path.resolve("src");
 const build = isProduction ? path.resolve("build") : path.resolve(".tmp");
 const serverOutput = path.resolve(build, "server");
-const serverAssetFileName = "assets.js";
-const serverFileName = "index.js";
 
 export const paths = {
     src,
     clientEntry: path.resolve(src, "client/index.tsx"),
     clientHtml: path.resolve(src, "client/index.html"),
-    serverAssetEntry: path.resolve(src, "client/app.tsx"),
-    serverEntry: path.resolve(src, "server", isProduction ? "index" : "app"),
+    serverEntry: path.resolve(src, "server", isProduction ? "index.ts" : "app.ts"),
     build,
     clientOutput: path.resolve(build, "client"),
     serverOutput,
-    serverAssetFileName,
-    serverAssetFile: path.join(serverOutput, serverAssetFileName),
-    serverFileName,
-    serverFile: path.join(serverOutput, serverFileName),
+    serverOutputFile: path.join(serverOutput, "index.js"),
 };
 
-const allShared = {
+const shared = {
     module: {
         preLoaders: [
             {
@@ -57,7 +51,6 @@ const allShared = {
     plugins: [
         new webpack.NoErrorsPlugin(),
         new webpack.optimize.OccurrenceOrderPlugin(),
-        new CleanPlugin([paths.clientOutput, paths.serverOutput], {verbose: false}),
     ],
     debug: !isProduction,
     cache: true,
@@ -83,12 +76,8 @@ const allShared = {
     },
 };
 
-const assetsShared = {
-    ...allShared,
-};
-
 const browserAssets = {
-    ...assetsShared,
+    ...shared,
     entry: paths.clientEntry,
     output: {
         path: paths.clientOutput,
@@ -97,34 +86,23 @@ const browserAssets = {
     },
     devtool: "source-map",
     plugins: [
-        ...assetsShared.plugins,
+        ...shared.plugins,
         // todo: generate an html file for each chunk
         new HtmlPlugin({
             inject: false,
             template: paths.clientHtml,
         }),
+        new CleanPlugin([paths.clientOutput]),
     ],
 };
 
-const serverAssets = {
-    ...assetsShared,
-    target: "node",
-    entry: paths.serverAssetEntry,
-    output: {
-        path: paths.serverOutput,
-        filename: paths.serverAssetFileName,
-        library: "app",
-        libraryTarget: "commonjs",
-    },
-};
-
 const server = {
-    ...allShared,
+    ...shared,
     target: "node",
     entry: paths.serverEntry,
     output: {
         path: paths.serverOutput,
-        filename: paths.serverFileName,
+        filename: path.basename(paths.serverOutputFile),
         libraryTarget: 'commonjs',
         ...(isProduction ? {} : {library: "app"})
     },
@@ -136,6 +114,10 @@ const server = {
         __dirname: false,
         __filename: false,
     },
+    plugins: [
+        ...shared.plugins,
+        new CleanPlugin([paths.serverOutput]),
+    ]
 };
 
-export default [browserAssets, serverAssets, server];
+export default [browserAssets, server];
