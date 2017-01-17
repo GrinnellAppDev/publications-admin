@@ -9,12 +9,19 @@
  */
 
 import * as express from "express";
-import * as path from "path";
+import {resolve} from "path";
+import {mustache} from "consolidate";
+import {h} from "preact";
+import * as render from "preact-render-to-string";
 
 const app = express();
 export default app;
+app.engine("html", mustache);
+app.set("views", resolve("client"));
 
-app.use("/assets", express.static(path.resolve("app")));
+app.use("/assets", express.static(resolve("client")));
 app.get("/", (req, resp) => {
-    resp.sendFile(path.resolve("app/index.html"));
+    const initialState = null;
+    const root = h(require("assets").app.default, {initialState});
+    resp.render("index.html", {renderedDOM: render(root)});
 });

@@ -9,36 +9,41 @@ import tslintConfig from "./tslint.json";
 
 const isProduction = process.env.NODE_ENV === "production";
 
-const paths = {
-    src: path.resolve("src"),
-    clientEntry: path.resolve("src/client/index"),
-    clientHtml: path.resolve("src/client/index.html"),
-    serverEntry: path.resolve("src/server/index"),
-    build: path.resolve("build"),
-    clientOutput: path.resolve("build/app"),
-    serverOutput: path.resolve("build/server"),
-};
+const src = path.resolve("src");
+const build = isProduction ? path.resolve("build") : path.resolve(".tmp");
+const serverOutput = path.resolve(build, "server");
+const serverAssetFileName = "assets.js";
+const serverFileName = "index.js";
 
-const tsloader = (isHot = false) => ({
-    test: /\.tsx?$/,
-    include: [paths.src],
-    loaders: [
-        ...(isHot ? ["react-hot"] : []),
-        "ts"
-    ],
-});
+export const paths = {
+    src,
+    clientEntry: path.resolve(src, "client/index.tsx"),
+    clientHtml: path.resolve(src, "client/index.html"),
+    serverAssetEntry: path.resolve(src, "client/app.tsx"),
+    serverEntry: path.resolve(src, "server", isProduction ? "index" : "app"),
+    build,
+    clientOutput: path.resolve(build, "client"),
+    serverOutput,
+    serverAssetFileName,
+    serverAssetFile: path.join(serverOutput, serverAssetFileName),
+    serverFileName,
+    serverFile: path.join(serverOutput, serverFileName),
+};
 
 const allShared = {
     module: {
         preLoaders: [
             {
                 test: /\.tsx$/,
-                include: [paths.src],
                 loader: "tslint",
             },
         ],
 
         loaders: [
+            {
+                test: /\.tsx?$/,
+                loader: "ts",
+            },
             {
                 test: /.json$/,
                 loaders: ["json"],
@@ -51,12 +56,11 @@ const allShared = {
     },
     plugins: [
         new webpack.NoErrorsPlugin(),
-        ...(isProduction ? [
-            new webpack.optimize.OccurrenceOrderPlugin(),
-            new CleanPlugin([paths.build])
-        ] : []),
+        new webpack.optimize.OccurrenceOrderPlugin(),
+        new CleanPlugin([paths.clientOutput, paths.serverOutput], {verbose: false}),
     ],
     debug: !isProduction,
+    cache: true,
     resolve: {
         extensions: [
             "",
@@ -81,24 +85,15 @@ const allShared = {
 
 const assetsShared = {
     ...allShared,
-    entry: [
-        paths.clientEntry,
-    ],
 };
 
-const browser = {
+const browserAssets = {
     ...assetsShared,
+    entry: paths.clientEntry,
     output: {
         path: paths.clientOutput,
         publicPath: "/assets",
         filename: "[name].js",
-    },
-    module: {
-        ...assetsShared.module,
-        loaders: [
-            ...assetsShared.module.loaders,
-            tsloader(!isProduction),
-        ],
     },
     devtool: "source-map",
     plugins: [
@@ -111,25 +106,30 @@ const browser = {
     ],
 };
 
+const serverAssets = {
+    ...assetsShared,
+    target: "node",
+    entry: paths.serverAssetEntry,
+    output: {
+        path: paths.serverOutput,
+        filename: paths.serverAssetFileName,
+        library: "app",
+        libraryTarget: "commonjs",
+    },
+};
+
 const server = {
     ...allShared,
     target: "node",
-    entry: [
-        paths.serverEntry,
-    ],
+    entry: paths.serverEntry,
     output: {
         path: paths.serverOutput,
-        filename: "index.js",
+        filename: paths.serverFileName,
         libraryTarget: 'commonjs',
-    },
-    module: {
-        ...allShared.module,
-        loaders: [
-            ...allShared.module.loaders,
-            tsloader(),
-        ],
+        ...(isProduction ? {} : {library: "app"})
     },
     externals: [
+        {"assets": paths.serverAssetFile},
         /^(?!\.|\/).+/i, // all non-relative imports
     ],
     node: {
@@ -138,4 +138,4 @@ const server = {
     },
 };
 
-export default [browser, server];
+export default [browserAssets, serverAssets, server];

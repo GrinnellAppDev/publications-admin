@@ -16,4 +16,4 @@ import {h, render} from "preact";
 import "./index.scss";
 import App, {ROOT_ID} from "./app";
 
-render(<App/>, document.body, document.getElementById(ROOT_ID));
+render(<App initialState={null}/>, document.body, document.getElementById(ROOT_ID));
