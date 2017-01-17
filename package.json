@@ -3,7 +3,7 @@
     "version": "0.0.0",
     "license": "GPL-3.0",
     "scripts": {
-        "lint": "tslint src/*",
+        "lint": "tslint --project tsconfig.json",
         "build": "NODE_ENV=production webpack",
         "build:deploy": "rm -rf build/node_modules && yarn run build || npm run build && yarn install --modules-folder build/node_modules --prod || npm install -C build --prod",
         "serve": "babel-node watch.js",
