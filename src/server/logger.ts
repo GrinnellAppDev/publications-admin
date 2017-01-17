@@ -10,7 +10,7 @@
 
 import * as httpEmojis from "http-status-emojis";
 import * as padLeft from "pad-left";
-import * as colors from "colors/safe";
+import {gray, red, green, blue, yellow, cyan, magenta} from "colors/safe";
 import {Request, Response, NextFunction} from "express";
 
 type TemplateFunction<T> = (strings: TemplateStringsArray, ...values: any[]) => T;
@@ -43,7 +43,7 @@ function getPrefix(): string {
     const tzHours = Math.floor(tz / 60);
     const tzMinutes = tz % 60;
     const tzSign = tz > 0 ? "-" : "+"; // it's swapped on purpose
-    return colors.gray(
+    return gray(
         padNums(2, "0") `[${month}/${day}/${year} ${hour}:${minute}:${second}
                           UTC${tzSign}${tzHours}${tzMinutes}]`
     );
@@ -54,12 +54,12 @@ export function log(message: string): void {
 }
 
 export function warn(message: string): void {
-    const coloredMessage = colors.yellow(message);
+    const coloredMessage = yellow(message);
     console.info(`${getPrefix()} ${coloredMessage}`);
 }
 
 export function error(message: string): void {
-    const coloredMessage = colors.red(message);
+    const coloredMessage = red(message);
     console.info(`${getPrefix()} ${coloredMessage}`);
 }
 
@@ -73,15 +73,15 @@ function coloredStatus(status: string | number): string {
     const str = String(status);
     switch (Math.floor(Number(status) / 100)) {
         case 1:
-            return colors.gray(str);
+            return gray(str);
         case 2:
-            return colors.green(str);
+            return green(str);
         case 3:
-            return colors.magenta(str);
+            return magenta(str);
         case 4:
-            return colors.yellow(str);
+            return yellow(str);
         case 5:
-            return colors.red(str);
+            return red(str);
         default:
             return str;
     }
@@ -96,14 +96,14 @@ function coloredStatus(status: string | number): string {
 function coloredMethod(method: string): string {
     switch (method.toLowerCase()) {
         case "get":
-            return colors.gray(method);
+            return gray(method);
         case "post":
-            return colors.blue(method);
+            return blue(method);
         case "put":
         case "patch":
-            return colors.magenta(method);
+            return magenta(method);
         case "delete":
-            return colors.cyan(method);
+            return cyan(method);
         default:
             return method;
     }
@@ -116,7 +116,7 @@ export default function logger(request: Request, response: Response, next: NextF
         const statusStr = coloredStatus(status);
         const method = coloredMethod(request.method);
         const requestUri = request.originalUrl;
-        log(`${emoji} ${statusStr} ${colors.gray("←")} ${method} ${requestUri}`);
+        log(`${emoji} ${statusStr} ${gray("←")} ${method} ${requestUri}`);
     });
     next();
 }
