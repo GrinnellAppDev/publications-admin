@@ -107,7 +107,6 @@ const server = {
         ...(isProduction ? {} : {library: "app"})
     },
     externals: [
-        {"assets": paths.serverAssetFile},
         /^(?!\.|\/).+/i, // all non-relative imports
     ],
     node: {
