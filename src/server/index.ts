@@ -9,8 +9,9 @@
  */
 
 import app from "./app";
+import {log} from "./logger";
 
 const port = Number(process.argv[2]) || 5000;
 app.listen(port, () => {
-    console.info(`Serving on http://localhost:${port}`);
+    log(`Serving on http://localhost:${port}`);
 });
