@@ -4,7 +4,7 @@
     "license": "GPL-3.0",
     "scripts": {
         "lint": "tslint --project tsconfig.json",
-        "build": "NODE_ENV=production webpack",
+        "build": "rm -rf build/node_modules && NODE_ENV=production webpack",
         "build:deploy": "rm -rf build/node_modules && yarn run build || npm run build && yarn install --modules-folder build/node_modules --prod || npm install -C build --prod",
         "serve": "babel-node watch.js",
         "serve:build": "cd build && NODE_ENV=production node server/index.js"
