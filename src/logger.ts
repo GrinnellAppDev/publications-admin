@@ -1,5 +1,5 @@
 /**
- * server/logger.js
+ * logger.ts
  *
  * Created by Zander Otavka on 1/11/16.
  * Copyright (C) 2016 Zander Otavka.  All rights reserved.

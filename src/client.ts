@@ -1,5 +1,5 @@
 /**
- * client/index.tsx
+ * client.ts
  *
  * Created by Zander Otavka on 1/15/17.
  * Copyright (C) 2016 Zander Otavka.  All rights reserved.
@@ -13,7 +13,6 @@ import "whatwg-fetch";
 
 import {h, render} from "preact";
 
-import "./index.scss";
-import App, {ROOT_ID} from "./app";
+import App, {ROOT_ID} from "./app/app";
 
-render(<App initialState={null} />, document.body, document.getElementById(ROOT_ID));
+render(h(App, {}), document.body, document.getElementById(ROOT_ID));

@@ -9,34 +9,39 @@
  */
 
 import path from "path";
+import fs from "fs";
 import webpack from "webpack";
 import browserSync from "browser-sync";
 import debounce from "debounce";
 
 import webpackConfig, {paths} from "./webpack.config.babel";
 
-const proxyPort = Number(process.argv[2]) || 3000;
-const expressPort = proxyPort + 10;
+const browserSyncPort = Number(process.argv[2]) || 3000;
+const expressPort = browserSyncPort + 10;
 
 const browserSyncServer = browserSync.create();
 browserSyncServer.init({
     proxy: `localhost:${expressPort}`,
-    port: proxyPort,
+    port: browserSyncPort,
     open: false,
 });
 
 let listener = null;
 function restartExpressServer() {
-    Object.keys(require.cache).forEach(key => {
-        if (key.indexOf(paths.serverOutput) === 0)
-            delete require.cache[key];
-    });
+    const serverFile = require.resolve(path.join(paths.build, "main"));
+    delete require.cache[serverFile];
 
     if (listener) listener.close();
-    listener = require(paths.serverOutputFile).app.default.listen(expressPort, console.error);
+    listener = require(serverFile).app.default.listen(expressPort, console.error);
 
     browserSyncServer.reload();
 }
 
+try {
+    fs.mkdirSync(paths.build);
+} catch (e) {
+    console.info(`Path "${paths.build}" already exists.`);
+}
+
 process.chdir(paths.build);
-webpack(webpackConfig).watch({}, debounce(restartExpressServer, 500));
+webpack(webpackConfig).watch({}, debounce(restartExpressServer, 700));

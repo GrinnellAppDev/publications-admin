@@ -2,29 +2,23 @@ import webpack from "webpack";
 import path from "path";
 
 import HtmlPlugin from "html-webpack-plugin";
-import CleanPlugin from "clean-webpack-plugin";
 
 import packageConfig from "./package.json";
 import tslintConfig from "./tslint.json";
 
 const isProduction = process.env.NODE_ENV === "production";
 
-const src = path.resolve("src");
-const build = isProduction ? path.resolve("build") : path.resolve(".tmp");
-const serverOutput = path.resolve(build, "server");
-
 export const paths = {
-    src,
-    clientEntry: path.resolve(src, "client/index.tsx"),
-    clientHtml: path.resolve(src, "client/index.html"),
-    serverEntry: path.resolve(src, "server", isProduction ? "index.ts" : "app.ts"),
-    build,
-    clientOutput: path.resolve(build, "client"),
-    serverOutput,
-    serverOutputFile: path.join(serverOutput, "index.js"),
+    htmlTemplate: path.resolve("src/template.html"),
+    clientEntry: path.resolve("src/client"),
+    serverEntry: path.resolve("src", isProduction ? "run" : "server"),
+    build: isProduction ? path.resolve("build") : path.resolve(".tmp"),
 };
 
 const shared = {
+    output: {
+        filename: "[name].js",
+    },
     module: {
         preLoaders: [
             {
@@ -41,10 +35,6 @@ const shared = {
             {
                 test: /.json$/,
                 loaders: ["json"],
-            },
-            {
-                test: /\.scss$/,
-                loaders: ["style", "css", "sass"],
             },
         ],
     },
@@ -80,9 +70,19 @@ const browserAssets = {
     ...shared,
     entry: paths.clientEntry,
     output: {
-        path: paths.clientOutput,
+        ...shared.output,
+        path: path.resolve(paths.build, "assets"),
         publicPath: "/assets",
-        filename: "[name].js",
+    },
+    module: {
+        ...shared.module,
+        loaders: [
+            ...shared.module.loaders,
+            {
+                test: /\.scss$/,
+                loaders: ["style", "css", "sass"],
+            },
+        ],
     },
     devtool: "source-map",
     plugins: [
@@ -90,9 +90,8 @@ const browserAssets = {
         // todo: generate an html file for each chunk
         new HtmlPlugin({
             inject: false,
-            template: paths.clientHtml,
+            template: paths.htmlTemplate,
         }),
-        new CleanPlugin([paths.clientOutput]),
     ],
 };
 
@@ -101,10 +100,20 @@ const server = {
     target: "node",
     entry: paths.serverEntry,
     output: {
-        path: paths.serverOutput,
-        filename: path.basename(paths.serverOutputFile),
-        libraryTarget: 'commonjs',
+        ...shared.output,
+        path: paths.build,
+        libraryTarget: "commonjs",
         ...(isProduction ? {} : {library: "app"})
+    },
+    module: {
+        ...shared.module,
+        loaders: [
+            ...shared.module.loaders,
+            {
+                test: /\.scss$/,
+                loader: "null",
+            },
+        ],
     },
     externals: [
         /^(?!\.|\/).+/i, // all non-relative imports
@@ -115,7 +124,6 @@ const server = {
     },
     plugins: [
         ...shared.plugins,
-        new CleanPlugin([paths.serverOutput]),
     ]
 };
 

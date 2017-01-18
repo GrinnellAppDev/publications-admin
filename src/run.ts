@@ -1,5 +1,5 @@
 /**
- * index.scss
+ * run.ts
  *
  * Created by Zander Otavka on 1/16/17.
  * Copyright (C) 2016 Zander Otavka.  All rights reserved.
@@ -8,19 +8,10 @@
  * See the accompanying file LICENSE or http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
-* {
-    box-sizing: border-box;
-}
+import server from "./server";
+import {log} from "./logger";
 
-a {
-    color: inherit;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-.foo {
-    font-style: italic;
-}
+const port = Number(process.argv[2]) || 5000;
+server.listen(port, () => {
+    log(`Serving on http://localhost:${port}`);
+});

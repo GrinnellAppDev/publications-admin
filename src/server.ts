@@ -1,5 +1,5 @@
 /**
- * server/app.ts
+ * server.ts
  *
  * Created by Zander Otavka on 1/16/17.
  * Copyright (C) 2016 Zander Otavka.  All rights reserved.
@@ -12,21 +12,21 @@ import * as express from "express";
 import {resolve} from "path";
 import {mustache} from "consolidate";
 
+import {h} from "preact";
 import * as render from "preact-render-to-string";
-import ClientApp from "../client/app";
+import App from "./app/app";
 
 import logger from "./logger";
 
 const app = express();
 app.engine("html", mustache);
-app.set("views", resolve("client"));
+app.set("views", resolve("assets"));
 
 app.use(logger);
 
-app.use("/assets", express.static(resolve("client")));
+app.use("/assets", express.static(resolve("assets")));
 app.get("/", (req, resp) => {
-    const initialState = null;
-    resp.render("index.html", {renderedDOM: render(ClientApp({initialState}))});
+    resp.render("index.html", {renderedDOM: render(h(App, {}))});
 });
 
 app.use((request, response) => {
