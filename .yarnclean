@@ -43,3 +43,4 @@ Gruntfile.js
 
 # custom exclusions
 !tslint/lib/test
+!svgo/.svgo.yml

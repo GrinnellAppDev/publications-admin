@@ -8,10 +8,12 @@
  * See the accompanying file LICENSE or http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
+import {magenta} from "colors/safe";
+
 import server from "./server";
-import {log} from "./logger";
+import {info} from "./logger";
 
 const port = Number(process.argv[2]) || 5000;
 server.listen(port, () => {
-    log(`Serving on http://localhost:${port}`);
+    info(magenta(`🍦 Serving on http://localhost:${port}`));
 });

@@ -26,6 +26,10 @@
     <% for (let key in htmlWebpackPlugin.files.chunks) { %>
     <script async src="<%= htmlWebpackPlugin.files.chunks[key].entry %>"></script>
     <% } %>
+
+    {{# preloads }}
+    <link rel="preload" href="{{{ url }}}" />
+    {{/ preloads }}
 </head>
 
 <body>

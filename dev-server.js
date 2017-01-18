@@ -27,11 +27,25 @@ browserSyncServer.init({
 });
 
 let listener = null;
-function restartExpressServer() {
+function restartExpressServer(err, stats) {
+    if (err) {
+        console.error(err);
+    }
+
+    console.info(stats.toString({
+        colors: true,
+        chunks: false,
+        hash: false,
+        version: false,
+    }));
+
     const serverFile = require.resolve(path.join(paths.build, "main"));
     delete require.cache[serverFile];
 
-    if (listener) listener.close();
+    if (listener) {
+        listener.close();
+    }
+
     listener = require(serverFile).app.default.listen(expressPort, console.error);
 
     browserSyncServer.reload();

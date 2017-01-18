@@ -26,7 +26,10 @@ app.use(logger);
 
 app.use("/assets", express.static(resolve("assets")));
 app.get("/", (req, resp) => {
-    resp.render("index.html", {renderedDOM: render(h(App, {}))});
+    resp.render("index.html", {
+        renderedDOM: render(h(App, {})),
+        preloads: false, // todo: add preloads based on route
+    });
 });
 
 app.use((request, response) => {

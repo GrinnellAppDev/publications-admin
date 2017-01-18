@@ -49,7 +49,7 @@ function getPrefix(): string {
     );
 }
 
-export function log(message: string): void {
+export function info(message: string): void {
     console.info(`${getPrefix()} ${message}`);
 }
 
@@ -116,7 +116,7 @@ export default function logger(request: Request, response: Response, next: NextF
         const statusStr = coloredStatus(status);
         const method = coloredMethod(request.method);
         const requestUri = request.originalUrl;
-        log(`${emoji} ${statusStr} ${gray("←")} ${method} ${requestUri}`);
+        info(`${emoji} ${statusStr} ${gray("←")} ${method} ${requestUri}`);
     });
     next();
 }
