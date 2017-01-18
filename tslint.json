@@ -69,6 +69,7 @@
             "check-operator",
             "check-separator",
             "check-type"
-        ]
+        ],
+        "jsx-alignment": false
     }
 }

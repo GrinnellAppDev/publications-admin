@@ -4,9 +4,6 @@ import path from "path";
 import HtmlPlugin from "html-webpack-plugin";
 import ExtractTextPlugin from "extract-text-webpack-plugin";
 
-import packageConfig from "./package.json";
-import tslintConfig from "./tslint.json";
-
 const isProduction = process.env.NODE_ENV === "production";
 
 export const paths = {
@@ -69,7 +66,7 @@ const shared = {
         configFileName: "tsconfig.json",
     },
     tslint: {
-        configuration: tslintConfig,
+        configFile: path.resolve("tslint.json"),
     },
 };
 
