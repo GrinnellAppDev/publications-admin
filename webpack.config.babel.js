@@ -3,6 +3,7 @@ import path from "path";
 
 import HtmlPlugin from "html-webpack-plugin";
 import ExtractTextPlugin from "extract-text-webpack-plugin";
+import InlineManifestPlugin from "inline-manifest-webpack-plugin";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -91,13 +92,18 @@ const browserAssets = {
     devtool: "source-map",
     plugins: [
         ...shared.plugins,
+        new ExtractTextPlugin(isProduction ? "[name].[contenthash].css" : "[name].css", {
+            allChunks: true,
+        }),
+        new webpack.optimize.CommonsChunkPlugin({
+            names: ['vendor', 'manifest'],
+            children: true,
+        }),
+        new InlineManifestPlugin(),
         new HtmlPlugin({
             inject: false,
             template: paths.htmlTemplate,
             minify: isProduction ? htmlMinifierConfig : false,
-        }),
-        new ExtractTextPlugin(isProduction ? "[name].[contenthash].css" : "[name].css", {
-            allChunks: true,
         }),
         ...(isProduction ? [
             new webpack.optimize.UglifyJsPlugin({
