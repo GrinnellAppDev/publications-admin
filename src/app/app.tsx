@@ -22,14 +22,12 @@ import * as React from "react";
 
 import "./app.scss";
 
-export default class App extends React.Component<{}, {}> {
-    render(): JSX.Element {
-        return (
-            <div>
-                <span className="foo">
-                    Hello world, how are you?
-                </span>
-            </div>
-        );
-    }
+export default function App(): JSX.Element {
+    return (
+        <div>
+            <span className="foo">
+                Hello world, how are you?
+            </span>
+        </div>
+    );
 }
