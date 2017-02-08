@@ -30,18 +30,11 @@ const isProduction = process.env.NODE_ENV === "production";
 const DEV_SERVER_PORT = 8080;
 const DEV_SERVER_HOST = "localhost";
 
-export const devServerConfig = {
-    port: DEV_SERVER_PORT,
-    host: DEV_SERVER_HOST,
-    publicPath: `http://${DEV_SERVER_HOST}:${DEV_SERVER_PORT}/`,
-    hot: true,
-};
-
 const paths = {
     htmlTemplate: path.resolve("src/index.html"),
-    clientEntry: path.resolve("src", isProduction ? "client" : "client.dev"),
+    clientEntry: path.resolve("src/client"),
     build: isProduction ? path.resolve("build") : path.resolve(".tmp"),
-    devServer: devServerConfig.publicPath,
+    devServer: `http://${DEV_SERVER_HOST}:${DEV_SERVER_PORT}/`,
 };
 
 const htmlMinifierConfig = {
@@ -51,20 +44,17 @@ const htmlMinifierConfig = {
 };
 
 export default {
-    entry: [
-        ...(isProduction ? [
-        ] : [
-            "react-hot-loader/patch",
-            "webpack-dev-server/client?" + paths.devServer,
-            "webpack/hot/only-dev-server",
-        ]),
-        paths.clientEntry,
-    ],
+    entry: paths.clientEntry,
 
     output: {
         filename: isProduction ? "[name].[hash].js" : "[name].js",
         path: paths.build,
         publicPath: isProduction ? "/" : paths.devServer,
+    },
+
+    devServer: {
+        port: DEV_SERVER_PORT,
+        host: DEV_SERVER_HOST,
     },
 
     cache: true,
@@ -81,9 +71,6 @@ export default {
             {
                 test: /\.tsx?$/,
                 use: [
-                    {
-                        loader: "react-hot-loader/webpack",
-                    },
                     {
                         loader: "babel-loader",
                         options: {
@@ -180,8 +167,6 @@ export default {
                 },
             }),
         ] : [
-            new webpack.HotModuleReplacementPlugin(),
-            new webpack.NamedModulesPlugin(),
         ]),
     ],
 

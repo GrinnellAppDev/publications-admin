@@ -5,7 +5,7 @@
     "scripts": {
         "lint": "tslint --project tsconfig.json",
         "build": "rm -rf build && NODE_ENV=production webpack",
-        "serve": "babel-node dev-server.js",
+        "serve": "webpack-dev-server",
         "serve:build": "cd build && http-server",
         "start": "yarn run build || npm run build && yarn run serve:build || npm run serve:build"
     },

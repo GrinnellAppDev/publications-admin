@@ -27,7 +27,7 @@ export default class App extends React.Component<{}, {}> {
         return (
             <div>
                 <span className="foo">
-                    Hello world, how are you doing?
+                    Hello world, how are you?
                 </span>
             </div>
         );
