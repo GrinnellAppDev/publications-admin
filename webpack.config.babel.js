@@ -7,11 +7,21 @@ import InlineManifestPlugin from "inline-manifest-webpack-plugin";
 
 const isProduction = process.env.NODE_ENV === "production";
 
-export const paths = {
+const DEV_SERVER_PORT = 8080;
+const DEV_SERVER_HOST = "localhost";
+
+export const devServerConfig = {
+    port: DEV_SERVER_PORT,
+    host: DEV_SERVER_HOST,
+    publicPath: `http://${DEV_SERVER_HOST}:${DEV_SERVER_PORT}/`,
+    hot: true,
+};
+
+const paths = {
     htmlTemplate: path.resolve("src/index.html"),
-    clientEntry: path.resolve("src/client"),
-    serverEntry: path.resolve("src", isProduction ? "run" : "server"),
+    clientEntry: path.resolve("src", isProduction ? "client" : "client.dev"),
     build: isProduction ? path.resolve("build") : path.resolve(".tmp"),
+    devServer: devServerConfig.publicPath,
 };
 
 const htmlMinifierConfig = {
@@ -20,93 +30,108 @@ const htmlMinifierConfig = {
     removeAttributeQuotes: true,
 };
 
-const shared = {
+export default {
+    entry: [
+        ...(isProduction ? [
+        ] : [
+            "react-hot-loader/patch",
+            "webpack-dev-server/client?" + paths.devServer,
+            "webpack/hot/only-dev-server",
+        ]),
+        paths.clientEntry,
+    ],
+
+    output: {
+        filename: isProduction ? "[name].[hash].js" : "[name].js",
+        path: paths.build,
+        publicPath: isProduction ? "/" : paths.devServer,
+    },
+
+    cache: true,
+
+    devtool: "source-map",
+
     module: {
-        preLoaders: [
-            {
-                test: /\.tsx$/,
-                loader: "tslint",
-            },
-        ],
-        loaders: [
+        rules: [
             {
                 test: /\.tsx?$/,
-                loader: "ts",
+                loader: "tslint-loader",
+                enforce: "pre",
             },
             {
-                test: /.json$/,
-                loaders: ["json"],
+                test: /\.tsx?$/,
+                use: [
+                    {
+                        loader: "react-hot-loader/webpack",
+                    },
+                    {
+                        loader: "babel-loader",
+                        options: {
+                            presets: [
+                                ["es2015", {modules: false}]
+                            ],
+                        },
+                    },
+                    {
+                        loader: "ts-loader",
+                    },
+                ],
+            },
+            {
+                test: /\.scss$/,
+                use: ExtractTextPlugin.extract({
+                    use: ["css-loader", "sass-loader"],
+                }),
+            },
+            {
+                test: /\.js/,
+                loader: "babel-loader",
+                include: path.resolve('node_modules/preact-compat/src'),
             },
         ],
     },
+
     plugins: [
-        new webpack.NoErrorsPlugin(),
-        new webpack.optimize.OccurrenceOrderPlugin(true),
+        new webpack.NoEmitOnErrorsPlugin(),
+
         new webpack.optimize.AggressiveMergingPlugin({}),
+
         new webpack.DefinePlugin({
             "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
         }),
-    ],
-    debug: !isProduction,
-    cache: true,
-    resolve: {
-        extensions: [
-            "",
-            ".webpack.js",
-            ".web.js",
-            ".js",
-            ".ts",
-            ".tsx",
-        ],
-        alias: {
-            "react": "preact-compat",
-            "react-dom": "preact-compat",
-        },
-    },
-    ts: {
-        configFileName: "tsconfig.json",
-    },
-    tslint: {
-        configFile: path.resolve("tslint.json"),
-    },
-};
 
-const browserAssets = {
-    ...shared,
-    entry: paths.clientEntry,
-    output: {
-        filename: isProduction ? "[name].[hash].js" : "[name].js",
-        path: path.resolve(paths.build, "assets"),
-        publicPath: "/assets",
-    },
-    module: {
-        ...shared.module,
-        loaders: [
-            ...shared.module.loaders,
-            {
-                test: /\.scss$/,
-                loader: ExtractTextPlugin.extract(["css", "sass"]),
+        new webpack.LoaderOptionsPlugin({
+            debug: !isProduction,
+            ts: {
+                configFileName: "tsconfig.json",
             },
-        ],
-    },
-    devtool: "source-map",
-    plugins: [
-        ...shared.plugins,
-        new ExtractTextPlugin(isProduction ? "[name].[contenthash].css" : "[name].css", {
+            tslint: {
+                configFile: path.resolve("tslint.json"),
+            },
+        }),
+
+        new ExtractTextPlugin({
+            filename: isProduction ? "[name].[contenthash].css" : "[name].css",
             allChunks: true,
         }),
+
         new webpack.optimize.CommonsChunkPlugin({
             names: ['vendor', 'manifest'],
             children: true,
         }),
+
         new InlineManifestPlugin(),
+
         new HtmlPlugin({
             inject: false,
             template: paths.htmlTemplate,
             minify: isProduction ? htmlMinifierConfig : false,
         }),
+
         ...(isProduction ? [
             new webpack.optimize.UglifyJsPlugin({
+                sourceMap: true,
+                minimize: true,
                 compress: {
                     drop_console: true,
                     screw_ie8: true,
@@ -135,50 +160,26 @@ const browserAssets = {
                 },
             }),
         ] : [
+            new webpack.HotModuleReplacementPlugin(),
+            new webpack.NamedModulesPlugin(),
         ]),
     ],
-};
 
-const server = {
-    ...shared,
-    target: "node",
-    entry: paths.serverEntry,
-    output: {
-        filename: "main.js",
-        path: paths.build,
-        libraryTarget: "commonjs",
-        ...(isProduction ? {} : {library: "app"})
-    },
-    module: {
-        ...shared.module,
-        loaders: [
-            ...shared.module.loaders,
-            {
-                test: /\.scss$/,
-                loader: "null",
-            },
+    resolve: {
+        extensions: [
+            ".webpack.js",
+            ".web.js",
+            ".js",
+            ".ts",
+            ".tsx",
         ],
-    },
-    externals: [
-        /^(?!\.|\/).+/i, // all non-relative imports
-    ],
-    node: {
-        __dirname: false,
-        __filename: false,
-    },
-    plugins: [
-        ...shared.plugins,
-        ...(isProduction ? [
-            new webpack.optimize.UglifyJsPlugin({
-                compress: {
-                    screw_ie8: true,
-                    dead_code: true,
-                    warnings: false,
-                },
-            }),
-        ] : [
-        ]),
-    ]
-};
 
-export default [browserAssets, server];
+        ...(isProduction ? {
+            alias: {
+                "react": "preact-compat",
+                "react-dom": "preact-compat",
+            },
+        } : {
+        }),
+    },
+};

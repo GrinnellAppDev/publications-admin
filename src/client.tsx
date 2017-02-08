@@ -1,5 +1,5 @@
 /**
- * client.ts
+ * client.tsx
  *
  * Created by Zander Otavka on 1/15/17.
  * Copyright (C) 2016 Zander Otavka.  All rights reserved.
@@ -11,8 +11,9 @@
 import "es6-promise";
 import "whatwg-fetch";
 
-import {h, render} from "preact";
+import * as React from "react";
+import {render} from "react-dom";
 
-import App, {ROOT_ID} from "./app/app";
+import App from "./app/App";
 
-render(h(App, {}), document.body, document.getElementById(ROOT_ID));
+render(<App/>, document.getElementById("root"));

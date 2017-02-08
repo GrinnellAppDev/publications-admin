@@ -13,23 +13,19 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Ride Along</title>
+    <title>Publications</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
 
     <% for (let key in htmlWebpackPlugin.files.css) { %>
-    <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[key] %>" />
+        <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[key] %>" />
     <% } %>
 
     <%= htmlWebpackPlugin.files.webpackManifest %>
 
     <% for (let key in htmlWebpackPlugin.files.chunks) { %>
-    <script async src="<%= htmlWebpackPlugin.files.chunks[key].entry %>"></script>
+        <script defer src="<%= htmlWebpackPlugin.files.chunks[key].entry %>"></script>
     <% } %>
-
-    {{# preloads }}
-    <link rel="preload" href="{{{ url }}}" />
-    {{/ preloads }}
 </head>
 
 <body>
@@ -41,7 +37,7 @@
         </p>
     <![endif]-->
 
-    {{{renderedDOM}}}
+    <div id="root"></div>
 </body>
 
 </html>

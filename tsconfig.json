@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
         "jsx": "react",
-        "jsxFactory": "h",
         "moduleResolution": "node",
         "sourceMap": true,
         "emitDecoratorMetadata": true,
@@ -10,7 +9,7 @@
         "noImplicitAny": false,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
-        "target": "es5",
+        "target": "es2015",
         "lib": [
             "dom",
             "dom.iterable",
