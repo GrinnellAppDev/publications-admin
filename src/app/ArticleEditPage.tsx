@@ -106,20 +106,20 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
     render(): JSX.Element {
         const {model, isLoading, submissionState} = this.state;
 
-        return isLoading ?
+        return isLoading ? (
             <div>Loading...</div>
-            :
+        ) : (
             <form onSubmit={this.onSubmit} style={{margin: "16px 20%"}}>
                 <h1>
                     {model.id ? "Edit" : "Create"} Article
                 </h1>
-                {submissionState === SubmissionState.ERRORED ?
+                {submissionState === SubmissionState.ERRORED ? (
                     <div>There was a problem submitting your article.</div>
-                    : submissionState === SubmissionState.SUBMITTING ?
+                ) : submissionState === SubmissionState.SUBMITTING ? (
                     <div>Submitting...</div>
-                    :
+                ) : (
                     ""
-                }
+                )}
                 <input
                     name="title" type="text" onChange={this.onTitleChange} value={model.title}
                     style={{width: "100%", fontSize: "1.3rem", fontWeight: "bold"}}
@@ -133,6 +133,7 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
                     }}
                     onChange={this.onContentChange} value={model.content} />
                 <input type="submit" />
-            </form>;
+            </form>
+        );
     }
 }

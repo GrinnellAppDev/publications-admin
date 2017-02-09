@@ -84,9 +84,9 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
 
                     <button onClick={this.onRefresh}>Refresh</button>
 
-                    {isLoading ?
+                    {isLoading ? (
                         <section>Loading...</section>
-                        :
+                    ) : (
                         <section>
                             {articles.map(article =>
                                 <Article
@@ -94,7 +94,7 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
                                     onDelete={this.onArticleDelete} />
                             )}
                         </section>
-                    }
+                    )}
                 </main>
             </div>
         );
