@@ -30,6 +30,9 @@ const isProduction = process.env.NODE_ENV === "production";
 const DEV_SERVER_PORT = 8080;
 const DEV_SERVER_HOST = "localhost";
 
+const DEV_API_ROOT = "https://g2j7qs2xs7.execute-api.us-west-2.amazonaws.com/devstable";
+const PRODUCTION_API_ROOT = "https://3iqnjzs7w1.execute-api.us-west-2.amazonaws.com/production";
+
 const paths = {
     htmlTemplate: path.resolve("src/index.html"),
     clientEntry: path.resolve("src/client"),
@@ -106,7 +109,7 @@ export default {
         new webpack.DefinePlugin({
             "process.env": {
                 NODE_ENV: JSON.stringify(process.env.NODE_ENV),
-                API_ROOT: isProduction ? "" : "'https://cpckj13abg.execute-api.us-west-2.amazonaws.com/zander'",
+                API_ROOT: JSON.stringify(isProduction ? PRODUCTION_API_ROOT : DEV_API_ROOT),
             },
         }),
 
