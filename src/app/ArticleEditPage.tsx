@@ -45,6 +45,16 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
         },
     };
 
+    componentDidMount(): void {
+        const {params} = this.props;
+
+        if (params.articleId) {
+            api.articles.get(params.publicationId, params.articleId).then(model => {
+                this.setState({model});
+            });
+        }
+    }
+
     private onTitleChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
         const title = ev.target.value;
         this.setState(({model}) => ({
