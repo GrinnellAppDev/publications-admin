@@ -31,14 +31,22 @@ interface RouteParams {
 
 type Props = RouteComponentProps<RouteParams, {}>;
 
+enum SubmissionState {
+    EDITING,
+    SUBMITTING,
+    ERRORED
+}
+
 interface State {
     model: ArticleModel;
     isLoading: boolean;
+    submissionState: SubmissionState;
 }
 
 export default class ArticleEditPage extends React.PureComponent<Props, State> {
     state: State = {
         isLoading: false,
+        submissionState: SubmissionState.EDITING,
         model: {
             id: "",
             publication: "",
@@ -49,6 +57,7 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
 
     componentDidMount(): void {
         const {params} = this.props;
+        this.setState({submissionState: SubmissionState.EDITING});
 
         if (params.articleId) {
             this.setState({isLoading: true});
@@ -75,6 +84,8 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
     private onSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
         ev.preventDefault();
 
+        this.setState({submissionState: SubmissionState.SUBMITTING});
+
         const {params, router} = this.props;
         const {model} = this.state;
 
@@ -87,19 +98,31 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
 
         promise.then(() => {
             router.goBack();
+        }).catch(err => {
+            this.setState({submissionState: SubmissionState.ERRORED});
         });
     }
 
     render(): JSX.Element {
-        const {model, isLoading} = this.state;
+        const {model, isLoading, submissionState} = this.state;
 
         return isLoading ?
             <div>Loading...</div>
             :
             <form onSubmit={this.onSubmit} style={{margin: "16px 20%"}}>
+                <h1>
+                    {model.id ? "Edit" : "Create"} Article
+                </h1>
+                {submissionState === SubmissionState.ERRORED ?
+                    <div>There was a problem submitting your article.</div>
+                    : submissionState === SubmissionState.SUBMITTING ?
+                    <div>Submitting...</div>
+                    :
+                    ""
+                }
                 <input
-                    name="title" type="text" onChange={this.onTitleChange}
-                    value={model.title} style={{width: "100%", fontSize: "1.3rem"}}
+                    name="title" type="text" onChange={this.onTitleChange} value={model.title}
+                    style={{width: "100%", fontSize: "1.3rem", fontWeight: "bold"}}
                     placeholder="Title" autoComplete="off" />
                 <textarea
                     name="content" style={{
