@@ -19,7 +19,7 @@
  */
 
 import * as React from "react";
-import {RouteComponentProps} from "react-router";
+import {RouteComponentProps, Link} from "react-router";
 
 import {ArticleModel} from "./models";
 import api from "./api";
@@ -104,12 +104,17 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
     }
 
     render(): JSX.Element {
+        const {params} = this.props;
         const {model, isLoading, submissionState} = this.state;
 
         return isLoading ? (
             <div>Loading...</div>
         ) : (
             <form onSubmit={this.onSubmit} style={{margin: "16px 20%"}}>
+                <Link to={`/publications/${params.publicationId}/articles`}>
+                    <button>Back</button>
+                </Link>
+
                 <h1>
                     {model.id ? "Edit" : "Create"} Article
                 </h1>
