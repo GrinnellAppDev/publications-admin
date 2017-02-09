@@ -1,7 +1,7 @@
 /**
- * App.tsx
+ * Article.tsx
  *
- * Created by Zander Otavka on 1/16/17.
+ * Created by Zander Otavka on 2/8/16.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,27 +19,32 @@
  */
 
 import * as React from "react";
-import {Router, Route, Redirect, hashHistory} from "react-router";
 
-import ArticleListPage from "./ArticleListPage";
-
-import "./app.scss";
-
-function NotFound(): JSX.Element {
-    return (
-        <div>
-            <h1>404 Not Found</h1>
-            <a href="#">Home</a>
-        </div>
-    );
+export interface ArticleEditModel {
+    content: string;
+    title: string;
 }
 
-export default function App(): JSX.Element {
+export interface ArticleModel extends ArticleEditModel {
+    id: string;
+    publicationId: string;
+}
+
+interface Props {
+    model: ArticleModel;
+    onDelete: (id: string) => void;
+}
+
+export default function Article({model, onDelete}: Props): JSX.Element {
+    const onDeleteClick = () => {
+        onDelete(model.id);
+    };
+
     return (
-        <Router history={hashHistory}>
-            <Redirect from="/" to="/articles" />
-            <Route path="/articles" component={ArticleListPage} />
-            <Route path="*" component={NotFound} />
-        </Router>
+        <article>
+            <h2>{model.title}</h2>
+            <button onClick={onDeleteClick}>Delete</button>
+            <section>{model.content}</section>
+        </article>
     );
 }
