@@ -36,12 +36,13 @@ export default function Article({model, onDelete}: Props): JSX.Element {
     return (
         <article style={{margin: "20px 0"}}>
             <h2 style={{marginBottom: "0"}}>{model.title}</h2>
-            <section>{model.content}</section>
 
             <Link to={`/publications/${model.publicationId}/articles/edit/${model.id}`}>
                 <button>Edit</button>
             </Link>
             <button onClick={onDeleteClick}>Delete</button>
+
+            <section>{model.content}</section>
         </article>
     );
 }
