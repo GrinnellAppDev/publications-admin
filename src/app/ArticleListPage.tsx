@@ -75,7 +75,7 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
         const {articles, isLoading} = this.state;
 
         return (
-            <div>
+            <div style={{margin: "16px 20%"}}>
                 <h1>Articles</h1>
                 <main>
                     <Link to={`/publications/${params.publicationId}/articles/new`}>

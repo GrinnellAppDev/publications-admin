@@ -50,7 +50,7 @@ export default class PublicationsListPage extends React.PureComponent<Props, Sta
         const {publications} = this.state;
 
         return (
-            <div>
+            <div style={{margin: "16px 20%"}}>
                 <h1>Publications</h1>
                 <section>
                     {publications.map(publication =>

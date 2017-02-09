@@ -92,13 +92,19 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
         return isLoading ?
             <div>Loading...</div>
             :
-            <form onSubmit={this.onSubmit}>
+            <form onSubmit={this.onSubmit} style={{margin: "16px 20%"}}>
                 <input
                     name="title" type="text" onChange={this.onTitleChange}
-                    value={model.title} />
+                    value={model.title} style={{width: "100%", fontSize: "1.3rem"}}
+                    placeholder="Title" />
                 <textarea
-                    name="content" style={{display: "block"}} onChange={this.onContentChange}
-                    value={model.content} />
+                    name="content" style={{
+                        display: "block",
+                        width: "100%",
+                        height: "50vh",
+                        fontSize: "1rem",
+                    }}
+                    onChange={this.onContentChange} value={model.content} />
                 <input type="submit" />
             </form>;
     }
