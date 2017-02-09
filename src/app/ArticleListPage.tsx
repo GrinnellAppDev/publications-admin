@@ -33,16 +33,24 @@ type Props = RouteComponentProps<RouteParams, {}>;
 
 interface State {
     articles: ArticleModel[];
+    isLoading: boolean;
 }
 
 export default class ArticleListPage extends React.PureComponent<Props, State> {
     state: State = {
-        articles: []
+        articles: [],
+        isLoading: false,
     };
 
     private reload(): Promise<void> {
+        if (this.state.isLoading) {
+            return Promise.reject(new Error("Already loading."));
+        }
+
+        this.setState({isLoading: true});
+
         return api.articles.list(this.props.params.publicationId).then(articles => {
-            this.setState({articles});
+            this.setState({articles, isLoading: false});
         });
     }
 
@@ -58,9 +66,13 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
         }));
     }
 
+    private onRefresh = (): void => {
+        this.reload();
+    }
+
     render(): JSX.Element {
         const {params} = this.props;
-        const {articles} = this.state;
+        const {articles, isLoading} = this.state;
 
         return (
             <div>
@@ -70,13 +82,19 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
                         <button>New Article</button>
                     </Link>
 
-                    <section>
-                        {articles.map(article =>
-                            <Article
-                                key={article.id} model={article}
-                                onDelete={this.onArticleDelete} />
-                        )}
-                    </section>
+                    <button onClick={this.onRefresh}>Refresh</button>
+
+                    {isLoading ?
+                        <section>Loading...</section>
+                        :
+                        <section>
+                            {articles.map(article =>
+                                <Article
+                                    key={article.id} model={article}
+                                    onDelete={this.onArticleDelete} />
+                            )}
+                        </section>
+                    }
                 </main>
             </div>
         );

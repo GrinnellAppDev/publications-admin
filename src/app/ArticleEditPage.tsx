@@ -33,10 +33,12 @@ type Props = RouteComponentProps<RouteParams, {}>;
 
 interface State {
     model: ArticleModel;
+    isLoading: boolean;
 }
 
 export default class ArticleEditPage extends React.PureComponent<Props, State> {
     state: State = {
+        isLoading: false,
         model: {
             id: "",
             publicationId: "",
@@ -49,8 +51,9 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
         const {params} = this.props;
 
         if (params.articleId) {
+            this.setState({isLoading: true});
             api.articles.get(params.publicationId, params.articleId).then(model => {
-                this.setState({model});
+                this.setState({model, isLoading: false});
             });
         }
     }
@@ -84,9 +87,11 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
     }
 
     render(): JSX.Element {
-        const {model} = this.state;
+        const {model, isLoading} = this.state;
 
-        return (
+        return isLoading ?
+            <div>Loading...</div>
+            :
             <form onSubmit={this.onSubmit}>
                 <input
                     name="title" type="text" onChange={this.onTitleChange}
@@ -95,7 +100,6 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
                     name="content" style={{display: "block"}} onChange={this.onContentChange}
                     value={model.content} />
                 <input type="submit" />
-            </form>
-        );
+            </form>;
     }
 }
