@@ -21,7 +21,9 @@
 import * as React from "react";
 import {RouteComponentProps, Link} from "react-router";
 
-import Article, {ArticleModel} from "./Article";
+import Article from "./Article";
+import {ArticleModel} from "./models";
+import api from "./api";
 
 interface RouteParams {
 }
@@ -34,23 +36,22 @@ interface State {
 
 export default class ArticleListPage extends React.PureComponent<Props, State> {
     state: State = {
-        articles: [
-            {
-                id: "a",
-                publicationId: "s&b",
-                content: "I am an article",
-                title: "My Article",
-            },
-            {
-                id: "b",
-                publicationId: "s&b",
-                content: "I am a different, sensationalist article",
-                title: "Badly Written Article",
-            }
-        ]
+        articles: []
     };
 
+    private reload(): Promise<void> {
+        return api.articles.list().then(articles => {
+            this.setState({articles});
+        });
+    }
+
+    componentDidMount(): void {
+        this.reload();
+    }
+
     private onArticleDelete = (id: string): void => {
+        api.articles.remove(id);
+
         this.setState(({articles}) => ({
             articles: articles.filter(article => article.id !== id)
         }));
@@ -63,7 +64,7 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
             <div>
                 <h1>Articles</h1>
                 <main>
-                    <Link to="/articles/new">New Article</Link>
+                    <Link to="/articles/new"><button>New Article</button></Link>
                     <section>
                         {articles.map(article =>
                             <Article

@@ -1,7 +1,7 @@
 /**
- * Article.tsx
+ * models.tsx
  *
- * Created by Zander Otavka on 2/8/16.
+ * Created by Zander Otavka on 2/8/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,31 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as React from "react";
-import {Link} from "react-router";
-
-import {ArticleModel} from "./models";
-
-interface Props {
-    model: ArticleModel;
-    onDelete: (id: string) => void;
+export interface ArticleEditModel {
+    content: string;
+    title: string;
 }
 
-export default function Article({model, onDelete}: Props): JSX.Element {
-    const onDeleteClick = () => {
-        onDelete(model.id);
-    };
-
-    return (
-        <article>
-            <h2>{model.title}</h2>
-
-            <Link to={`/articles/edit/${model.id}`}>
-                <button>Edit</button>
-            </Link>
-            <button onClick={onDeleteClick}>Delete</button>
-
-            <section>{model.content}</section>
-        </article>
-    );
+export interface ArticleModel extends ArticleEditModel {
+    id: string;
+    publicationId: string;
 }

@@ -21,7 +21,8 @@
 import * as React from "react";
 import {RouteComponentProps} from "react-router";
 
-import {ArticleModel} from "./Article";
+import {ArticleModel} from "./models";
+import api from "./api";
 
 interface RouteParams {
     id?: string;
@@ -59,6 +60,14 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
 
     private onSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
         ev.preventDefault();
+
+        const {model} = this.state;
+        if (model.id) {
+            api.articles.edit(model.id, model);
+        } else {
+            api.articles.create(model);
+        }
+
         this.props.router.goBack();
     }
 
