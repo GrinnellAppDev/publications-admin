@@ -41,7 +41,7 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
         isLoading: false,
         model: {
             id: "",
-            publicationId: "",
+            publication: "",
             title: "",
             content: "",
         },

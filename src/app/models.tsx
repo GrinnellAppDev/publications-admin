@@ -30,5 +30,5 @@ export interface ArticleEditModel {
 
 export interface ArticleModel extends ArticleEditModel {
     id: string;
-    publicationId: string;
+    publication: string;
 }

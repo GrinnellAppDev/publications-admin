@@ -18,60 +18,88 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/// <reference types="whatwg-fetch" />
+
 import {ArticleModel, ArticleEditModel, PublicationModel} from "./models";
 
-// declare const process: any;
-// const API_ROOT: string = process.env.API_ROOT;
+declare const process: any;
+const API_ROOT: string = process.env.API_ROOT;
 
-const EXAMPLE_PUBLICATIONS = [
-    {
-        id: "s&b",
-        name: "Scarlett and Black",
-    },
-];
-
-const EXAMPLE_ARTICLES = [
-    {
-        id: "a",
-        publicationId: "s&b",
-        content: "I am an article",
-        title: "My Article",
-    },
-    {
-        id: "b",
-        publicationId: "s&b",
-        content: "I am a different, sensationalist article",
-        title: "Badly Written Article",
+function checkResponse(resp: Response): Response {
+    if (resp.ok) {
+        return resp;
+    } else {
+        throw new Error("Fetch error.");
     }
-];
+}
 
 export default {
     publications: {
         list(): Promise<PublicationModel[]> {
-            return Promise.resolve(EXAMPLE_PUBLICATIONS);
+            return fetch(`${API_ROOT}/publications`, {
+                method: "GET",
+                mode: "cors",
+            })
+                .then(checkResponse)
+                .then(resp => resp.json())
+                .then((data: any) => {
+                    return data as PublicationModel[];
+                });
         },
     },
 
     articles: {
         list(publicationId: string): Promise<ArticleModel[]> {
-            return Promise.resolve(EXAMPLE_ARTICLES);
+            return fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
+                method: "GET",
+                mode: "cors",
+            })
+                .then(checkResponse)
+                .then(resp => resp.json())
+                .then((data: any) => {
+                    return data as ArticleModel[];
+                });
         },
 
         get(publicationId: string, articleId: string): Promise<ArticleModel> {
-            return Promise.resolve(EXAMPLE_ARTICLES.find(a => a.id === articleId));
+            return fetch(`${API_ROOT}/publications/${publicationId}/articles/${articleId}`, {
+                method: "GET",
+                mode: "cors",
+            })
+                .then(checkResponse)
+                .then(resp => resp.json())
+                .then((data: any) => {
+                    return data as ArticleModel;
+                });
         },
 
         remove(publicationId: string, articleId: string): Promise<void> {
-            // return fetch(`${API_ROOT}/publications/`);
-            return Promise.resolve();
+            return fetch(`${API_ROOT}/publications/${publicationId}/articles/${articleId}`, {
+                method: "DELETE",
+                mode: "cors",
+            })
+                .then(checkResponse)
+                .then(() => undefined);
         },
 
         create(publicationId: string, model: ArticleEditModel): Promise<void> {
-            return Promise.resolve();
+            return fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
+                method: "POST",
+                mode: "cors",
+                body: JSON.stringify(model),
+            })
+                .then(checkResponse)
+                .then(() => undefined);
         },
 
         edit(publicationId: string, articleId: string, model: ArticleEditModel): Promise<void> {
-            return Promise.resolve();
+            return fetch(`${API_ROOT}/publications/${publicationId}/articles/${articleId}`, {
+                method: "PATCH",
+                mode: "cors",
+                body: JSON.stringify(model),
+            })
+                .then(checkResponse)
+                .then(() => undefined);
         },
     },
 };

@@ -12,6 +12,7 @@
     "dependencies": {
         "@types/react": "^15.0.6",
         "@types/react-router": "^3.0.2",
+        "@types/whatwg-fetch": "^0.0.33",
         "es6-promise": "^4.0.5",
         "preact": "^7.1.0",
         "preact-compat": "^3.10.0",
