@@ -23,6 +23,7 @@ import {RouteComponentProps, Link} from "react-router";
 
 import {ArticleModel} from "./models";
 import api from "./api";
+import {pageRootStyle} from "./sharedStyles";
 
 interface RouteParams {
     publicationId: string;
@@ -108,9 +109,9 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
         const {model, isLoading, submissionState} = this.state;
 
         return isLoading ? (
-            <div>Loading...</div>
+            <div style={pageRootStyle}>Loading...</div>
         ) : (
-            <form onSubmit={this.onSubmit} style={{margin: "16px 20%"}}>
+            <form onSubmit={this.onSubmit} style={pageRootStyle}>
                 <Link to={`/publications/${params.publicationId}/articles`}>
                     <button>Back</button>
                 </Link>

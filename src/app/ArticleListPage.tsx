@@ -24,6 +24,7 @@ import {RouteComponentProps, Link} from "react-router";
 import Article from "./Article";
 import {ArticleModel} from "./models";
 import api from "./api";
+import {pageRootStyle} from "./sharedStyles";
 
 interface RouteParams {
     publicationId: string;
@@ -75,7 +76,7 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
         const {articles, isLoading} = this.state;
 
         return (
-            <div style={{margin: "16px 20%"}}>
+            <div style={pageRootStyle}>
                 <Link to="/publications">
                     <button>Back</button>
                 </Link>

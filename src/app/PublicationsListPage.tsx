@@ -23,6 +23,7 @@ import {RouteComponentProps, Link} from "react-router";
 
 import {PublicationModel} from "./models";
 import api from "./api";
+import {pageRootStyle} from "./sharedStyles";
 
 interface RouteOptions {
 }
@@ -31,15 +32,20 @@ type Props = RouteComponentProps<RouteOptions, {}>;
 
 interface State {
     publications: PublicationModel[];
+    isLoading: boolean;
 }
 
 export default class PublicationsListPage extends React.PureComponent<Props, State> {
     state: State = {
+        isLoading: false,
         publications: [],
     };
 
     private reload(): void {
-        api.publications.list().then(publications => this.setState({publications}));
+        this.setState({isLoading: true});
+        api.publications.list().then(publications => {
+            this.setState({publications, isLoading: false});
+        });
     }
 
     componentDidMount(): void {
@@ -47,10 +53,12 @@ export default class PublicationsListPage extends React.PureComponent<Props, Sta
     }
 
     render(): JSX.Element {
-        const {publications} = this.state;
+        const {publications, isLoading} = this.state;
 
-        return (
-            <div style={{margin: "16px 20%"}}>
+        return isLoading ? (
+            <div style={pageRootStyle}>Loading...</div>
+        ) : (
+            <div style={pageRootStyle}>
                 <h1>Publications</h1>
                 <section>
                     {publications.map(publication =>
