@@ -113,6 +113,7 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
                 <h1>
                     {model.id ? "Edit" : "Create"} Article
                 </h1>
+
                 {submissionState === SubmissionState.ERRORED ? (
                     <div>There was a problem submitting your article.</div>
                 ) : submissionState === SubmissionState.SUBMITTING ? (
@@ -120,18 +121,19 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
                 ) : (
                     ""
                 )}
+
                 <input
                     name="title" type="text" onChange={this.onTitleChange} value={model.title}
                     style={{width: "100%", fontSize: "1.3rem", fontWeight: "bold"}}
                     placeholder="Title" autoComplete="off" />
                 <textarea
-                    name="content" style={{
+                    name="content" onChange={this.onContentChange} value={model.content}
+                    style={{
                         display: "block",
                         width: "100%",
                         height: "50vh",
                         fontSize: "0.9rem",
-                    }}
-                    onChange={this.onContentChange} value={model.content} />
+                    }} />
                 <input type="submit" />
             </form>
         );
