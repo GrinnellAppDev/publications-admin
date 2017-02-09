@@ -19,7 +19,7 @@
  */
 
 import * as React from "react";
-import {RouteComponentProps} from "react-router";
+import {RouteComponentProps, Link} from "react-router";
 
 import Article, {ArticleModel} from "./Article";
 
@@ -50,11 +50,6 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
         ]
     };
 
-    private onLinkClick = (ev: React.MouseEvent<HTMLAnchorElement>): void => {
-        ev.preventDefault();
-        this.props.router.push(ev.currentTarget.href);
-    }
-
     private onArticleDelete = (id: string): void => {
         this.setState(({articles}) => ({
             articles: articles.filter(article => article.id !== id)
@@ -68,9 +63,7 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
             <div>
                 <h1>Articles</h1>
                 <main>
-                    <a href="#/articles/new" onClick={this.onLinkClick}>
-                        New Article
-                    </a>
+                    <Link to="/articles/new">New Article</Link>
                     <section>
                         {articles.map(article =>
                             <Article

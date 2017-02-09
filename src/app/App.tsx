@@ -22,6 +22,7 @@ import * as React from "react";
 import {Router, Route, Redirect, hashHistory} from "react-router";
 
 import ArticleListPage from "./ArticleListPage";
+import ArticleEditPage from "./ArticleEditPage";
 
 import "./app.scss";
 
@@ -39,6 +40,8 @@ export default function App(): JSX.Element {
         <Router history={hashHistory}>
             <Redirect from="/" to="/articles" />
             <Route path="/articles" component={ArticleListPage} />
+            <Route path="/articles/new" component={ArticleEditPage} />
+            <Route path="/articles/edit/:id" component={ArticleEditPage} />
             <Route path="*" component={NotFound} />
         </Router>
     );
