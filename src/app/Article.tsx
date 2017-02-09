@@ -34,7 +34,7 @@ export default function Article({model, onDelete}: Props): JSX.Element {
     };
 
     return (
-        <article style={{margin: "20px 0"}}>
+        <article>
             <h2 style={{marginBottom: "0"}}>{model.title}</h2>
 
             <Link to={`/publications/${model.publicationId}/articles/edit/${model.id}`}>
