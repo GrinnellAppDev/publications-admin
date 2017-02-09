@@ -24,6 +24,7 @@ import path from "path";
 import HtmlPlugin from "html-webpack-plugin";
 import ExtractTextPlugin from "extract-text-webpack-plugin";
 import InlineManifestPlugin from "inline-manifest-webpack-plugin";
+import OptimizeCssAssetsPlugin from "optimize-css-assets-webpack-plugin";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -172,6 +173,8 @@ export default {
                     screw_ie8: true,
                 },
             }),
+
+            new OptimizeCssAssetsPlugin(),
         ] : [
         ]),
     ],
