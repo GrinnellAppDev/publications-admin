@@ -18,36 +18,59 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ArticleModel, ArticleEditModel} from "./models";
+import {ArticleModel, ArticleEditModel, PublicationModel} from "./models";
+
+// declare const process: any;
+// const API_ROOT: string = process.env.API_ROOT;
+
+const EXAMPLE_PUBLICATIONS = [
+    {
+        id: "s&b",
+        name: "Scarlett and Black",
+    },
+];
+
+const EXAMPLE_ARTICLES = [
+    {
+        id: "a",
+        publicationId: "s&b",
+        content: "I am an article",
+        title: "My Article",
+    },
+    {
+        id: "b",
+        publicationId: "s&b",
+        content: "I am a different, sensationalist article",
+        title: "Badly Written Article",
+    }
+];
 
 export default {
+    publications: {
+        list(): Promise<PublicationModel[]> {
+            return Promise.resolve(EXAMPLE_PUBLICATIONS);
+        },
+    },
+
     articles: {
-        list(): Promise<ArticleModel[]> {
-            return Promise.resolve([
-                {
-                    id: "a",
-                    publicationId: "s&b",
-                    content: "I am an article",
-                    title: "My Article",
-                },
-                {
-                    id: "b",
-                    publicationId: "s&b",
-                    content: "I am a different, sensationalist article",
-                    title: "Badly Written Article",
-                }
-            ]);
+        list(publicationId: string): Promise<ArticleModel[]> {
+            return Promise.resolve(EXAMPLE_ARTICLES);
         },
 
-        remove(id: string): Promise<void> {
+        get(publicationId: string, articleId: string): Promise<ArticleModel> {
+            return Promise.resolve(EXAMPLE_ARTICLES.find(a => a.id === articleId));
+        },
+
+        remove(publicationId: string, articleId: string): Promise<void> {
+            // return fetch(`${API_ROOT}/publications/`);
             return Promise.resolve();
         },
 
-        create(model: ArticleEditModel): Promise<void> {
+        create(publicationId: string, model: ArticleEditModel): Promise<void> {
             return Promise.resolve();
         },
 
-        edit(id: string, model: ArticleEditModel): Promise<void> {
+        edit(publicationId: string, articleId: string, model: ArticleEditModel): Promise<void> {
             return Promise.resolve();
         },
     },

@@ -21,6 +21,7 @@
 import * as React from "react";
 import {Router, Route, Redirect, hashHistory} from "react-router";
 
+import PublicationsListPage from "./PublicationsListPage";
 import ArticleListPage from "./ArticleListPage";
 import ArticleEditPage from "./ArticleEditPage";
 
@@ -38,10 +39,13 @@ function NotFound(): JSX.Element {
 export default function App(): JSX.Element {
     return (
         <Router history={hashHistory}>
-            <Redirect from="/" to="/articles" />
-            <Route path="/articles" component={ArticleListPage} />
-            <Route path="/articles/new" component={ArticleEditPage} />
-            <Route path="/articles/edit/:id" component={ArticleEditPage} />
+            <Redirect from="/" to="/publications" />
+            <Route path="/publications" component={PublicationsListPage} />
+            <Route path="/publications/:publicationId/articles" component={ArticleListPage} />
+            <Route path="/publications/:publicationId/articles/new" component={ArticleEditPage} />
+            <Route
+                path="/publications/:publicationId/articles/edit/:articleId"
+                component={ArticleEditPage} />
             <Route path="*" component={NotFound} />
         </Router>
     );

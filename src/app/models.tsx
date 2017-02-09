@@ -18,6 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+export interface PublicationModel {
+    id: string;
+    name: string;
+}
+
 export interface ArticleEditModel {
     content: string;
     title: string;

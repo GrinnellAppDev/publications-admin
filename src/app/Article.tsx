@@ -37,7 +37,7 @@ export default function Article({model, onDelete}: Props): JSX.Element {
         <article>
             <h2>{model.title}</h2>
 
-            <Link to={`/articles/edit/${model.id}`}>
+            <Link to={`/publications/${model.publicationId}/articles/edit/${model.id}`}>
                 <button>Edit</button>
             </Link>
             <button onClick={onDeleteClick}>Delete</button>

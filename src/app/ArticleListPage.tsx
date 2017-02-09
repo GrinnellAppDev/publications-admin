@@ -26,6 +26,7 @@ import {ArticleModel} from "./models";
 import api from "./api";
 
 interface RouteParams {
+    publicationId: string;
 }
 
 type Props = RouteComponentProps<RouteParams, {}>;
@@ -40,7 +41,7 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
     };
 
     private reload(): Promise<void> {
-        return api.articles.list().then(articles => {
+        return api.articles.list(this.props.params.publicationId).then(articles => {
             this.setState({articles});
         });
     }
@@ -50,7 +51,7 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
     }
 
     private onArticleDelete = (id: string): void => {
-        api.articles.remove(id);
+        api.articles.remove(this.props.params.publicationId, id);
 
         this.setState(({articles}) => ({
             articles: articles.filter(article => article.id !== id)
@@ -58,13 +59,17 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
     }
 
     render(): JSX.Element {
+        const {params} = this.props;
         const {articles} = this.state;
 
         return (
             <div>
                 <h1>Articles</h1>
                 <main>
-                    <Link to="/articles/new"><button>New Article</button></Link>
+                    <Link to={`/publications/${params.publicationId}/articles/new`}>
+                        <button>New Article</button>
+                    </Link>
+
                     <section>
                         {articles.map(article =>
                             <Article
