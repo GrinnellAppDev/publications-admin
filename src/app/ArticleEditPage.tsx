@@ -75,15 +75,19 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
     private onSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
         ev.preventDefault();
 
-        const {params} = this.props;
+        const {params, router} = this.props;
         const {model} = this.state;
+
+        let promise;
         if (model.id) {
-            api.articles.edit(params.publicationId, model.id, model);
+            promise = api.articles.edit(params.publicationId, model.id, model);
         } else {
-            api.articles.create(params.publicationId, model);
+            promise = api.articles.create(params.publicationId, model);
         }
 
-        this.props.router.goBack();
+        promise.then(() => {
+            router.goBack();
+        });
     }
 
     render(): JSX.Element {
@@ -96,13 +100,13 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
                 <input
                     name="title" type="text" onChange={this.onTitleChange}
                     value={model.title} style={{width: "100%", fontSize: "1.3rem"}}
-                    placeholder="Title" />
+                    placeholder="Title" autoComplete="off" />
                 <textarea
                     name="content" style={{
                         display: "block",
                         width: "100%",
                         height: "50vh",
-                        fontSize: "1rem",
+                        fontSize: "0.9rem",
                     }}
                     onChange={this.onContentChange} value={model.content} />
                 <input type="submit" />
