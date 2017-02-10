@@ -68,21 +68,21 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
         }
     }
 
-    private onTitleChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    private onTitleChange = (ev: React.ChangeEvent<HTMLInputElement>): void => {
         const title = ev.target.value;
         this.setState(({model}) => ({
             model: {...model, title},
         }));
     }
 
-    private onContentChange = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
+    private onContentChange = (ev: React.ChangeEvent<HTMLTextAreaElement>): void => {
         const content = ev.target.value;
         this.setState(({model}) => ({
             model: {...model, content},
         }));
     }
 
-    private onSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
+    private onSubmit = async (ev: React.FormEvent<HTMLFormElement>): Promise<void> => {
         ev.preventDefault();
 
         this.setState({submissionState: SubmissionState.SUBMITTING});
@@ -90,18 +90,17 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
         const {params, router} = this.props;
         const {model} = this.state;
 
-        let promise;
-        if (model.id) {
-            promise = api.articles.edit(params.publicationId, model.id, model);
-        } else {
-            promise = api.articles.create(params.publicationId, model);
-        }
+        try {
+            if (model.id) {
+                await api.articles.edit(params.publicationId, model.id, model);
+            } else {
+                await api.articles.create(params.publicationId, model);
+            }
 
-        promise.then(() => {
             router.goBack();
-        }).catch(err => {
+        } catch (err) {
             this.setState({submissionState: SubmissionState.ERRORED});
-        });
+        }
     }
 
     render(): JSX.Element {

@@ -25,81 +25,95 @@ import {ArticleModel, ArticleEditModel, PublicationModel} from "./models";
 declare const process: any;
 const API_ROOT: string = process.env.API_ROOT;
 
-function checkResponse(resp: Response): Response {
-    if (resp.ok) {
-        return resp;
-    } else {
-        throw new Error("Fetch error.");
+class FetchError extends Error {
+    status: number;
+
+    constructor(resp: Response) {
+        super(`Fetch errored with code: ${resp.status} - ${resp.statusText}`);
+        this.status = resp.status;
     }
 }
 
 export default {
     publications: {
-        list(): Promise<PublicationModel[]> {
-            return fetch(`${API_ROOT}/publications`, {
+        async list(): Promise<PublicationModel[]> {
+            const resp = await fetch(`${API_ROOT}/publications`, {
                 method: "GET",
                 mode: "cors",
-            })
-                .then(checkResponse)
-                .then(resp => resp.json())
-                .then((data: any) => {
-                    return data as PublicationModel[];
-                });
+            });
+
+            if (!resp.ok) {
+                throw new FetchError(resp);
+            }
+
+            return await resp.json() as PublicationModel[];
         },
     },
 
     articles: {
-        list(publicationId: string): Promise<ArticleModel[]> {
-            return fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
+        async list(publicationId: string): Promise<ArticleModel[]> {
+            const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
                 method: "GET",
                 mode: "cors",
-            })
-                .then(checkResponse)
-                .then(resp => resp.json())
-                .then((data: any) => {
-                    return data as ArticleModel[];
-                });
+            });
+
+            if (!resp.ok) {
+                throw new FetchError(resp);
+            }
+
+            return await resp.json() as ArticleModel[];
         },
 
-        get(publicationId: string, articleId: string): Promise<ArticleModel> {
-            return fetch(`${API_ROOT}/publications/${publicationId}/articles/${articleId}`, {
+        async get(publicationId: string, articleId: string): Promise<ArticleModel> {
+            const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
+                                     `${articleId}`, {
                 method: "GET",
                 mode: "cors",
-            })
-                .then(checkResponse)
-                .then(resp => resp.json())
-                .then((data: any) => {
-                    return data as ArticleModel;
-                });
+            });
+
+            if (!resp.ok) {
+                throw new FetchError(resp);
+            }
+
+            return await resp.json() as ArticleModel;
         },
 
-        remove(publicationId: string, articleId: string): Promise<void> {
-            return fetch(`${API_ROOT}/publications/${publicationId}/articles/${articleId}`, {
+        async remove(publicationId: string, articleId: string): Promise<void> {
+            const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
+                                     `${articleId}`, {
                 method: "DELETE",
                 mode: "cors",
-            })
-                .then(checkResponse)
-                .then(() => undefined);
+            });
+
+            if (!resp.ok) {
+                throw new FetchError(resp);
+            }
         },
 
-        create(publicationId: string, model: ArticleEditModel): Promise<void> {
-            return fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
+        async create(publicationId: string, model: ArticleEditModel): Promise<void> {
+            const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
                 method: "POST",
                 mode: "cors",
                 body: JSON.stringify(model),
-            })
-                .then(checkResponse)
-                .then(() => undefined);
+            });
+
+            if (!resp.ok) {
+                throw new FetchError(resp);
+            }
         },
 
-        edit(publicationId: string, articleId: string, model: ArticleEditModel): Promise<void> {
-            return fetch(`${API_ROOT}/publications/${publicationId}/articles/${articleId}`, {
+        async edit(publicationId: string, articleId: string,
+                   model: ArticleEditModel): Promise<void> {
+            const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
+                                     `${articleId}`, {
                 method: "PATCH",
                 mode: "cors",
                 body: JSON.stringify(model),
-            })
-                .then(checkResponse)
-                .then(() => undefined);
+            });
+
+            if (!resp.ok) {
+                throw new FetchError(resp);
+            }
         },
     },
 };
