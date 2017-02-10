@@ -18,3 +18,9 @@ on the project, run `yarn lint` or `npm run lint`.  You can optionally fix error
 To create a production build, run `yarn build` or `npm run build`.  Then run `yarn serve:build` or
 `npm run serve:build` to start the production server.  A port can be specified just like with
 `yarn serve`.
+
+## Deploying
+
+Make sure you are signed into the aws cli with the AppDev account. Be sure to run `yarn build`, then
+`aws s3 cp build s3://publications-admin-site --recursive --region "us-east-2"` to deploy to the s3
+bucket called `publications-admin-site`.
