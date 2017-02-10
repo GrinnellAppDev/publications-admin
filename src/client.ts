@@ -21,11 +21,11 @@
 import "es6-promise";
 import "whatwg-fetch";
 
-import * as React from "react";
+import {createElement} from "react";
 import {render} from "react-dom";
 
 import App from "./app/App";
 
 import "./index.scss";
 
-render(React.createElement(App), document.getElementById("root"));
+render(createElement(App), document.getElementById("root"));
