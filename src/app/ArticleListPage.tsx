@@ -26,13 +26,6 @@ import {ArticleModel, PublicationModel} from "./models";
 import api from "./api";
 import {pageRootStyle} from "./sharedStyles";
 
-class NoPublicationError extends Error {
-    isNoPublicationError: boolean = true;
-    constructor() {
-        super("No publication id.");
-    }
-}
-
 class AlreadyLoadingError extends Error {
     isAlreadyLoadingError: boolean = true;
     constructor() {
@@ -59,36 +52,36 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
         isLoading: false,
     };
 
-    private async reload(): Promise<void> {
+    private publicationsPromise: Promise<PublicationModel[]>;
+
+    private async reload(publicationId: string = this.props.params.publicationId): Promise<void> {
         if (this.state.isLoading) {
             throw new AlreadyLoadingError();
         }
 
-        const {params} = this.props;
-
-        if (params.publicationId) {
+        if (publicationId) {
             this.setState({isLoading: true});
-            const articles = await api.articles.list(this.props.params.publicationId);
-            this.setState({articles, isLoading: false});
+            this.setState({
+                articles: await api.articles.list(publicationId),
+                isLoading: false,
+            });
         } else {
-            throw new NoPublicationError();
+            const id = (await this.publicationsPromise)[0].id;
+            this.props.router.replace(`/publications/${id}/articles`);
         }
     }
 
     async componentDidMount(): Promise<void> {
-        const {router} = this.props;
+        this.publicationsPromise = api.publications.list();
+        this.setState({publications: await this.publicationsPromise});
+        await this.reload();
+    }
 
-        const publications = await api.publications.list();
-        this.setState({publications});
+    async componentWillReceiveProps({params: nextParams}: Props): Promise<void> {
+        const {params: currentParams} = this.props;
 
-        try {
-            await this.reload();
-        } catch (err) {
-            if ((err as NoPublicationError).isNoPublicationError) {
-                const id = publications[0].id;
-                router.replace(`/publications/${id}/articles`);
-                await this.reload();
-            }
+        if (nextParams.publicationId !== currentParams.publicationId) {
+            await this.reload(nextParams.publicationId);
         }
     }
 

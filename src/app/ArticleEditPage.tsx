@@ -62,8 +62,10 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
 
         if (params.articleId) {
             this.setState({isLoading: true});
-            const model = await api.articles.get(params.publicationId, params.articleId);
-            this.setState({model, isLoading: false});
+            this.setState({
+                model: await api.articles.get(params.publicationId, params.articleId),
+                isLoading: false,
+            });
         }
     }
 
