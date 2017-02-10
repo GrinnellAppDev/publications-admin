@@ -73,7 +73,7 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
         }
     }
 
-    private async load(): Promise<void> {
+    async componentDidMount(): Promise<void> {
         const {router} = this.props;
 
         const publications = await api.publications.list();
@@ -88,10 +88,6 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
                 await this.reload();
             }
         }
-    }
-
-    componentDidMount(): void {
-        this.load();
     }
 
     private onArticleDelete = (id: string): void => {
