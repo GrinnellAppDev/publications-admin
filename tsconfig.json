@@ -9,7 +9,7 @@
         "noImplicitAny": false,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
-        "target": "es6",
+        "target": "es5",
         "module": "es6",
         "lib": [
             "dom",

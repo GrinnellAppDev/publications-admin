@@ -27,12 +27,14 @@ import api from "./api";
 import {pageRootStyle} from "./sharedStyles";
 
 class NoPublicationError extends Error {
+    isNoPublicationError: boolean = true;
     constructor() {
         super("No publication id.");
     }
 }
 
 class AlreadyLoadingError extends Error {
+    isAlreadyLoadingError: boolean = true;
     constructor() {
         super("Already loading.");
     }
@@ -82,7 +84,7 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
         try {
             await this.reload();
         } catch (err) {
-            if (err instanceof NoPublicationError) {
+            if ((err as NoPublicationError).isNoPublicationError) {
                 const id = publications[0].id;
                 router.replace(`/publications/${id}/articles`);
                 await this.reload();
@@ -102,7 +104,7 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
         try {
             await this.reload();
         } catch (err) {
-            if (!(err instanceof AlreadyLoadingError)) {
+            if (!(err as AlreadyLoadingError).isAlreadyLoadingError) {
                 throw err;
             }
         }
