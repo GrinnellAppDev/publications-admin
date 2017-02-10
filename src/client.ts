@@ -1,5 +1,5 @@
 /**
- * client.tsx
+ * client.ts
  *
  * Created by Zander Otavka on 1/15/17.
  * Copyright (C) 2016  Grinnell AppDev.
@@ -28,4 +28,4 @@ import App from "./app/App";
 
 import "./index.scss";
 
-render(<App/>, document.getElementById("root"));
+render(React.createElement(App), document.getElementById("root"));
