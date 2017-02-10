@@ -53,6 +53,10 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
             publication: "",
             title: "",
             content: "",
+            authorName: "",
+            authorEmail: "",
+            dateEdited: new Date(),
+            datePublished: new Date(),
         },
     };
 

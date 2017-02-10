@@ -20,7 +20,7 @@
 
 /// <reference types="whatwg-fetch" />
 
-import {ArticleModel, ArticleEditModel, PublicationModel} from "./models";
+import {ArticleModel, ArticleEditModel, PublicationModel, conversions as conv} from "./models";
 
 declare const process: any;
 const API_ROOT: string = process.env.API_ROOT;
@@ -47,7 +47,7 @@ export default {
                 throw new FetchError(resp);
             }
 
-            return await resp.json() as PublicationModel[];
+            return conv.requestToArray(conv.requestToPublicationModel, await resp.json());
         },
     },
 
@@ -62,7 +62,7 @@ export default {
                 throw new FetchError(resp);
             }
 
-            return await resp.json() as ArticleModel[];
+            return conv.requestToArray(conv.requestToArticleModel, await resp.json());
         },
 
         async get(publicationId: string, articleId: string): Promise<ArticleModel> {
@@ -76,7 +76,7 @@ export default {
                 throw new FetchError(resp);
             }
 
-            return await resp.json() as ArticleModel;
+            return conv.requestToArticleModel(await resp.json());
         },
 
         async remove(publicationId: string, articleId: string): Promise<void> {
@@ -95,7 +95,7 @@ export default {
             const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
                 method: "POST",
                 mode: "cors",
-                body: JSON.stringify(model),
+                body: JSON.stringify(conv.articleEditModelToRequest(model)),
             });
 
             if (!resp.ok) {
@@ -109,7 +109,7 @@ export default {
                                      `${articleId}`, {
                 method: "PATCH",
                 mode: "cors",
-                body: JSON.stringify(model),
+                body: JSON.stringify(conv.articleEditModelToRequest(model)),
             });
 
             if (!resp.ok) {

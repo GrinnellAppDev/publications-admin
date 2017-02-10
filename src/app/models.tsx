@@ -26,9 +26,36 @@ export interface PublicationModel {
 export interface ArticleEditModel {
     content: string;
     title: string;
+    authorName: string;
+    authorEmail: string;
 }
 
 export interface ArticleModel extends ArticleEditModel {
     id: string;
     publication: string;
+    datePublished: Date;
+    dateEdited: Date;
 }
+
+export const conversions = {
+    requestToArray<T>(elementConversion: (element: any) => T, request: any): T[] {
+        return (request as any[]).map(elementConversion);
+    },
+
+    requestToPublicationModel(request: any): PublicationModel {
+        return {...request as PublicationModel};
+    },
+
+    requestToArticleModel(request: any): ArticleModel {
+        return {
+            ...request as ArticleModel,
+            dateEdited: new Date(request.dateEdited),
+            datePublished: new Date(request.datePublished),
+        };
+    },
+
+    articleEditModelToRequest(model: ArticleEditModel): any {
+        const {content, title, authorEmail, authorName} = model;
+        return {content, title, authorEmail, authorName};
+    },
+};
