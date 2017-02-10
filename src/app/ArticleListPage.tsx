@@ -131,11 +131,11 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
 
                 <header>
                     <h1>
-                        {publications.length !== 0 && params.publicationId ?
+                        {publications.length !== 0 && params.publicationId ? (
                             publications.find(({id}) => id === params.publicationId).name + " "
-                        :
+                        ) : (
                             ""
-                        }
+                        )}
 
                         Articles
                     </h1>
