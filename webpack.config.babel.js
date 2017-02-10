@@ -74,19 +74,7 @@ export default {
             },
             {
                 test: /\.tsx?$/,
-                use: [
-                    {
-                        loader: "babel-loader",
-                        options: {
-                            presets: [
-                                ["es2015", {modules: false}]
-                            ],
-                        },
-                    },
-                    {
-                        loader: "ts-loader",
-                    },
-                ],
+                loader: "ts-loader",
             },
             {
                 test: /\.scss$/,

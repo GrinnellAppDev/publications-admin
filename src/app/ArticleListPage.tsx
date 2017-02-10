@@ -22,41 +22,76 @@ import * as React from "react";
 import {RouteComponentProps, Link} from "react-router";
 
 import Article from "./Article";
-import {ArticleModel} from "./models";
+import {ArticleModel, PublicationModel} from "./models";
 import api from "./api";
 import {pageRootStyle} from "./sharedStyles";
 
+class NoPublicationError extends Error {
+    constructor() {
+        super("No publication id.");
+    }
+}
+
+class AlreadyLoadingError extends Error {
+    constructor() {
+        super("Already loading.");
+    }
+}
+
 interface RouteParams {
-    publicationId: string;
+    publicationId?: string;
 }
 
 type Props = RouteComponentProps<RouteParams, {}>;
 
 interface State {
     articles: ArticleModel[];
+    publications: PublicationModel[];
     isLoading: boolean;
 }
 
 export default class ArticleListPage extends React.PureComponent<Props, State> {
     state: State = {
         articles: [],
+        publications: [],
         isLoading: false,
     };
 
-    private reload(): Promise<void> {
+    private async reload(): Promise<void> {
         if (this.state.isLoading) {
-            return Promise.reject(new Error("Already loading."));
+            throw new AlreadyLoadingError();
         }
 
-        this.setState({isLoading: true});
+        const {params} = this.props;
 
-        return api.articles.list(this.props.params.publicationId).then(articles => {
+        if (params.publicationId) {
+            this.setState({isLoading: true});
+            const articles = await api.articles.list(this.props.params.publicationId);
             this.setState({articles, isLoading: false});
-        });
+        } else {
+            throw new NoPublicationError();
+        }
+    }
+
+    private async load(): Promise<void> {
+        const {router} = this.props;
+
+        const publications = await api.publications.list();
+        this.setState({publications});
+
+        try {
+            await this.reload();
+        } catch (err) {
+            if (err instanceof NoPublicationError) {
+                const id = publications[0].id;
+                router.replace(`/publications/${id}/articles`);
+                await this.reload();
+            }
+        }
     }
 
     componentDidMount(): void {
-        this.reload();
+        this.load();
     }
 
     private onArticleDelete = (id: string): void => {
@@ -67,21 +102,49 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
         }));
     }
 
-    private onRefresh = (): void => {
-        this.reload();
+    private onRefresh = async (): Promise<void> => {
+        try {
+            await this.reload();
+        } catch (err) {
+            if (!(err instanceof AlreadyLoadingError)) {
+                throw err;
+            }
+        }
     }
 
     render(): JSX.Element {
         const {params} = this.props;
-        const {articles, isLoading} = this.state;
+        const {articles, publications, isLoading} = this.state;
 
         return (
             <div style={pageRootStyle}>
-                <Link to="/publications">
-                    <button>Back</button>
-                </Link>
+                <nav>
+                    <ul>
+                        {publications.map(publication =>
+                            <li key={publication.id}>
+                                <Link
+                                    to={`/publications/${publication.id}/articles`}
+                                    activeStyle={{fontWeight: "bold"}}>
 
-                <h1>Articles</h1>
+                                    {publication.name}
+                                </Link>
+                            </li>
+                        )}
+                    </ul>
+                </nav>
+
+                <header>
+                    <h1>
+                        {publications.length !== 0 && params.publicationId ?
+                            publications.find(({id}) => id === params.publicationId).name + " "
+                        :
+                            ""
+                        }
+
+                        Articles
+                    </h1>
+                </header>
+
                 <main>
                     <Link to={`/publications/${params.publicationId}/articles/new`}>
                         <button>New Article</button>
