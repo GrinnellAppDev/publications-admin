@@ -106,7 +106,7 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
         const {params} = this.props;
         const {model, isLoading, submissionState} = this.state;
 
-        return isLoading ? (
+        return (isLoading) ? (
             <div style={pageRootStyle}>Loading...</div>
         ) : (
             <form onSubmit={this.onSubmit} style={pageRootStyle}>
@@ -118,9 +118,9 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
                     {model.id ? "Edit" : "Create"} Article
                 </h1>
 
-                {submissionState === SubmissionState.ERRORED ? (
+                {(submissionState === SubmissionState.ERRORED) ? (
                     <div>There was a problem submitting your article.</div>
-                ) : submissionState === SubmissionState.SUBMITTING ? (
+                ) : (submissionState === SubmissionState.SUBMITTING) ? (
                     <div>Submitting...</div>
                 ) : (
                     ""
