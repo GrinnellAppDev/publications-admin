@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-declare namespace Bem {
+declare module Bem {
     interface PredicateList {
         [key: string]: boolean | (() => boolean);
     }
@@ -34,8 +34,8 @@ declare namespace Bem {
     }
 
     interface Helper {
-        (elementOrArguments?: string | HelperArguments,
-         modifiers?: List, extra?: List): {className: string};
+        (element?: string, modifiers?: List, extra?: List): {className: string};
+        (args: HelperArguments): {className: string};
     }
 
     interface HelperConstructorOptions {
@@ -45,8 +45,10 @@ declare namespace Bem {
     }
 
     interface HelperConstructor {
-        new(nameOrOptions: string | HelperConstructorOptions): Helper;
-        (nameOrOptions: string | HelperConstructorOptions): Helper;
+        new(name: string): Helper;
+        new(options: HelperConstructorOptions): Helper;
+        (name: string): Helper;
+        (options: HelperConstructorOptions): Helper;
     }
 }
 
