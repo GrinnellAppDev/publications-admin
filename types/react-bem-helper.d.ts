@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-declare namespace ReactBEM {
+declare namespace Bem {
     interface PredicateList {
         [key: string]: boolean | (() => boolean);
     }
@@ -51,6 +51,6 @@ declare namespace ReactBEM {
 }
 
 declare module "react-bem-helper" {
-    var BEMHelper: ReactBEM.HelperConstructor;
+    var BEMHelper: Bem.HelperConstructor;
     export = BEMHelper;
 }
