@@ -18,8 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference types="whatwg-fetch" />
-
 import {ArticleModel, ArticleEditModel, PublicationModel, conversions as conv} from "./models";
 
 declare const process: any;

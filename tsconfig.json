@@ -20,6 +20,8 @@
     "compileOnSave": false,
     "filesGlob": [
         "src/**/*.ts",
-        "src/**/*.tsx"
+        "src/**/*.tsx",
+        "types/**/*.d.ts",
+        "node_modules/@types/whatwg-fetch/index.d.ts"
     ]
 }

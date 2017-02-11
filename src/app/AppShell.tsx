@@ -1,7 +1,7 @@
 /**
- * Article.tsx
+ * AppShell.tsx
  *
- * Created by Zander Otavka on 2/8/16.
+ * Created by Zander Otavka on 2/10/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,34 +20,18 @@
 
 import * as React from "react";
 import * as BEMHelper from "react-bem-helper";
-import {Link} from "react-router";
+import {RouteComponentProps} from "react-router";
 
-import {ArticleModel} from "./models";
+import "./AppShell.scss";
 
-import "./Article.scss";
+const bem = new BEMHelper("AppShell");
 
-interface Props {
-    model: ArticleModel;
-    onDelete: (id: string) => void;
-}
+type Props = RouteComponentProps<{}, {}> & {children?: React.ReactNode};
 
-const bem = new BEMHelper("Article");
-
-export default function Article({model, onDelete}: Props): JSX.Element {
-    const onDeleteClick = () => {
-        onDelete(model.id);
-    };
-
+export default function AppShell(props: Props): JSX.Element {
     return (
-        <article>
-            <h2 {...bem("title")}>{model.title}</h2>
-
-            <Link to={`/publications/${model.publication}/articles/edit/${model.id}`}>
-                <button>Edit</button>
-            </Link>
-            <button onClick={onDeleteClick}>Delete</button>
-
-            <section>{model.content}</section>
-        </article>
+        <div {...bem()}>
+            {props.children}
+        </div>
     );
 }

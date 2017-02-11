@@ -1,7 +1,7 @@
 /**
- * app.scss
+ * Article.scss
  *
- * Created by Zander Otavka on 1/16/17.
+ * Created by Zander Otavka on 2/11/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,15 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-a {
-    color: inherit;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-button {
-    cursor: pointer;
+.Article {
+    &__title {
+        margin-bottom: 0;
+    }
 }

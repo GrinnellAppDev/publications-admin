@@ -1,7 +1,7 @@
 /**
- * sharedStyles.tsx
+ * ArticleEditPage.scss
  *
- * Created by Zander Otavka on 2/9/17.
+ * Created by Zander Otavka on 2/11/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const pageRootStyle: React.CSSProperties = {
-    margin: "16px 20%",
-};
+.ArticleEditPage {
+    @mixin input {
+        font-size: 0.9rem;
+        border: none;
+    }
+
+    @mixin blockInput {
+        @include input();
+        display: block;
+        width: 100%;
+    }
+
+    &__title-input {
+        @include blockInput();
+        font-size: 1.3rem;
+        font-weight: bold;
+    }
+
+    &__header-image-input {
+        @include blockInput();
+    }
+
+    &__author-wrapper {
+        display: flex;
+        flex-direction: row;
+
+        input {
+            @include input();
+            flex: 1;
+        }
+    }
+
+    &__content-input {
+        @include blockInput();
+        height: 50vh;
+    }
+}

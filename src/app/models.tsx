@@ -28,6 +28,7 @@ export interface ArticleEditModel {
     title: string;
     authorName: string;
     authorEmail: string;
+    headerImage: string;
 }
 
 export interface ArticleModel extends ArticleEditModel {

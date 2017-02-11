@@ -20,10 +20,12 @@
 
 import * as React from "react";
 import {RouteComponentProps, Link} from "react-router";
+import * as BEMHelper from "react-bem-helper";
 
 import {ArticleModel} from "./models";
 import api from "./api";
-import {pageRootStyle} from "./sharedStyles";
+
+import "./ArticleEditPage.scss";
 
 interface RouteParams {
     publicationId: string;
@@ -44,6 +46,8 @@ interface State {
     submissionState: SubmissionState;
 }
 
+const bem = new BEMHelper("ArticleEditPage");
+
 export default class ArticleEditPage extends React.PureComponent<Props, State> {
     state: State = {
         isLoading: false,
@@ -55,6 +59,7 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
             content: "",
             authorName: "",
             authorEmail: "",
+            headerImage: "",
             dateEdited: new Date(),
             datePublished: new Date(),
         },
@@ -113,9 +118,9 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
         const {model, isLoading, submissionState} = this.state;
 
         return (isLoading) ? (
-            <div style={pageRootStyle}>Loading...</div>
+            <div>Loading...</div>
         ) : (
-            <form onSubmit={this.onSubmit} style={pageRootStyle}>
+            <form onSubmit={this.onSubmit}>
                 <Link to={`/publications/${params.publicationId}/articles`}>
                     <button>Back</button>
                 </Link>
@@ -134,16 +139,27 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
 
                 <input
                     name="title" type="text" onChange={this.onTitleChange} value={model.title}
-                    style={{width: "100%", fontSize: "1.3rem", fontWeight: "bold"}}
-                    placeholder="Title" autoComplete="off" />
+                    placeholder="Title" autoComplete="off"
+                    {...bem("title-input")} />
+
+                <input
+                    name="headerImage" type="url" value={model.headerImage}
+                    placeholder="Header Image URL" autoComplete="off"
+                    {...bem("header-image-input")} />
+
+                <div {...bem("author-wrapper")}>
+                    <input
+                        name="authorName" type="text" value={model.authorName}
+                        placeholder="Author Name" autoComplete="off" autoCapitalize="word" />
+                    <input
+                        name="authorEmail" type="email" value={model.authorEmail}
+                        placeholder="Author Email" autoComplete="off" />
+                </div>
+
                 <textarea
                     name="content" onChange={this.onContentChange} value={model.content}
-                    style={{
-                        display: "block",
-                        width: "100%",
-                        height: "50vh",
-                        fontSize: "0.9rem",
-                    }} />
+                    {...bem("content-input")} />
+
                 <input type="submit" />
             </form>
         );

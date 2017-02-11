@@ -19,12 +19,11 @@
  */
 
 import * as React from "react";
-import {Router, Route, hashHistory} from "react-router";
+import {Router, Route, IndexRoute, hashHistory} from "react-router";
 
+import AppShell from "./AppShell";
 import ArticleListPage from "./ArticleListPage";
 import ArticleEditPage from "./ArticleEditPage";
-
-import "./app.scss";
 
 function NotFound(): JSX.Element {
     return (
@@ -38,13 +37,16 @@ function NotFound(): JSX.Element {
 export default function App(): JSX.Element {
     return (
         <Router history={hashHistory}>
-            <Route path="/" component={ArticleListPage} />
-            <Route path="/publications/:publicationId/articles" component={ArticleListPage} />
-            <Route path="/publications/:publicationId/articles/new" component={ArticleEditPage} />
-            <Route
-                path="/publications/:publicationId/articles/edit/:articleId"
-                component={ArticleEditPage} />
-            <Route path="*" component={NotFound} />
+            <Route path="/" component={AppShell}>
+                <IndexRoute component={ArticleListPage} />
+                <Route path="publications/:publicationId/articles" component={ArticleListPage} />
+                <Route
+                    path="publications/:publicationId/articles/new" component={ArticleEditPage} />
+                <Route
+                    path="publications/:publicationId/articles/edit/:articleId"
+                    component={ArticleEditPage} />
+                <Route path="*" component={NotFound} />
+            </Route>
         </Router>
     );
 }

@@ -19,12 +19,14 @@
  */
 
 import * as React from "react";
+import * as BEMHelper from "react-bem-helper";
 import {RouteComponentProps, Link} from "react-router";
 
 import Article from "./Article";
 import {ArticleModel, PublicationModel} from "./models";
 import api from "./api";
-import {pageRootStyle} from "./sharedStyles";
+
+import "./ArticleListPage.scss";
 
 class AlreadyLoadingError extends Error {
     isAlreadyLoadingError: boolean = true;
@@ -44,6 +46,8 @@ interface State {
     publications: PublicationModel[];
     isLoading: boolean;
 }
+
+const bem = new BEMHelper("ArticleListPage");
 
 export default class ArticleListPage extends React.PureComponent<Props, State> {
     state: State = {
@@ -108,14 +112,15 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
         const {articles, publications, isLoading} = this.state;
 
         return (
-            <div style={pageRootStyle}>
+            <div>
                 <nav>
                     <ul>
                         {publications.map(publication =>
                             <li key={publication.id}>
                                 <Link
                                     to={`/publications/${publication.id}/articles`}
-                                    activeStyle={{fontWeight: "bold"}}>
+                                    {...bem("publication-link")}
+                                    activeClassName={bem("publication-link", "active").className}>
 
                                     {publication.name}
                                 </Link>
