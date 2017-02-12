@@ -63,6 +63,11 @@ function onAuthorInputChange(this: AuthorProps, field: "name" | "email",
     });
 }
 
+function onAuthorRemoveClick(this: AuthorProps, ev: React.MouseEvent<HTMLButtonElement>): void {
+    ev.preventDefault();
+    this.onRemove(this.index);
+}
+
 function Author(props: AuthorProps): JSX.Element {
     return (
         <div {...bem("author")}>
@@ -74,7 +79,7 @@ function Author(props: AuthorProps): JSX.Element {
                 name="authorEmail" type="email" value={props.model.email}
                 onChange={onAuthorInputChange.bind(props, "email")}
                 placeholder="Author Email" autoComplete="off" />
-            <button onClick={props.onRemove.bind(null, props.index)}>Remove</button>
+            <button onClick={onAuthorRemoveClick.bind(props)}>Remove</button>
         </div>
     );
 }
@@ -243,7 +248,7 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
                     name="content" onChange={this.onContentChange} value={model.content}
                     {...bem("content-input")} />
 
-                <input type="submit" />
+                <input type="submit" value={(model.id ? "Update" : "Create") + " Article"} />
             </form>
         );
     }
