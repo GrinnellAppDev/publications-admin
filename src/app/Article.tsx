@@ -63,7 +63,7 @@ export default function Article({model, onDelete}: Props): JSX.Element {
                     <span {...bem("date")}>
                         {getMonthShortText(model.datePublished)} {model.datePublished.getDate()}
                     </span>
-                    &nbsp;&bull; {model.brief}
+                    {model.brief ? " • " + model.brief : ""}
                 </div>
             </section>
         </article>
