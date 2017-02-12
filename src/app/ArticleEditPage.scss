@@ -39,7 +39,7 @@
         @include blockInput();
     }
 
-    &__author-wrapper {
+    &__author {
         display: flex;
         flex-direction: row;
 
@@ -47,6 +47,10 @@
             @include input();
             flex: 1;
         }
+    }
+
+    &__brief-input {
+        @include blockInput();
     }
 
     &__content-input {

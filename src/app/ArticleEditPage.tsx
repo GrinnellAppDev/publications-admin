@@ -22,10 +22,17 @@ import * as React from "react";
 import {RouteComponentProps, Link} from "react-router";
 import * as BEMHelper from "react-bem-helper";
 
-import {ArticleModel} from "./models";
+import {ArticleModel, AuthorModel} from "./models";
 import api from "./api";
 
 import "./ArticleEditPage.scss";
+
+interface AuthorProps {
+    index: number;
+    model: AuthorModel;
+    onChange: (index: number, newModel: AuthorModel) => void;
+    onRemove: (index: number) => void;
+}
 
 interface RouteParams {
     publicationId: string;
@@ -48,6 +55,30 @@ interface State {
 
 const bem = new BEMHelper("ArticleEditPage");
 
+function onAuthorInputChange(this: AuthorProps, field: "name" | "email",
+                             {target}: React.ChangeEvent<HTMLInputElement>): void {
+    this.onChange(this.index, {
+        ...this.model,
+        [field]: target.value,
+    });
+}
+
+function Author(props: AuthorProps): JSX.Element {
+    return (
+        <div {...bem("author")}>
+            <input
+                name="authorName" type="text" value={props.model.name}
+                onChange={onAuthorInputChange.bind(props, "name")}
+                placeholder="Author Name" autoComplete="off" autoCapitalize="word" />
+            <input
+                name="authorEmail" type="email" value={props.model.email}
+                onChange={onAuthorInputChange.bind(props, "email")}
+                placeholder="Author Email" autoComplete="off" />
+            <button onClick={props.onRemove.bind(null, props.index)}>Remove</button>
+        </div>
+    );
+}
+
 export default class ArticleEditPage extends React.PureComponent<Props, State> {
     state: State = {
         isLoading: false,
@@ -57,8 +88,8 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
             publication: "",
             title: "",
             content: "",
-            authorName: "",
-            authorEmail: "",
+            brief: "",
+            authors: [{name: "", email: ""}],
             headerImage: "",
             dateEdited: new Date(),
             datePublished: new Date(),
@@ -85,6 +116,50 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
         }));
     }
 
+    private onHeaderImageChange = (ev: React.ChangeEvent<HTMLInputElement>): void => {
+        const headerImage = ev.target.value;
+        this.setState(({model}) => ({
+            model: {...model, headerImage},
+        }));
+    }
+
+    private onAuthorAdd = (ev: React.MouseEvent<HTMLButtonElement>): void => {
+        ev.preventDefault();
+        this.setState(({model}) => ({
+            model: {
+                ...model,
+                authors: [...model.authors, {name: "", email: ""}],
+            },
+        }));
+    }
+
+    private onAuthorChange = (newAuthorIndex: number, newAuthor: AuthorModel): void => {
+        this.setState(({model}) => ({
+            model: {
+                ...model,
+                authors: model.authors.map((author, index) =>
+                    (index === newAuthorIndex) ? newAuthor : author
+                ),
+            },
+        }));
+    }
+
+    private onAuthorRemove = (removeIndex: number): void => {
+        this.setState(({model}) => ({
+            model: {
+                ...model,
+                authors: model.authors.filter((author, index) => index !== removeIndex),
+            },
+        }));
+    }
+
+    private onBriefChange = (ev: React.ChangeEvent<HTMLInputElement>): void => {
+        const brief = ev.target.value;
+        this.setState(({model}) => ({
+            model: {...model, brief},
+        }));
+    }
+
     private onContentChange = (ev: React.ChangeEvent<HTMLTextAreaElement>): void => {
         const content = ev.target.value;
         this.setState(({model}) => ({
@@ -98,7 +173,10 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
         this.setState({submissionState: SubmissionState.SUBMITTING});
 
         const {params, router} = this.props;
-        const {model} = this.state;
+        const model = {
+            ...this.state.model,
+            authors: this.state.model.authors.filter(author => author.name || author.email),
+        };
 
         try {
             if (model.id) {
@@ -118,9 +196,9 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
         const {model, isLoading, submissionState} = this.state;
 
         return (isLoading) ? (
-            <div {...bem(null, ["loading"])}>Loading...</div>
+            <div {...bem("", "loading")}>Loading...</div>
         ) : (
-            <form {...bem()} onSubmit={this.onSubmit}>
+            <form {...bem("")} onSubmit={this.onSubmit}>
                 <Link to={`/publications/${params.publicationId}/articles`}>
                     <button>Back</button>
                 </Link>
@@ -144,17 +222,22 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
 
                 <input
                     name="headerImage" type="url" value={model.headerImage}
-                    placeholder="Header Image URL" autoComplete="off"
-                    {...bem("header-image-input")} />
+                    onChange={this.onHeaderImageChange} placeholder="Header Image URL"
+                    autoComplete="off" {...bem("header-image-input")} />
 
-                <div {...bem("author-wrapper")}>
-                    <input
-                        name="authorName" type="text" value={model.authorName}
-                        placeholder="Author Name" autoComplete="off" autoCapitalize="word" />
-                    <input
-                        name="authorEmail" type="email" value={model.authorEmail}
-                        placeholder="Author Email" autoComplete="off" />
+                <div {...bem("authors")}>
+                    {model.authors.map((model, index) =>
+                        <Author
+                            {...{model, index}} key={index} onChange={this.onAuthorChange}
+                            onRemove={this.onAuthorRemove} />
+                    )}
                 </div>
+
+                <button onClick={this.onAuthorAdd}>Add Author</button>
+
+                <input
+                    name="brief" type="text" value={model.brief} onChange={this.onBriefChange}
+                    placeholder="Brief" autoComplete="off" {...bem("brief-input")} />
 
                 <textarea
                     name="content" onChange={this.onContentChange} value={model.content}
