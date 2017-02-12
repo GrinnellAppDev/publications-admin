@@ -149,9 +149,9 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
                     <button onClick={this.onRefresh}>Refresh</button>
 
                     {(isLoading) ? (
-                        <section>Loading...</section>
+                        <section {...bem("articles")}>Loading...</section>
                     ) : (
-                        <section>
+                        <section {...bem("articles")}>
                             {articles.map(article =>
                                 <Article
                                     key={article.id} model={article}
