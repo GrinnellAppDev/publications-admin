@@ -34,6 +34,10 @@
 
     &__header-image {
         width: 100%;
+
+        &[src=""] {
+            opacity: 0;
+        }
     }
 
     &__detail-wrapper {
