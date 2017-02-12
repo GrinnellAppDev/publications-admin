@@ -40,10 +40,6 @@ function getMonthShortText(date: Date): string {
 }
 
 export default function Article({model, onDelete}: Props): JSX.Element {
-    const onDeleteClick = () => {
-        onDelete(model.id);
-    };
-
     return (
         <article {...bem()}>
             <div {...bem("header-image-wrapper")}>
@@ -58,7 +54,7 @@ export default function Article({model, onDelete}: Props): JSX.Element {
                     <Link to={`/publications/${model.publication}/articles/edit/${model.id}`}>
                         <button>Edit</button>
                     </Link>
-                    <button onClick={onDeleteClick}>Delete</button>
+                    <button onClick={onDelete.bind(null, model.id)}>Delete</button>
                 </div>
 
                 <div>
