@@ -7,7 +7,8 @@
         "build": "rm -rf build && NODE_ENV=production webpack",
         "serve": "webpack-dev-server",
         "serve:build": "cd build && http-server",
-        "start": "if which yarn > /dev/null; then yarn run build && yarn run serve:build; else npm run build && npm run serve:build; fi"
+        "start": "if which yarn > /dev/null; then yarn run build && yarn run serve:build; else npm run build && npm run serve:build; fi",
+        "deploy": "aws s3 cp build s3://publications-admin-site --recursive --region \"us-east-2\""
     },
     "dependencies": {
         "@types/react": "^15.0.6",
