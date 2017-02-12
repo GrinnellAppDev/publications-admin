@@ -47,7 +47,9 @@ export default function Article({model, onDelete}: Props): JSX.Element {
     return (
         <article {...bem()}>
             <div {...bem("header-image-wrapper")}>
-                <img {...bem("header-image")} src={model.headerImage || ""} />
+                <div {...bem("header-image-container")}>
+                    <img {...bem("header-image")} src={model.headerImage || ""} />
+                </div>
             </div>
             <section {...bem("detail-wrapper")}>
                 <h2 {...bem("title")}>{model.title}</h2>
