@@ -18,7 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ArticleModel, ArticleEditModel, PublicationModel, conversions as conv} from "./models";
+import {ArticleModel, ArticleEditModel, ArticleBriefModel, PublicationModel,
+        conversions as conv} from "./models";
 
 declare const process: any;
 const API_ROOT: string = process.env.API_ROOT;
@@ -50,7 +51,7 @@ export default {
     },
 
     articles: {
-        async list(publicationId: string): Promise<ArticleModel[]> {
+        async list(publicationId: string): Promise<ArticleBriefModel[]> {
             const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
                 method: "GET",
                 mode: "cors",
@@ -60,7 +61,7 @@ export default {
                 throw new FetchError(resp);
             }
 
-            return conv.requestToArray(conv.requestToArticleModel, await resp.json());
+            return conv.requestToArray(conv.requestToArticleBriefModel, await resp.json());
         },
 
         async get(publicationId: string, articleId: string): Promise<ArticleModel> {

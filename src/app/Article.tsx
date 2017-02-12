@@ -22,16 +22,22 @@ import * as React from "react";
 import * as BEMHelper from "react-bem-helper";
 import {Link} from "react-router";
 
-import {ArticleModel} from "./models";
+import {ArticleBriefModel} from "./models";
 
 import "./Article.scss";
 
 interface Props {
-    model: ArticleModel;
+    model: ArticleBriefModel;
     onDelete: (id: string) => void;
 }
 
 const bem = new BEMHelper("Article");
+
+function getMonthShortText(date: Date): string {
+    const MONTHS = ["Jan", "Feb", "Mar", "April", "May", "June", "July", "Aug", "Sep", "Oct", "Nov",
+                    "Dec"];
+    return MONTHS[date.getMonth()];
+}
 
 export default function Article({model, onDelete}: Props): JSX.Element {
     const onDeleteClick = () => {
@@ -39,15 +45,27 @@ export default function Article({model, onDelete}: Props): JSX.Element {
     };
 
     return (
-        <article>
-            <h2 {...bem("title")}>{model.title}</h2>
+        <article {...bem()}>
+            <div {...bem("header-image-wrapper")}>
+                <img {...bem("header-image")} src={model.headerImage} />
+            </div>
+            <section {...bem("detail-wrapper")}>
+                <h2 {...bem("title")}>{model.title}</h2>
 
-            <Link to={`/publications/${model.publication}/articles/edit/${model.id}`}>
-                <button>Edit</button>
-            </Link>
-            <button onClick={onDeleteClick}>Delete</button>
+                <div>
+                    <Link to={`/publications/${model.publication}/articles/edit/${model.id}`}>
+                        <button>Edit</button>
+                    </Link>
+                    <button onClick={onDeleteClick}>Delete</button>
+                </div>
 
-            <section>{model.content}</section>
+                <div>
+                    <span {...bem("date")}>
+                        {getMonthShortText(model.datePublished)} {model.datePublished.getDate()}
+                    </span>
+                    &nbsp;&bull; {model.brief}
+                </div>
+            </section>
         </article>
     );
 }

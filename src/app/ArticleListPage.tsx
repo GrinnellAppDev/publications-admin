@@ -23,7 +23,7 @@ import * as BEMHelper from "react-bem-helper";
 import {RouteComponentProps, Link} from "react-router";
 
 import Article from "./Article";
-import {ArticleModel, PublicationModel} from "./models";
+import {ArticleBriefModel, PublicationModel} from "./models";
 import api from "./api";
 
 import "./ArticleListPage.scss";
@@ -42,7 +42,7 @@ interface RouteParams {
 type Props = RouteComponentProps<RouteParams, {}>;
 
 interface State {
-    articles: ArticleModel[];
+    articles: ArticleBriefModel[];
     publications: PublicationModel[];
     isLoading: boolean;
 }
