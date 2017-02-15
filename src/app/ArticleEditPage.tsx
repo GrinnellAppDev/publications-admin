@@ -199,6 +199,8 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
     render(): JSX.Element {
         const {params} = this.props;
         const {model, isLoading, submissionState} = this.state;
+        const isErrored = submissionState === SubmissionState.ERRORED;
+        const isSubmitting = submissionState === SubmissionState.SUBMITTING;
 
         return (isLoading) ? (
             <div {...bem("", "loading")}>Loading...</div>
@@ -212,29 +214,21 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
                     {model.id ? "Edit" : "Create"} Article
                 </h1>
 
-                {(submissionState === SubmissionState.ERRORED) ? (
-                    <div>There was a problem submitting your article.</div>
-                ) : (submissionState === SubmissionState.SUBMITTING) ? (
-                    <div>Submitting...</div>
-                ) : (
-                    ""
-                )}
-
                 <input
                     name="title" type="text" onChange={this.onTitleChange} value={model.title}
                     placeholder="Title" autoComplete="off"
-                    {...bem("title-input")} />
+                    {...bem("input", "block title")} />
 
                 <input
                     name="headerImage" type="url" value={model.headerImage}
                     onChange={this.onHeaderImageChange} placeholder="Header Image URL"
-                    autoComplete="off" {...bem("header-image-input")} />
+                    autoComplete="off" {...bem("input", "block")} />
 
                 <div {...bem("authors")}>
                     {model.authors.map((model, index) =>
                         <Author
                             {...{model, index}} key={index} onChange={this.onAuthorChange}
-                            onRemove={this.onAuthorRemove} />
+                            onRemove={this.onAuthorRemove} {...bem("input")} />
                     )}
                 </div>
 
@@ -242,13 +236,21 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
 
                 <input
                     name="brief" type="text" value={model.brief} onChange={this.onBriefChange}
-                    placeholder="Brief" autoComplete="off" {...bem("brief-input")} />
+                    placeholder="Brief" autoComplete="off" maxLength={140}
+                    {...bem("input", "block")} />
 
                 <textarea
                     name="content" onChange={this.onContentChange} value={model.content}
-                    {...bem("content-input")} />
+                    {...bem("input", "block content")} />
 
                 <input type="submit" value={(model.id ? "Update" : "Create") + " Article"} />
+
+                <div {...bem("submit-status", {"hidden": !isErrored, "error": true})}>
+                    There was a problem submitting your article.
+                </div>
+                <div {...bem("submit-status", {"hidden": !isSubmitting})}>
+                    Submitting...
+                </div>
             </form>
         );
     }
