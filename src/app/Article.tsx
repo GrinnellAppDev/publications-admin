@@ -33,45 +33,31 @@ interface Props {
 
 const bem = new BEMHelper("Article")
 
-function getMonthShortText(date: Date): string {
-    const MONTHS = ["Jan", "Feb", "Mar", "April", "May", "June", "July", "Aug", "Sep", "Oct", "Nov",
-                    "Dec"]
-    return MONTHS[date.getMonth()]
-}
+const SHORT_MONTHS = ["Jan", "Feb", "Mar", "April", "May", "June", "July", "Aug", "Sep", "Oct",
+                      "Nov", "Dec"]
 
-export default class Article extends React.PureComponent<Props, {}> {
-    private onDeleteClick = (ev: React.MouseEvent<HTMLButtonElement>): void => {
-        const {model, onDelete} = this.props
-        onDelete(model.id)
-    }
+export default ({model, onDelete}: Props) =>
+    <article {...bem()}>
+        <div {...bem("header-image-wrapper")}>
+            <div {...bem("header-image-container")}>
+                <img {...bem("header-image")} src={model.headerImage || ""} />
+            </div>
+        </div>
+        <section {...bem("detail-wrapper")}>
+            <h2 {...bem("title")}>{model.title}</h2>
 
-    render(): JSX.Element {
-        const {model} = this.props
-        return (
-            <article {...bem()}>
-                <div {...bem("header-image-wrapper")}>
-                    <div {...bem("header-image-container")}>
-                        <img {...bem("header-image")} src={model.headerImage || ""} />
-                    </div>
-                </div>
-                <section {...bem("detail-wrapper")}>
-                    <h2 {...bem("title")}>{model.title}</h2>
+            <div>
+                <Link to={`/publications/${model.publication}/articles/edit/${model.id}`}>
+                    <button>Edit</button>
+                </Link>
+                <button onClick={() => onDelete(model.id)}>Delete</button>
+            </div>
 
-                    <div>
-                        <Link to={`/publications/${model.publication}/articles/edit/${model.id}`}>
-                            <button>Edit</button>
-                        </Link>
-                        <button onClick={this.onDeleteClick}>Delete</button>
-                    </div>
-
-                    <div>
-                        <span {...bem("date")}>
-                            {getMonthShortText(model.datePublished)} {model.datePublished.getDate()}
-                        </span>
-                        {model.brief ? " • " + model.brief : ""}
-                    </div>
-                </section>
-            </article>
-        )
-    }
-}
+            <div>
+                <span {...bem("date")}>
+                    {SHORT_MONTHS[model.datePublished.getMonth()]} {model.datePublished.getDate()}
+                </span>
+                {model.brief ? " • " + model.brief : ""}
+            </div>
+        </section>
+    </article>

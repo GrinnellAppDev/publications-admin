@@ -49,52 +49,44 @@ export interface ArticleModel extends ArticleEditModel, ArticleBriefModel {
     dateEdited: Date
 }
 
-function requestToArray<T>(elementConversion: (element: any) => T, request: any): T[] {
-    return (request as any[]).map(elementConversion)
-}
-
-function requestToPublicationModel(request: any): PublicationModel {
-    return {...request as PublicationModel}
-}
-
-function requestToArticleModel(request: any): ArticleModel {
-    return {
-        ...request as ArticleModel,
-        dateEdited: new Date(request.dateEdited),
-        datePublished: new Date(request.datePublished),
-    }
-}
-
-function requestToArticleBriefModel(request: any): ArticleBriefModel {
-    return {
-        ...request as ArticleBriefModel,
-        datePublished: new Date(request.datePublished),
-    }
-}
-
-function arrayToRequest<T>(elementConversion: (element: T) => any, array: T[]): any {
-    return array.map(elementConversion).filter(element => element !== undefined)
-}
-
-function authorModelToRequest(model: AuthorModel): any {
-    const {name, email} = model
-    return {name, email}
-}
-
-function articleEditModelToRequest(model: ArticleEditModel): any {
-    const {content, title, authors, headerImage, brief} = model
-    return {
-        authors: arrayToRequest(authorModelToRequest, authors),
-        content, title, headerImage, brief,
-    }
-}
-
 export const conversions = {
-    requestToArray,
-    requestToPublicationModel,
-    requestToArticleModel,
-    requestToArticleBriefModel,
-    arrayToRequest,
-    authorModelToRequest,
-    articleEditModelToRequest,
+    requestToArray<T>(elementConversion: (element: any) => T, request: any): T[] {
+        return (request as any[]).map(elementConversion)
+    },
+
+    requestToPublicationModel(request: any): PublicationModel {
+        return {...request as PublicationModel}
+    },
+
+    requestToArticleModel(request: any): ArticleModel {
+        return {
+            ...request as ArticleModel,
+            dateEdited: new Date(request.dateEdited),
+            datePublished: new Date(request.datePublished),
+        }
+    },
+
+    requestToArticleBriefModel(request: any): ArticleBriefModel {
+        return {
+            ...request as ArticleBriefModel,
+            datePublished: new Date(request.datePublished),
+        }
+    },
+
+    arrayToRequest<T>(elementConversion: (element: T) => any, array: T[]): any {
+        return array.map(elementConversion).filter(element => element !== undefined)
+    },
+
+    authorModelToRequest(model: AuthorModel): any {
+        const {name, email} = model
+        return {name, email}
+    },
+
+    articleEditModelToRequest(model: ArticleEditModel): any {
+        const {content, title, authors, headerImage, brief} = model
+        return {
+            authors: conversions.arrayToRequest(conversions.authorModelToRequest, authors),
+            content, title, headerImage, brief,
+        }
+    },
 }

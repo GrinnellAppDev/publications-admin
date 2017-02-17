@@ -28,10 +28,7 @@ const bem = new BEMHelper("AppShell")
 
 type Props = RouteComponentProps<{}, {}> & {children?: React.ReactNode}
 
-export default function AppShell(props: Props): JSX.Element {
-    return (
-        <div {...bem()}>
-            {props.children}
-        </div>
-    )
-}
+export default (props: Props) =>
+    <div {...bem()}>
+        {props.children}
+    </div>

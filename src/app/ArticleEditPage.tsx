@@ -44,7 +44,7 @@ type Props = RouteComponentProps<RouteParams, {}>
 enum SubmissionState {
     EDITING,
     SUBMITTING,
-    ERRORED
+    ERRORED,
 }
 
 interface State {
@@ -55,41 +55,24 @@ interface State {
 
 const bem = new BEMHelper("ArticleEditPage")
 
-class Author extends React.PureComponent<AuthorProps, {}> {
-    private emitInputChange(field: "name" | "email", value: string): void {
-        const {index, model, onChange} = this.props
-        onChange(index, {...model, [field]: value})
-    }
-
-    private onNameChange = ({target}: React.ChangeEvent<HTMLInputElement>): void => {
-        this.emitInputChange("name", target.value)
-    }
-
-    private onEmailChange = ({target}: React.ChangeEvent<HTMLInputElement>): void => {
-        this.emitInputChange("email", target.value)
-    }
-
-    private onRemoveClick = (ev: React.MouseEvent<HTMLButtonElement>): void => {
-        const {onRemove, index} = this.props
-        ev.preventDefault()
-        onRemove(index)
-    }
-
-    render(): JSX.Element {
-        const {model} = this.props
-        return (
-            <div {...bem("author")}>
-                <input
-                    name="authorName" type="text" value={model.name} onChange={this.onNameChange}
-                    placeholder="Author Name" autoComplete="off" autoCapitalize="word" />
-                <input
-                    name="authorEmail" type="email" value={model.email}
-                    onChange={this.onEmailChange} placeholder="Author Email" autoComplete="off" />
-                <button onClick={this.onRemoveClick}>Remove</button>
-            </div>
-        )
-    }
-}
+const Author = ({model, index, onChange, onRemove}: AuthorProps) => (
+    <div {...bem("author")}>
+        <input
+            name="authorName" type="text" value={model.name}
+            onChange={ev => onChange(index, {...model, name: ev.target.value})}
+            placeholder="Author Name" autoComplete="off" autoCapitalize="word" />
+        <input
+            name="authorEmail" type="email" value={model.email}
+            onChange={ev => onChange(index, {...model, email: ev.target.value})}
+            placeholder="Author Email" autoComplete="off" />
+        <button onClick={ev => {
+            ev.preventDefault()
+            onRemove(index)
+        }}>
+            Remove
+        </button>
+    </div>
+)
 
 export default class ArticleEditPage extends React.PureComponent<Props, State> {
     state: State = {

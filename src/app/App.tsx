@@ -25,28 +25,22 @@ import AppShell from "./AppShell"
 import ArticleListPage from "./ArticleListPage"
 import ArticleEditPage from "./ArticleEditPage"
 
-function NotFound(): JSX.Element {
-    return (
-        <div>
-            <h1>404 Not Found</h1>
-            <a href="#">Home</a>
-        </div>
-    )
-}
+const NotFound = () =>
+    <div>
+        <h1>404 Not Found</h1>
+        <a href="#">Home</a>
+    </div>
 
-export default function App(): JSX.Element {
-    return (
-        <Router history={hashHistory}>
-            <Route path="/" component={AppShell}>
-                <IndexRoute component={ArticleListPage} />
-                <Route path="publications/:publicationId/articles" component={ArticleListPage} />
-                <Route
-                    path="publications/:publicationId/articles/new" component={ArticleEditPage} />
-                <Route
-                    path="publications/:publicationId/articles/edit/:articleId"
-                    component={ArticleEditPage} />
-                <Route path="*" component={NotFound} />
-            </Route>
-        </Router>
-    )
-}
+export default () =>
+    <Router history={hashHistory}>
+        <Route path="/" component={AppShell}>
+            <IndexRoute component={ArticleListPage} />
+            <Route path="publications/:publicationId/articles" component={ArticleListPage} />
+            <Route
+                path="publications/:publicationId/articles/new" component={ArticleEditPage} />
+            <Route
+                path="publications/:publicationId/articles/edit/:articleId"
+                component={ArticleEditPage} />
+            <Route path="*" component={NotFound} />
+        </Route>
+    </Router>

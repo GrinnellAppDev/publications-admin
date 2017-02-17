@@ -61,7 +61,7 @@
                 "variable-declaration": "onespace"
             }
         ],
-        "variable-name": true,
+        "variable-name": false,
         "whitespace": [
             true,
             "check-branch",
@@ -71,6 +71,7 @@
             "check-type"
         ],
         "jsx-alignment": false,
-        "jsx-no-multiline-js": false
+        "jsx-no-multiline-js": false,
+        "jsx-no-lambda": false
     }
 }
