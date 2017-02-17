@@ -18,14 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import "es6-promise";
-import "whatwg-fetch";
+import "es6-promise"
+import "whatwg-fetch"
 
-import {createElement} from "react";
-import {render} from "react-dom";
+import {createElement} from "react"
+import {render} from "react-dom"
 
-import App from "./app/App";
+import App from "./app/App"
 
-import "./index.scss";
+import "./index.scss"
 
-render(createElement(App), document.getElementById("root"));
+render(createElement(App), document.getElementById("root"))
