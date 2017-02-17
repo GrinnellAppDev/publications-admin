@@ -18,28 +18,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as React from "react";
-import {RouteComponentProps, Link} from "react-router";
-import * as BEMHelper from "react-bem-helper";
+import * as React from "react"
+import {RouteComponentProps, Link} from "react-router"
+import * as BEMHelper from "react-bem-helper"
 
-import {ArticleModel, AuthorModel} from "./models";
-import api from "./api";
+import {ArticleModel, AuthorModel} from "./models"
+import api from "./api"
 
-import "./ArticleEditPage.scss";
+import "./ArticleEditPage.scss"
 
 interface AuthorProps {
-    index: number;
-    model: AuthorModel;
-    onChange: (index: number, newModel: AuthorModel) => void;
-    onRemove: (index: number) => void;
+    index: number
+    model: AuthorModel
+    onChange: (index: number, newModel: AuthorModel) => void
+    onRemove: (index: number) => void
 }
 
 interface RouteParams {
-    publicationId: string;
-    articleId?: string;
+    publicationId: string
+    articleId?: string
 }
 
-type Props = RouteComponentProps<RouteParams, {}>;
+type Props = RouteComponentProps<RouteParams, {}>
 
 enum SubmissionState {
     EDITING,
@@ -48,35 +48,35 @@ enum SubmissionState {
 }
 
 interface State {
-    model: ArticleModel;
-    isLoading: boolean;
-    submissionState: SubmissionState;
+    model: ArticleModel
+    isLoading: boolean
+    submissionState: SubmissionState
 }
 
-const bem = new BEMHelper("ArticleEditPage");
+const bem = new BEMHelper("ArticleEditPage")
 
 class Author extends React.PureComponent<AuthorProps, {}> {
     private emitInputChange(field: "name" | "email", value: string): void {
-        const {index, model, onChange} = this.props;
-        onChange(index, {...model, [field]: value});
+        const {index, model, onChange} = this.props
+        onChange(index, {...model, [field]: value})
     }
 
     private onNameChange = ({target}: React.ChangeEvent<HTMLInputElement>): void => {
-        this.emitInputChange("name", target.value);
+        this.emitInputChange("name", target.value)
     }
 
     private onEmailChange = ({target}: React.ChangeEvent<HTMLInputElement>): void => {
-        this.emitInputChange("email", target.value);
+        this.emitInputChange("email", target.value)
     }
 
     private onRemoveClick = (ev: React.MouseEvent<HTMLButtonElement>): void => {
-        const {onRemove, index} = this.props;
-        ev.preventDefault();
-        onRemove(index);
+        const {onRemove, index} = this.props
+        ev.preventDefault()
+        onRemove(index)
     }
 
     render(): JSX.Element {
-        const {model} = this.props;
+        const {model} = this.props
         return (
             <div {...bem("author")}>
                 <input
@@ -87,7 +87,7 @@ class Author extends React.PureComponent<AuthorProps, {}> {
                     onChange={this.onEmailChange} placeholder="Author Email" autoComplete="off" />
                 <button onClick={this.onRemoveClick}>Remove</button>
             </div>
-        );
+        )
     }
 }
 
@@ -106,43 +106,43 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
             dateEdited: new Date(),
             datePublished: new Date(),
         },
-    };
+    }
 
     async componentDidMount(): Promise<void> {
-        const {params} = this.props;
-        this.setState({submissionState: SubmissionState.EDITING});
+        const {params} = this.props
+        this.setState({submissionState: SubmissionState.EDITING})
 
         if (params.articleId) {
-            this.setState({isLoading: true});
+            this.setState({isLoading: true})
             this.setState({
                 model: await api.articles.get(params.publicationId, params.articleId),
                 isLoading: false,
-            });
+            })
         }
     }
 
     private onTitleChange = (ev: React.ChangeEvent<HTMLInputElement>): void => {
-        const title = ev.target.value;
+        const title = ev.target.value
         this.setState(({model}) => ({
             model: {...model, title},
-        }));
+        }))
     }
 
     private onHeaderImageChange = (ev: React.ChangeEvent<HTMLInputElement>): void => {
-        const headerImage = ev.target.value;
+        const headerImage = ev.target.value
         this.setState(({model}) => ({
             model: {...model, headerImage},
-        }));
+        }))
     }
 
     private onAuthorAdd = (ev: React.MouseEvent<HTMLButtonElement>): void => {
-        ev.preventDefault();
+        ev.preventDefault()
         this.setState(({model}) => ({
             model: {
                 ...model,
                 authors: [...model.authors, {name: "", email: ""}],
             },
-        }));
+        }))
     }
 
     private onAuthorChange = (newAuthorIndex: number, newAuthor: AuthorModel): void => {
@@ -153,7 +153,7 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
                     (index === newAuthorIndex) ? newAuthor : author
                 ),
             },
-        }));
+        }))
     }
 
     private onAuthorRemove = (removeIndex: number): void => {
@@ -162,52 +162,52 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
                 ...model,
                 authors: model.authors.filter((author, index) => index !== removeIndex),
             },
-        }));
+        }))
     }
 
     private onBriefChange = (ev: React.ChangeEvent<HTMLInputElement>): void => {
-        const brief = ev.target.value;
+        const brief = ev.target.value
         this.setState(({model}) => ({
             model: {...model, brief},
-        }));
+        }))
     }
 
     private onContentChange = (ev: React.ChangeEvent<HTMLTextAreaElement>): void => {
-        const content = ev.target.value;
+        const content = ev.target.value
         this.setState(({model}) => ({
             model: {...model, content},
-        }));
+        }))
     }
 
     private onSubmit = async (ev: React.FormEvent<HTMLFormElement>): Promise<void> => {
-        ev.preventDefault();
+        ev.preventDefault()
 
-        this.setState({submissionState: SubmissionState.SUBMITTING});
+        this.setState({submissionState: SubmissionState.SUBMITTING})
 
-        const {params, router} = this.props;
+        const {params, router} = this.props
         const model = {
             ...this.state.model,
             authors: this.state.model.authors.filter(author => author.name || author.email),
-        };
+        }
 
         try {
             if (model.id) {
-                await api.articles.edit(params.publicationId, model.id, model);
+                await api.articles.edit(params.publicationId, model.id, model)
             } else {
-                await api.articles.create(params.publicationId, model);
+                await api.articles.create(params.publicationId, model)
             }
 
-            router.goBack();
+            router.goBack()
         } catch (err) {
-            this.setState({submissionState: SubmissionState.ERRORED});
+            this.setState({submissionState: SubmissionState.ERRORED})
         }
     }
 
     render(): JSX.Element {
-        const {params} = this.props;
-        const {model, isLoading, submissionState} = this.state;
-        const isErrored = submissionState === SubmissionState.ERRORED;
-        const isSubmitting = submissionState === SubmissionState.SUBMITTING;
+        const {params} = this.props
+        const {model, isLoading, submissionState} = this.state
+        const isErrored = submissionState === SubmissionState.ERRORED
+        const isSubmitting = submissionState === SubmissionState.SUBMITTING
 
         return (isLoading) ? (
             <div {...bem("", "loading")}>Loading...</div>
@@ -259,6 +259,6 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
                     Submitting...
                 </div>
             </form>
-        );
+        )
     }
 }

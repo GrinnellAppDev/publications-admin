@@ -18,12 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as React from "react";
-import {Router, Route, IndexRoute, hashHistory} from "react-router";
+import * as React from "react"
+import {Router, Route, IndexRoute, hashHistory} from "react-router"
 
-import AppShell from "./AppShell";
-import ArticleListPage from "./ArticleListPage";
-import ArticleEditPage from "./ArticleEditPage";
+import AppShell from "./AppShell"
+import ArticleListPage from "./ArticleListPage"
+import ArticleEditPage from "./ArticleEditPage"
 
 function NotFound(): JSX.Element {
     return (
@@ -31,7 +31,7 @@ function NotFound(): JSX.Element {
             <h1>404 Not Found</h1>
             <a href="#">Home</a>
         </div>
-    );
+    )
 }
 
 export default function App(): JSX.Element {
@@ -48,5 +48,5 @@ export default function App(): JSX.Element {
                 <Route path="*" component={NotFound} />
             </Route>
         </Router>
-    );
+    )
 }
