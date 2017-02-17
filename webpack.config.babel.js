@@ -97,7 +97,7 @@ export default {
 
         new webpack.DefinePlugin({
             "process.env": {
-                NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+                NODE_ENV: JSON.stringify(isProduction ? "production" : "dev"),
                 API_ROOT: JSON.stringify(isProduction ? PRODUCTION_API_ROOT : DEV_API_ROOT),
             },
         }),

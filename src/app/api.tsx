@@ -21,7 +21,6 @@
 import {ArticleModel, ArticleEditModel, ArticleBriefModel, PublicationModel,
         conversions as conv} from "./models";
 
-declare const process: any;
 const API_ROOT: string = process.env.API_ROOT;
 
 class FetchError extends Error {
