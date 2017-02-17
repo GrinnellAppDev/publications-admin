@@ -55,33 +55,40 @@ interface State {
 
 const bem = new BEMHelper("ArticleEditPage");
 
-function onAuthorInputChange(this: AuthorProps, field: "name" | "email",
-                             {target}: React.ChangeEvent<HTMLInputElement>): void {
-    this.onChange(this.index, {
-        ...this.model,
-        [field]: target.value,
-    });
-}
+class Author extends React.PureComponent<AuthorProps, {}> {
+    private emitInputChange(field: "name" | "email", value: string): void {
+        const {index, model, onChange} = this.props;
+        onChange(index, {...model, [field]: value});
+    }
 
-function onAuthorRemoveClick(this: AuthorProps, ev: React.MouseEvent<HTMLButtonElement>): void {
-    ev.preventDefault();
-    this.onRemove(this.index);
-}
+    private onNameChange = ({target}: React.ChangeEvent<HTMLInputElement>): void => {
+        this.emitInputChange("name", target.value);
+    }
 
-function Author(props: AuthorProps): JSX.Element {
-    return (
-        <div {...bem("author")}>
-            <input
-                name="authorName" type="text" value={props.model.name}
-                onChange={onAuthorInputChange.bind(props, "name")}
-                placeholder="Author Name" autoComplete="off" autoCapitalize="word" />
-            <input
-                name="authorEmail" type="email" value={props.model.email}
-                onChange={onAuthorInputChange.bind(props, "email")}
-                placeholder="Author Email" autoComplete="off" />
-            <button onClick={onAuthorRemoveClick.bind(props)}>Remove</button>
-        </div>
-    );
+    private onEmailChange = ({target}: React.ChangeEvent<HTMLInputElement>): void => {
+        this.emitInputChange("email", target.value);
+    }
+
+    private onRemoveClick = (ev: React.MouseEvent<HTMLButtonElement>): void => {
+        const {onRemove, index} = this.props;
+        ev.preventDefault();
+        onRemove(index);
+    }
+
+    render(): JSX.Element {
+        const {model} = this.props;
+        return (
+            <div {...bem("author")}>
+                <input
+                    name="authorName" type="text" value={model.name} onChange={this.onNameChange}
+                    placeholder="Author Name" autoComplete="off" autoCapitalize="word" />
+                <input
+                    name="authorEmail" type="email" value={model.email}
+                    onChange={this.onEmailChange} placeholder="Author Email" autoComplete="off" />
+                <button onClick={this.onRemoveClick}>Remove</button>
+            </div>
+        );
+    }
 }
 
 export default class ArticleEditPage extends React.PureComponent<Props, State> {
