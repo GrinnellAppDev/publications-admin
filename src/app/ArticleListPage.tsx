@@ -18,98 +18,98 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as React from "react";
-import * as BEMHelper from "react-bem-helper";
-import {RouteComponentProps, Link} from "react-router";
+import * as React from "react"
+import * as BEMHelper from "react-bem-helper"
+import {RouteComponentProps, Link} from "react-router"
 
-import Article from "./Article";
-import {ArticleBriefModel, PublicationModel} from "./models";
-import api from "./api";
+import Article from "./Article"
+import {ArticleBriefModel, PublicationModel} from "./models"
+import api from "./api"
 
-import "./ArticleListPage.scss";
+import "./ArticleListPage.scss"
 
 class AlreadyLoadingError extends Error {
-    isAlreadyLoadingError: boolean = true;
+    isAlreadyLoadingError: boolean = true
     constructor() {
-        super("Already loading.");
+        super("Already loading.")
     }
 }
 
 interface RouteParams {
-    publicationId?: string;
+    publicationId?: string
 }
 
-type Props = RouteComponentProps<RouteParams, {}>;
+type Props = RouteComponentProps<RouteParams, {}>
 
 interface State {
-    articles: ArticleBriefModel[];
-    publications: PublicationModel[];
-    isLoading: boolean;
+    articles: ArticleBriefModel[]
+    publications: PublicationModel[]
+    isLoading: boolean
 }
 
-const bem = new BEMHelper("ArticleListPage");
+const bem = new BEMHelper("ArticleListPage")
 
 export default class ArticleListPage extends React.PureComponent<Props, State> {
     state: State = {
         articles: [],
         publications: [],
         isLoading: false,
-    };
+    }
 
-    private publicationsPromise: Promise<PublicationModel[]>;
+    private publicationsPromise: Promise<PublicationModel[]>
 
     private async reload(publicationId: string = this.props.params.publicationId): Promise<void> {
         if (this.state.isLoading) {
-            throw new AlreadyLoadingError();
+            throw new AlreadyLoadingError()
         }
 
         if (publicationId) {
-            this.setState({isLoading: true});
+            this.setState({isLoading: true})
             this.setState({
                 articles: await api.articles.list(publicationId),
                 isLoading: false,
-            });
+            })
         } else {
-            const id = (await this.publicationsPromise)[0].id;
-            this.props.router.replace(`/publications/${id}/articles`);
+            const id = (await this.publicationsPromise)[0].id
+            this.props.router.replace(`/publications/${id}/articles`)
         }
     }
 
     async componentDidMount(): Promise<void> {
-        this.publicationsPromise = api.publications.list();
-        this.setState({publications: await this.publicationsPromise});
-        await this.reload();
+        this.publicationsPromise = api.publications.list()
+        this.setState({publications: await this.publicationsPromise})
+        await this.reload()
     }
 
     async componentWillReceiveProps({params: nextParams}: Props): Promise<void> {
-        const {params: currentParams} = this.props;
+        const {params: currentParams} = this.props
 
         if (nextParams.publicationId !== currentParams.publicationId) {
-            await this.reload(nextParams.publicationId);
+            await this.reload(nextParams.publicationId)
         }
     }
 
     private onArticleDelete = (id: string): void => {
-        api.articles.remove(this.props.params.publicationId, id);
+        api.articles.remove(this.props.params.publicationId, id)
 
         this.setState(({articles}) => ({
             articles: articles.filter(article => article.id !== id)
-        }));
+        }))
     }
 
     private onRefresh = async (): Promise<void> => {
         try {
-            await this.reload();
+            await this.reload()
         } catch (err) {
             if (!(err as AlreadyLoadingError).isAlreadyLoadingError) {
-                throw err;
+                throw err
             }
         }
     }
 
     render(): JSX.Element {
-        const {params} = this.props;
-        const {articles, publications, isLoading} = this.state;
+        const {params} = this.props
+        const {articles, publications, isLoading} = this.state
 
         return (
             <div>
@@ -161,6 +161,6 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
                     )}
                 </main>
             </div>
-        );
+        )
     }
 }

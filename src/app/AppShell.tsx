@@ -18,20 +18,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as React from "react";
-import * as BEMHelper from "react-bem-helper";
-import {RouteComponentProps} from "react-router";
+import * as React from "react"
+import * as BEMHelper from "react-bem-helper"
+import {RouteComponentProps} from "react-router"
 
-import "./AppShell.scss";
+import "./AppShell.scss"
 
-const bem = new BEMHelper("AppShell");
+const bem = new BEMHelper("AppShell")
 
-type Props = RouteComponentProps<{}, {}> & {children?: React.ReactNode};
+type Props = RouteComponentProps<{}, {}> & {children?: React.ReactNode}
 
 export default function AppShell(props: Props): JSX.Element {
     return (
         <div {...bem()}>
             {props.children}
         </div>
-    );
+    )
 }

@@ -19,17 +19,17 @@
  */
 
 import {ArticleModel, ArticleEditModel, ArticleBriefModel, PublicationModel,
-        conversions as conv} from "./models";
+        conversions as conv} from "./models"
 
-const API_ROOT: string = process.env.API_ROOT;
+const API_ROOT: string = process.env.API_ROOT
 
 class FetchError extends Error {
-    isFetchError: boolean = true;
-    status: number;
+    isFetchError: boolean = true
+    status: number
 
     constructor(resp: Response) {
-        super(`Fetch errored with code: ${resp.status} - ${resp.statusText}`);
-        this.status = resp.status;
+        super(`Fetch errored with code: ${resp.status} - ${resp.statusText}`)
+        this.status = resp.status
     }
 }
 
@@ -39,13 +39,13 @@ export default {
             const resp = await fetch(`${API_ROOT}/publications`, {
                 method: "GET",
                 mode: "cors",
-            });
+            })
 
             if (!resp.ok) {
-                throw new FetchError(resp);
+                throw new FetchError(resp)
             }
 
-            return conv.requestToArray(conv.requestToPublicationModel, await resp.json());
+            return conv.requestToArray(conv.requestToPublicationModel, await resp.json())
         },
     },
 
@@ -54,13 +54,13 @@ export default {
             const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
                 method: "GET",
                 mode: "cors",
-            });
+            })
 
             if (!resp.ok) {
-                throw new FetchError(resp);
+                throw new FetchError(resp)
             }
 
-            return conv.requestToArray(conv.requestToArticleBriefModel, await resp.json());
+            return conv.requestToArray(conv.requestToArticleBriefModel, await resp.json())
         },
 
         async get(publicationId: string, articleId: string): Promise<ArticleModel> {
@@ -68,13 +68,13 @@ export default {
                                      `${articleId}`, {
                 method: "GET",
                 mode: "cors",
-            });
+            })
 
             if (!resp.ok) {
-                throw new FetchError(resp);
+                throw new FetchError(resp)
             }
 
-            return conv.requestToArticleModel(await resp.json());
+            return conv.requestToArticleModel(await resp.json())
         },
 
         async remove(publicationId: string, articleId: string): Promise<void> {
@@ -82,10 +82,10 @@ export default {
                                      `${articleId}`, {
                 method: "DELETE",
                 mode: "cors",
-            });
+            })
 
             if (!resp.ok) {
-                throw new FetchError(resp);
+                throw new FetchError(resp)
             }
         },
 
@@ -94,10 +94,10 @@ export default {
                 method: "POST",
                 mode: "cors",
                 body: JSON.stringify(conv.articleEditModelToRequest(model)),
-            });
+            })
 
             if (!resp.ok) {
-                throw new FetchError(resp);
+                throw new FetchError(resp)
             }
         },
 
@@ -108,11 +108,11 @@ export default {
                 method: "PATCH",
                 mode: "cors",
                 body: JSON.stringify(conv.articleEditModelToRequest(model)),
-            });
+            })
 
             if (!resp.ok) {
-                throw new FetchError(resp);
+                throw new FetchError(resp)
             }
         },
     },
-};
+}

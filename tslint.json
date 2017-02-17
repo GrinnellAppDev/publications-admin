@@ -35,7 +35,7 @@
         ],
         "quotemark": [true, "double"],
         "radix": true,
-        "semicolon": [true, "always"],
+        "semicolon": [true, "never"],
         "triple-equals": [false],
         "typedef": [
             true,

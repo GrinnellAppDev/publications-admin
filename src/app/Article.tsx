@@ -18,35 +18,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as React from "react";
-import * as BEMHelper from "react-bem-helper";
-import {Link} from "react-router";
+import * as React from "react"
+import * as BEMHelper from "react-bem-helper"
+import {Link} from "react-router"
 
-import {ArticleBriefModel} from "./models";
+import {ArticleBriefModel} from "./models"
 
-import "./Article.scss";
+import "./Article.scss"
 
 interface Props {
-    model: ArticleBriefModel;
-    onDelete: (id: string) => void;
+    model: ArticleBriefModel
+    onDelete: (id: string) => void
 }
 
-const bem = new BEMHelper("Article");
+const bem = new BEMHelper("Article")
 
 function getMonthShortText(date: Date): string {
     const MONTHS = ["Jan", "Feb", "Mar", "April", "May", "June", "July", "Aug", "Sep", "Oct", "Nov",
-                    "Dec"];
-    return MONTHS[date.getMonth()];
+                    "Dec"]
+    return MONTHS[date.getMonth()]
 }
 
 export default class Article extends React.PureComponent<Props, {}> {
     private onDeleteClick = (ev: React.MouseEvent<HTMLButtonElement>): void => {
-        const {model, onDelete} = this.props;
-        onDelete(model.id);
+        const {model, onDelete} = this.props
+        onDelete(model.id)
     }
 
     render(): JSX.Element {
-        const {model} = this.props;
+        const {model} = this.props
         return (
             <article {...bem()}>
                 <div {...bem("header-image-wrapper")}>
@@ -72,6 +72,6 @@ export default class Article extends React.PureComponent<Props, {}> {
                     </div>
                 </section>
             </article>
-        );
+        )
     }
 }

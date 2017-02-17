@@ -19,42 +19,42 @@
  */
 
 export interface PublicationModel {
-    id: string;
-    name: string;
+    id: string
+    name: string
 }
 
 export interface AuthorModel {
-    name: string;
-    email: string;
+    name: string
+    email: string
 }
 
 export interface ArticleBriefModel {
-    id: string;
-    publication: string;
-    datePublished: Date;
-    headerImage: string;
-    title: string;
-    brief: string;
+    id: string
+    publication: string
+    datePublished: Date
+    headerImage: string
+    title: string
+    brief: string
 }
 
 export interface ArticleEditModel {
-    content: string;
-    headerImage: string;
-    title: string;
-    brief: string;
-    authors: AuthorModel[];
+    content: string
+    headerImage: string
+    title: string
+    brief: string
+    authors: AuthorModel[]
 }
 
 export interface ArticleModel extends ArticleEditModel, ArticleBriefModel {
-    dateEdited: Date;
+    dateEdited: Date
 }
 
 function requestToArray<T>(elementConversion: (element: any) => T, request: any): T[] {
-    return (request as any[]).map(elementConversion);
+    return (request as any[]).map(elementConversion)
 }
 
 function requestToPublicationModel(request: any): PublicationModel {
-    return {...request as PublicationModel};
+    return {...request as PublicationModel}
 }
 
 function requestToArticleModel(request: any): ArticleModel {
@@ -62,31 +62,31 @@ function requestToArticleModel(request: any): ArticleModel {
         ...request as ArticleModel,
         dateEdited: new Date(request.dateEdited),
         datePublished: new Date(request.datePublished),
-    };
+    }
 }
 
 function requestToArticleBriefModel(request: any): ArticleBriefModel {
     return {
         ...request as ArticleBriefModel,
         datePublished: new Date(request.datePublished),
-    };
+    }
 }
 
 function arrayToRequest<T>(elementConversion: (element: T) => any, array: T[]): any {
-    return array.map(elementConversion).filter(element => element !== undefined);
+    return array.map(elementConversion).filter(element => element !== undefined)
 }
 
 function authorModelToRequest(model: AuthorModel): any {
-    const {name, email} = model;
-    return {name, email};
+    const {name, email} = model
+    return {name, email}
 }
 
 function articleEditModelToRequest(model: ArticleEditModel): any {
-    const {content, title, authors, headerImage, brief} = model;
+    const {content, title, authors, headerImage, brief} = model
     return {
         authors: arrayToRequest(authorModelToRequest, authors),
         content, title, headerImage, brief,
-    };
+    }
 }
 
 export const conversions = {
@@ -97,4 +97,4 @@ export const conversions = {
     arrayToRequest,
     authorModelToRequest,
     articleEditModelToRequest,
-};
+}

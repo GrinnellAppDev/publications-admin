@@ -18,34 +18,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import webpack from "webpack";
-import path from "path";
+import webpack from "webpack"
+import path from "path"
 
-import HtmlPlugin from "html-webpack-plugin";
-import ExtractTextPlugin from "extract-text-webpack-plugin";
-import InlineManifestPlugin from "inline-manifest-webpack-plugin";
-import OptimizeCssAssetsPlugin from "optimize-css-assets-webpack-plugin";
+import HtmlPlugin from "html-webpack-plugin"
+import ExtractTextPlugin from "extract-text-webpack-plugin"
+import InlineManifestPlugin from "inline-manifest-webpack-plugin"
+import OptimizeCssAssetsPlugin from "optimize-css-assets-webpack-plugin"
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === "production"
 
-const DEV_SERVER_PORT = 8080;
-const DEV_SERVER_HOST = "localhost";
+const DEV_SERVER_PORT = 8080
+const DEV_SERVER_HOST = "localhost"
 
-const DEV_API_ROOT = "https://g2j7qs2xs7.execute-api.us-west-2.amazonaws.com/devstable";
-const PRODUCTION_API_ROOT = "https://3iqnjzs7w1.execute-api.us-west-2.amazonaws.com/production";
+const DEV_API_ROOT = "https://g2j7qs2xs7.execute-api.us-west-2.amazonaws.com/devstable"
+const PRODUCTION_API_ROOT = "https://3iqnjzs7w1.execute-api.us-west-2.amazonaws.com/production"
 
 const paths = {
     htmlTemplate: path.resolve("src/index.html"),
     clientEntry: path.resolve("src/client"),
     build: isProduction ? path.resolve("build") : path.resolve(".tmp"),
     devServer: `http://${DEV_SERVER_HOST}:${DEV_SERVER_PORT}/`,
-};
+}
 
 const htmlMinifierConfig = {
     collapseInlineTagWhitespace: true,
     collapseWhitespace: true,
     removeAttributeQuotes: true,
-};
+}
 
 export default {
     entry: paths.clientEntry,
@@ -184,4 +184,4 @@ export default {
         } : {
         }),
     },
-};
+}

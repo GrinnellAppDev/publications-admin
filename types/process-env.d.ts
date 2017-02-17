@@ -22,7 +22,7 @@
 /** Interface to build variables. */
 declare var process: {
     env: {
-        NODE_ENV: "production" | "dev";
-        API_ROOT: string;
-    };
-};
+        NODE_ENV: "production" | "dev"
+        API_ROOT: string
+    }
+}
