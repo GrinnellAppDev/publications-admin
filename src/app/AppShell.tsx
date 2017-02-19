@@ -19,16 +19,19 @@
  */
 
 import * as React from "react"
-import * as BEMHelper from "react-bem-helper"
+import {block} from "react-bem-helper"
 import {RouteComponentProps} from "react-router"
 
 import "./AppShell.scss"
 
-const bem = new BEMHelper("AppShell")
+const b = block("AppShell")
 
 type Props = RouteComponentProps<{}, {}> & {children?: React.ReactNode}
 
-export default (props: Props) =>
-    <div {...bem()}>
-        {props.children}
-    </div>
+export default function AppShell(props: Props): JSX.Element {
+    return (
+        <div className={b()}>
+            {props.children}
+        </div>
+    )
+}

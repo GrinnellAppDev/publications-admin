@@ -19,14 +19,11 @@
  */
 
 import * as React from "react"
-import * as BEMHelper from "react-bem-helper"
-import {RouteComponentProps, Link} from "react-router"
+import {RouteComponentProps} from "react-router"
 
-import Article from "./Article"
+import ArticleList from "./ArticleList"
 import {ArticleBriefModel, PublicationModel} from "./models"
 import api from "./api"
-
-import "./ArticleListPage.scss"
 
 class AlreadyLoadingError extends Error {
     isAlreadyLoadingError: boolean = true
@@ -46,8 +43,6 @@ interface State {
     publications: PublicationModel[]
     isLoading: boolean
 }
-
-const bem = new BEMHelper("ArticleListPage")
 
 export default class ArticleListPage extends React.PureComponent<Props, State> {
     state: State = {
@@ -110,57 +105,11 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
     render(): JSX.Element {
         const {params} = this.props
         const {articles, publications, isLoading} = this.state
+        const currentPublication = publications.find(({id}) => id === params.publicationId)
 
-        return (
-            <div>
-                <nav>
-                    <ul>
-                        {publications.map(publication =>
-                            <li key={publication.id}>
-                                <Link
-                                    to={`/publications/${publication.id}/articles`}
-                                    {...bem("publication-link")}
-                                    activeClassName={bem("publication-link", "active").className}>
-
-                                    {publication.name}
-                                </Link>
-                            </li>
-                        )}
-                    </ul>
-                </nav>
-
-                <header>
-                    <h1>
-                        {(publications.length !== 0 && params.publicationId) ? (
-                            publications.find(({id}) => id === params.publicationId).name + " "
-                        ) : (
-                            ""
-                        )}
-
-                        Articles
-                    </h1>
-                </header>
-
-                <main>
-                    <Link to={`/publications/${params.publicationId}/articles/new`}>
-                        <button>New Article</button>
-                    </Link>
-
-                    <button onClick={this.onRefresh}>Refresh</button>
-
-                    {(isLoading) ? (
-                        <section {...bem("articles")}>Loading...</section>
-                    ) : (
-                        <section {...bem("articles")}>
-                            {articles.map(article =>
-                                <Article
-                                    key={article.id} model={article}
-                                    onDelete={this.onArticleDelete} />
-                            )}
-                        </section>
-                    )}
-                </main>
-            </div>
-        )
+        return <ArticleList
+            articles={articles} isLoading={isLoading} publications={publications}
+            currentPublication={currentPublication}
+            onArticleDelete={this.onArticleDelete} onRefresh={this.onRefresh} />
     }
 }

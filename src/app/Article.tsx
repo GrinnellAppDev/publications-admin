@@ -19,7 +19,7 @@
  */
 
 import * as React from "react"
-import * as BEMHelper from "react-bem-helper"
+import {block} from "react-bem-helper"
 import {Link} from "react-router"
 
 import {ArticleBriefModel} from "./models"
@@ -31,33 +31,38 @@ interface Props {
     onDelete: (id: string) => void
 }
 
-const bem = new BEMHelper("Article")
+const b = block("Article")
 
 const SHORT_MONTHS = ["Jan", "Feb", "Mar", "April", "May", "June", "July", "Aug", "Sep", "Oct",
                       "Nov", "Dec"]
 
-export default ({model, onDelete}: Props) =>
-    <article {...bem()}>
-        <div {...bem("header-image-wrapper")}>
-            <div {...bem("header-image-container")}>
-                <img {...bem("header-image")} src={model.headerImage || ""} />
+export default function Article({model, onDelete}: Props): JSX.Element {
+    return (
+        <article className={b()}>
+            <div className={b("header-image-wrapper")}>
+                <div className={b("header-image-container")}>
+                    <img className={b("header-image")} src={model.headerImage || ""} />
+                </div>
             </div>
-        </div>
-        <section {...bem("detail-wrapper")}>
-            <h2 {...bem("title")}>{model.title}</h2>
+            <section className={b("detail-wrapper")}>
+                <h2 className={b("title")}>{model.title}</h2>
 
-            <div>
-                <Link to={`/publications/${model.publication}/articles/edit/${model.id}`}>
-                    <button>Edit</button>
-                </Link>
-                <button onClick={() => onDelete(model.id)}>Delete</button>
-            </div>
+                <div>
+                    <Link to={`/publications/${model.publication}/articles/edit/${model.id}`}>
+                        <button>Edit</button>
+                    </Link>
+                    <button onClick={() => onDelete(model.id)}>Delete</button>
+                </div>
 
-            <div>
-                <span {...bem("date")}>
-                    {SHORT_MONTHS[model.datePublished.getMonth()]} {model.datePublished.getDate()}
-                </span>
-                {model.brief ? " • " + model.brief : ""}
-            </div>
-        </section>
-    </article>
+                <div>
+                    <span className={b("date")}>
+                        {SHORT_MONTHS[model.datePublished.getMonth()]}
+                        {" "}
+                        {model.datePublished.getDate()}
+                    </span>
+                    {model.brief ? " • " + model.brief : ""}
+                </div>
+            </section>
+        </article>
+    )
+}

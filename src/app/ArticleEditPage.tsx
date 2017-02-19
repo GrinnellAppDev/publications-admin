@@ -19,20 +19,11 @@
  */
 
 import * as React from "react"
-import {RouteComponentProps, Link} from "react-router"
-import * as BEMHelper from "react-bem-helper"
+import {RouteComponentProps} from "react-router"
 
 import {ArticleModel, AuthorModel} from "./models"
 import api from "./api"
-
-import "./ArticleEditPage.scss"
-
-interface AuthorProps {
-    index: number
-    model: AuthorModel
-    onChange: (index: number, newModel: AuthorModel) => void
-    onRemove: (index: number) => void
-}
+import ArticleEditForm, {SubmissionState} from "./ArticleEditForm"
 
 interface RouteParams {
     publicationId: string
@@ -41,38 +32,11 @@ interface RouteParams {
 
 type Props = RouteComponentProps<RouteParams, {}>
 
-enum SubmissionState {
-    EDITING,
-    SUBMITTING,
-    ERRORED,
-}
-
 interface State {
     model: ArticleModel
     isLoading: boolean
     submissionState: SubmissionState
 }
-
-const bem = new BEMHelper("ArticleEditPage")
-
-const Author = ({model, index, onChange, onRemove}: AuthorProps) => (
-    <div {...bem("author")}>
-        <input
-            name="authorName" type="text" value={model.name}
-            onChange={ev => onChange(index, {...model, name: ev.target.value})}
-            placeholder="Author Name" autoComplete="off" autoCapitalize="word" />
-        <input
-            name="authorEmail" type="email" value={model.email}
-            onChange={ev => onChange(index, {...model, email: ev.target.value})}
-            placeholder="Author Email" autoComplete="off" />
-        <button onClick={ev => {
-            ev.preventDefault()
-            onRemove(index)
-        }}>
-            Remove
-        </button>
-    </div>
-)
 
 export default class ArticleEditPage extends React.PureComponent<Props, State> {
     state: State = {
@@ -189,59 +153,12 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
     render(): JSX.Element {
         const {params} = this.props
         const {model, isLoading, submissionState} = this.state
-        const isErrored = submissionState === SubmissionState.ERRORED
-        const isSubmitting = submissionState === SubmissionState.SUBMITTING
-
-        return (isLoading) ? (
-            <div {...bem("", "loading")}>Loading...</div>
-        ) : (
-            <form {...bem("")} onSubmit={this.onSubmit}>
-                <Link to={`/publications/${params.publicationId}/articles`}>
-                    <button>Back</button>
-                </Link>
-
-                <h1>
-                    {model.id ? "Edit" : "Create"} Article
-                </h1>
-
-                <input
-                    name="title" type="text" onChange={this.onTitleChange} value={model.title}
-                    placeholder="Title" autoComplete="off"
-                    {...bem("input", "block title")} />
-
-                <input
-                    name="headerImage" type="url" value={model.headerImage}
-                    onChange={this.onHeaderImageChange} placeholder="Header Image URL"
-                    autoComplete="off" {...bem("input", "block")} />
-
-                <div {...bem("authors")}>
-                    {model.authors.map((model, index) =>
-                        <Author
-                            {...{model, index}} key={index} onChange={this.onAuthorChange}
-                            onRemove={this.onAuthorRemove} {...bem("input")} />
-                    )}
-                </div>
-
-                <button onClick={this.onAuthorAdd}>Add Author</button>
-
-                <input
-                    name="brief" type="text" value={model.brief} onChange={this.onBriefChange}
-                    placeholder="Brief" autoComplete="off" maxLength={140}
-                    {...bem("input", "block")} />
-
-                <textarea
-                    name="content" onChange={this.onContentChange} value={model.content}
-                    {...bem("input", "block content")} />
-
-                <input type="submit" value={(model.id ? "Update" : "Create") + " Article"} />
-
-                <div {...bem("submit-status", {"hidden": !isErrored, "error": true})}>
-                    There was a problem submitting your article.
-                </div>
-                <div {...bem("submit-status", {"hidden": !isSubmitting})}>
-                    Submitting...
-                </div>
-            </form>
-        )
+        return <ArticleEditForm
+            model={model} isLoading={isLoading} submissionState={submissionState}
+            publicationId={params.publicationId} onTitleChange={this.onTitleChange}
+            onHeaderImageChange={this.onHeaderImageChange} onAuthorAdd={this.onAuthorAdd}
+            onAuthorChange={this.onAuthorChange} onAuthorRemove={this.onAuthorRemove}
+            onBriefChange={this.onBriefChange} onContentChange={this.onContentChange}
+            onSubmit={this.onSubmit} />
     }
 }

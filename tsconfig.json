@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
         "jsx": "react",
-        "moduleResolution": "node",
         "sourceMap": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
@@ -12,6 +11,8 @@
         "noUnusedLocals": true,
         "target": "es5",
         "module": "es6",
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
         "lib": [
             "dom",
             "dom.iterable",
