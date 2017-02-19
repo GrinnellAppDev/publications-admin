@@ -21,8 +21,8 @@
 import * as React from "react"
 import {RouteComponentProps} from "react-router"
 
-import {ArticleModel, AuthorModel} from "./models"
-import api from "./api"
+import {ArticleModel, AuthorModel} from "./state/models"
+import api from "./state/api"
 import ArticleEditForm, {SubmissionState} from "./ArticleEditForm"
 
 interface RouteParams {

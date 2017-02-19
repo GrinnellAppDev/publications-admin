@@ -22,7 +22,7 @@ import * as React from "react"
 import {block} from "react-bem-helper"
 import {Link} from "react-router"
 
-import {ArticleBriefModel, PublicationModel} from "./models"
+import {ArticleBriefModel, PublicationModel} from "./state/models"
 import Article from "./Article"
 
 import "./ArticleList.scss"

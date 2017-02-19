@@ -20,7 +20,7 @@
 
 import * as React from "react"
 
-import {AuthorModel} from "./models"
+import {AuthorModel} from "./state/models"
 
 interface StateProps {
     index: number

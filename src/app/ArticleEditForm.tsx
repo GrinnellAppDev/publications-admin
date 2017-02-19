@@ -22,7 +22,7 @@ import * as React from "react"
 import {block} from "react-bem-helper"
 import {Link} from "react-router"
 
-import {AuthorModel, ArticleModel} from "./models"
+import {AuthorModel, ArticleModel} from "./state/models"
 import AuthorInput from "./AuthorInput"
 
 import "./ArticleEditForm.scss"

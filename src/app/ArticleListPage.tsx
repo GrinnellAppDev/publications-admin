@@ -22,8 +22,8 @@ import * as React from "react"
 import {RouteComponentProps} from "react-router"
 
 import ArticleList from "./ArticleList"
-import {ArticleBriefModel, PublicationModel} from "./models"
-import api from "./api"
+import {ArticleBriefModel, PublicationModel} from "./state/models"
+import api from "./state/api"
 
 class AlreadyLoadingError extends Error {
     isAlreadyLoadingError: boolean = true
