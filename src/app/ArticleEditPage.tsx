@@ -154,11 +154,10 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
         const {params} = this.props
         const {model, isLoading, submissionState} = this.state
         return <ArticleEditForm
-            model={model} isLoading={isLoading} submissionState={submissionState}
-            publicationId={params.publicationId} onTitleChange={this.onTitleChange}
-            onHeaderImageChange={this.onHeaderImageChange} onAuthorAdd={this.onAuthorAdd}
-            onAuthorChange={this.onAuthorChange} onAuthorRemove={this.onAuthorRemove}
-            onBriefChange={this.onBriefChange} onContentChange={this.onContentChange}
-            onSubmit={this.onSubmit} />
+            {...{model, isLoading, submissionState}} publicationId={params.publicationId}
+            onTitleChange={this.onTitleChange} onHeaderImageChange={this.onHeaderImageChange}
+            onAuthorAdd={this.onAuthorAdd} onAuthorChange={this.onAuthorChange}
+            onAuthorRemove={this.onAuthorRemove} onBriefChange={this.onBriefChange}
+            onContentChange={this.onContentChange} onSubmit={this.onSubmit} />
     }
 }

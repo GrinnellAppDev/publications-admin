@@ -108,8 +108,7 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
         const currentPublication = publications.find(({id}) => id === params.publicationId)
 
         return <ArticleList
-            articles={articles} isLoading={isLoading} publications={publications}
-            currentPublication={currentPublication}
+            {...{articles, publications, isLoading, currentPublication}}
             onArticleDelete={this.onArticleDelete} onRefresh={this.onRefresh} />
     }
 }
