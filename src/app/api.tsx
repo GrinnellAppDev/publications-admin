@@ -18,8 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ArticleModel, ArticleEditModel, ArticleBriefModel, PublicationModel,
-        conversions as conv} from "./models"
+import {PublicationModel, ArticleModel, ArticleEditModel, ArticleBriefModel,
+        AuthorModel} from "./models"
 
 const API_ROOT: string = process.env.API_ROOT
 
@@ -30,6 +30,46 @@ class FetchError extends Error {
     constructor(resp: Response) {
         super(`Fetch errored with code: ${resp.status} - ${resp.statusText}`)
         this.status = resp.status
+    }
+}
+
+function requestToArray<T>(elementConversion: (element: any) => T, request: any): T[] {
+    return (request as any[]).map(elementConversion)
+}
+
+function requestToPublicationModel(request: any): PublicationModel {
+    return {...request as PublicationModel}
+}
+
+function requestToArticleModel(request: any): ArticleModel {
+    return {
+        ...request as ArticleModel,
+        dateEdited: new Date(request.dateEdited),
+        datePublished: new Date(request.datePublished),
+    }
+}
+
+function requestToArticleBriefModel(request: any): ArticleBriefModel {
+    return {
+        ...request as ArticleBriefModel,
+        datePublished: new Date(request.datePublished),
+    }
+}
+
+function arrayToRequest<T>(elementConversion: (element: T) => any, array: T[]): any {
+    return array.map(elementConversion).filter(element => element !== undefined)
+}
+
+function authorModelToRequest(model: AuthorModel): any {
+    const {name, email} = model
+    return {name, email}
+}
+
+function articleEditModelToRequest(model: ArticleEditModel): any {
+    const {content, title, authors, headerImage, brief} = model
+    return {
+        authors: arrayToRequest(authorModelToRequest, authors),
+        content, title, headerImage, brief,
     }
 }
 
@@ -45,7 +85,7 @@ export default {
                 throw new FetchError(resp)
             }
 
-            return conv.requestToArray(conv.requestToPublicationModel, await resp.json())
+            return requestToArray(requestToPublicationModel, await resp.json())
         },
     },
 
@@ -60,7 +100,7 @@ export default {
                 throw new FetchError(resp)
             }
 
-            return conv.requestToArray(conv.requestToArticleBriefModel, await resp.json())
+            return requestToArray(requestToArticleBriefModel, await resp.json())
         },
 
         async get(publicationId: string, articleId: string): Promise<ArticleModel> {
@@ -74,7 +114,7 @@ export default {
                 throw new FetchError(resp)
             }
 
-            return conv.requestToArticleModel(await resp.json())
+            return requestToArticleModel(await resp.json())
         },
 
         async remove(publicationId: string, articleId: string): Promise<void> {
@@ -93,7 +133,7 @@ export default {
             const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
                 method: "POST",
                 mode: "cors",
-                body: JSON.stringify(conv.articleEditModelToRequest(model)),
+                body: JSON.stringify(articleEditModelToRequest(model)),
             })
 
             if (!resp.ok) {
@@ -107,7 +147,7 @@ export default {
                                      `${articleId}`, {
                 method: "PATCH",
                 mode: "cors",
-                body: JSON.stringify(conv.articleEditModelToRequest(model)),
+                body: JSON.stringify(articleEditModelToRequest(model)),
             })
 
             if (!resp.ok) {

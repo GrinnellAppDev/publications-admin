@@ -18,11 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export interface PublicationModel {
-    id: string
-    name: string
-}
-
 export interface AuthorModel {
     name: string
     email: string
@@ -49,44 +44,7 @@ export interface ArticleModel extends ArticleEditModel, ArticleBriefModel {
     dateEdited: Date
 }
 
-export const conversions = {
-    requestToArray<T>(elementConversion: (element: any) => T, request: any): T[] {
-        return (request as any[]).map(elementConversion)
-    },
-
-    requestToPublicationModel(request: any): PublicationModel {
-        return {...request as PublicationModel}
-    },
-
-    requestToArticleModel(request: any): ArticleModel {
-        return {
-            ...request as ArticleModel,
-            dateEdited: new Date(request.dateEdited),
-            datePublished: new Date(request.datePublished),
-        }
-    },
-
-    requestToArticleBriefModel(request: any): ArticleBriefModel {
-        return {
-            ...request as ArticleBriefModel,
-            datePublished: new Date(request.datePublished),
-        }
-    },
-
-    arrayToRequest<T>(elementConversion: (element: T) => any, array: T[]): any {
-        return array.map(elementConversion).filter(element => element !== undefined)
-    },
-
-    authorModelToRequest(model: AuthorModel): any {
-        const {name, email} = model
-        return {name, email}
-    },
-
-    articleEditModelToRequest(model: ArticleEditModel): any {
-        const {content, title, authors, headerImage, brief} = model
-        return {
-            authors: conversions.arrayToRequest(conversions.authorModelToRequest, authors),
-            content, title, headerImage, brief,
-        }
-    },
+export interface PublicationModel {
+    id: string
+    name: string
 }
