@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@types/history@*":
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/@types/history/-/history-4.5.0.tgz#2f5c3aad4fbd00f89e99b83083e354bc5308e307"
+"@types/history@^3":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@types/history/-/history-3.2.0.tgz#b9afac537ef30c4ca3aa1a6bea08c039011073d4"
 
 "@types/react-dom@^0.14.23":
   version "0.14.23"
@@ -12,11 +12,25 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-router@^3.0.2":
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/@types/react-router/-/react-router-3.0.3.tgz#78644c9a0dd7e04f7101b9a03d63361e69587030"
+"@types/react-redux@^4.4.36":
+  version "4.4.36"
+  resolved "https://registry.yarnpkg.com/@types/react-redux/-/react-redux-4.4.36.tgz#5d1e768f3291c66c8e54d8a48e42f7cb554a7d87"
   dependencies:
-    "@types/history" "*"
+    "@types/react" "*"
+    redux "^3.6.0"
+
+"@types/react-router-redux@^4.0.41":
+  version "4.0.41"
+  resolved "https://registry.yarnpkg.com/@types/react-router-redux/-/react-router-redux-4.0.41.tgz#429d9ae7964240dd6d80fc006b406176ce5aa9b6"
+  dependencies:
+    "@types/history" "^3"
+    redux "^3.6.0"
+
+"@types/react-router@^3.0.4":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@types/react-router/-/react-router-3.0.4.tgz#48acd0334b80302feb6983dff0f96445eaa89cc8"
+  dependencies:
+    "@types/history" "^3"
     "@types/react" "*"
 
 "@types/react@*", "@types/react@^15.0.6":
@@ -3465,6 +3479,10 @@ reduce-function-call@^1.0.1:
   dependencies:
     balanced-match "^0.4.2"
 
+redux-thunk@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.2.0.tgz#e615a16e16b47a19a515766133d1e3e99b7852e5"
+
 redux@^3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/redux/-/redux-3.6.0.tgz#887c2b3d0b9bd86eca2be70571c27654c19e188d"
@@ -3599,6 +3617,10 @@ require-main-filename@^1.0.1:
 requires-port@1.0.x, requires-port@1.x.x:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/requires-port/-/requires-port-1.0.0.tgz#925d2601d39ac485e091cf0da5c6e694dc3dcaff"
+
+reselect@^2.5.4:
+  version "2.5.4"
+  resolved "https://registry.yarnpkg.com/reselect/-/reselect-2.5.4.tgz#b7d23fdf00b83fa7ad0279546f8dbbbd765c7047"
 
 resolve@^1.1.7:
   version "1.2.0"

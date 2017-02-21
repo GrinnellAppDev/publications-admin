@@ -18,25 +18,53 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as React from "react"
 import {RouteComponentProps} from "react-router"
+import {connect} from "react-redux"
 
-import ArticleList from "./ArticleList"
-import {ArticleBriefModel, PublicationModel} from "./state/models"
-import api from "./state/api"
-
-class AlreadyLoadingError extends Error {
-    isAlreadyLoadingError: boolean = true
-    constructor() {
-        super("Already loading.")
-    }
-}
+import ArticleList, {StateProps, DispatchProps} from "./ArticleList"
+import {StateModel} from "./state/models"
+// import api from "./state/api"
+import {getPublications, getArticles} from "./state/selectors"
+// import {clearArticlesAction, deleteArticleAction} from "./state/actions"
 
 interface RouteParams {
     publicationId?: string
 }
 
-type Props = RouteComponentProps<RouteParams, {}>
+interface OwnProps extends RouteComponentProps<RouteParams, {}> {
+}
+
+const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
+    (state: StateModel, ownProps) => ({
+        articles: getArticles(state),
+        publications: getPublications(state),
+        isLoading: state.isLoadingArticles,
+        currentPublication: state.publicationsById[ownProps.params.publicationId],
+    }),
+
+    dispatch => ({
+        onRefresh: () => {
+            return
+        },
+        onArticleDelete: id => {
+            return
+        },
+    }),
+)
+
+export default withReduxConnect(ArticleList)
+
+/*
+class AlreadyLoadingError extends Error {
+    isAlreadyLoadingError: boolean = true
+    static isTypeOf(err: any): err is AlreadyLoadingError {
+        return !!(err as AlreadyLoadingError).isAlreadyLoadingError
+    }
+
+    constructor() {
+        super("Already loading.")
+    }
+}
 
 interface State {
     articles: ArticleBriefModel[]
@@ -44,7 +72,7 @@ interface State {
     isLoading: boolean
 }
 
-export default class ArticleListPage extends React.PureComponent<Props, State> {
+export default class ArticleListPage extends React.PureComponent<OwnProps, State> {
     state: State = {
         articles: [],
         publications: [],
@@ -76,7 +104,7 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
         await this.reload()
     }
 
-    async componentWillReceiveProps({params: nextParams}: Props): Promise<void> {
+    async componentWillReceiveProps({params: nextParams}: OwnProps): Promise<void> {
         const {params: currentParams} = this.props
 
         if (nextParams.publicationId !== currentParams.publicationId) {
@@ -96,7 +124,7 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
         try {
             await this.reload()
         } catch (err) {
-            if (!(err as AlreadyLoadingError).isAlreadyLoadingError) {
+            if (!AlreadyLoadingError.isTypeOf(err)) {
                 throw err
             }
         }
@@ -112,3 +140,4 @@ export default class ArticleListPage extends React.PureComponent<Props, State> {
             onArticleDelete={this.onArticleDelete} onRefresh={this.onRefresh} />
     }
 }
+*/

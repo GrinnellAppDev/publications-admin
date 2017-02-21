@@ -1,5 +1,5 @@
 /**
- * api.tsx
+ * api.ts
  *
  * Created by Zander Otavka on 2/8/17.
  * Copyright (C) 2016  Grinnell AppDev.
@@ -18,13 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PublicationModel, ArticleModel, ArticleEditModel, ArticleBriefModel,
+import {PublicationModel, FullArticleModel, ArticleEditModel, ArticleBriefModel,
         AuthorModel} from "./models"
 
-const API_ROOT: string = process.env.API_ROOT
+const API_ROOT = process.env.API_ROOT
 
-class FetchError extends Error {
-    isFetchError: boolean = true
+export class FetchError extends Error {
+    private isFetchError: boolean = true
+    static isTypeOf = (err: any): err is FetchError => !!(err as FetchError).isFetchError
+
     status: number
 
     constructor(resp: Response) {
@@ -41,9 +43,9 @@ function requestToPublicationModel(request: any): PublicationModel {
     return {...request as PublicationModel}
 }
 
-function requestToArticleModel(request: any): ArticleModel {
+function requestToArticleModel(request: any): FullArticleModel {
     return {
-        ...request as ArticleModel,
+        ...request as FullArticleModel,
         dateEdited: new Date(request.dateEdited),
         datePublished: new Date(request.datePublished),
     }
@@ -73,9 +75,23 @@ function articleEditModelToRequest(model: ArticleEditModel): any {
     }
 }
 
-export default {
+export interface Api {
     publications: {
-        async list(): Promise<PublicationModel[]> {
+        list(): Promise<PublicationModel[]>
+    }
+
+    articles: {
+        list(publicationId: string): Promise<ArticleBriefModel[]>
+        get(publicationId: string, articleId: string): Promise<FullArticleModel>
+        remove(publicationId: string, articleId: string): Promise<void>
+        create(publicationId: string, model: ArticleEditModel): Promise<void>
+        edit(publicationId: string, articleId: string, model: ArticleEditModel): Promise<void>
+    }
+}
+
+export const api: Api = {
+    publications: {
+        list: async () => {
             const resp = await fetch(`${API_ROOT}/publications`, {
                 method: "GET",
                 mode: "cors",
@@ -90,7 +106,7 @@ export default {
     },
 
     articles: {
-        async list(publicationId: string): Promise<ArticleBriefModel[]> {
+        list: async publicationId => {
             const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
                 method: "GET",
                 mode: "cors",
@@ -103,7 +119,7 @@ export default {
             return requestToArray(requestToArticleBriefModel, await resp.json())
         },
 
-        async get(publicationId: string, articleId: string): Promise<ArticleModel> {
+        get: async (publicationId, articleId) => {
             const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
                                      `${articleId}`, {
                 method: "GET",
@@ -117,7 +133,7 @@ export default {
             return requestToArticleModel(await resp.json())
         },
 
-        async remove(publicationId: string, articleId: string): Promise<void> {
+        remove: async (publicationId, articleId) => {
             const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
                                      `${articleId}`, {
                 method: "DELETE",
@@ -129,7 +145,7 @@ export default {
             }
         },
 
-        async create(publicationId: string, model: ArticleEditModel): Promise<void> {
+        create: async (publicationId, model) => {
             const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
                 method: "POST",
                 mode: "cors",
@@ -141,8 +157,7 @@ export default {
             }
         },
 
-        async edit(publicationId: string, articleId: string,
-                   model: ArticleEditModel): Promise<void> {
+        edit: async (publicationId, articleId, model) => {
             const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
                                      `${articleId}`, {
                 method: "PATCH",

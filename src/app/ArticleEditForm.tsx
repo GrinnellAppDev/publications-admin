@@ -22,7 +22,7 @@ import * as React from "react"
 import {block} from "react-bem-helper"
 import {Link} from "react-router"
 
-import {AuthorModel, ArticleModel} from "./state/models"
+import {AuthorModel, FullArticleModel} from "./state/models"
 import AuthorInput from "./AuthorInput"
 
 import "./ArticleEditForm.scss"
@@ -34,7 +34,7 @@ export enum SubmissionState {
 }
 
 export interface StateProps {
-    model: ArticleModel
+    model: FullArticleModel
     isLoading: boolean
     submissionState: SubmissionState
     publicationId: string

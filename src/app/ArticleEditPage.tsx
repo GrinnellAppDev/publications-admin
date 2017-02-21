@@ -21,8 +21,8 @@
 import * as React from "react"
 import {RouteComponentProps} from "react-router"
 
-import {ArticleModel, AuthorModel} from "./state/models"
-import api from "./state/api"
+import {FullArticleModel, AuthorModel} from "./state/models"
+import {api} from "./state/api"
 import ArticleEditForm, {SubmissionState} from "./ArticleEditForm"
 
 interface RouteParams {
@@ -33,7 +33,7 @@ interface RouteParams {
 type Props = RouteComponentProps<RouteParams, {}>
 
 interface State {
-    model: ArticleModel
+    model: FullArticleModel
     isLoading: boolean
     submissionState: SubmissionState
 }

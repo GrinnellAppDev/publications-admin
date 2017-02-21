@@ -20,10 +20,46 @@
 
 import * as React from "react"
 import {Router, Route, IndexRoute, hashHistory} from "react-router"
+import {Provider} from "react-redux"
+import {createStore, combineReducers, applyMiddleware} from "redux"
+import {syncHistoryWithStore, routerReducer, routerMiddleware} from "react-router-redux"
+import thunk from "redux-thunk"
+
+import * as reducers from "./state/reducers"
+import {api} from "./state/api"
+import {ThunkContext, loadPublications, goToPublication} from "./state/actions"
+import {StateModel} from "./state/models"
+import {getPublications} from "./state/selectors"
 
 import AppShell from "./AppShell"
 import ArticleListPage from "./ArticleListPage"
 import ArticleEditPage from "./ArticleEditPage"
+
+const thunkContext: ThunkContext = {api}
+
+const store = createStore(
+    combineReducers<StateModel>({
+        ...reducers,
+        routing: routerReducer,
+    }),
+    applyMiddleware(
+        routerMiddleware(hashHistory),
+        thunk.withExtraArgument(thunkContext),
+    ),
+)
+
+class PublicationFetcher extends React.PureComponent<{}, {}> {
+    async componentDidMount(): Promise<void> {
+        await store.dispatch(loadPublications())
+        await store.dispatch(goToPublication(
+            getPublications(store.getState())[0].id
+        ))
+    }
+
+    render(): JSX.Element {
+        return <div/>
+    }
+}
 
 function NotFound(): JSX.Element {
     return (
@@ -36,18 +72,22 @@ function NotFound(): JSX.Element {
 
 export default function App(): JSX.Element {
     return (
-        <Router history={hashHistory}>
-            <Route path="/" component={AppShell}>
-                <IndexRoute component={ArticleListPage} />
-                <Route path="publications/:publicationId/articles" component={ArticleListPage} />
-                <Route
-                    path="publications/:publicationId/articles/new"
-                    component={ArticleEditPage} />
-                <Route
-                    path="publications/:publicationId/articles/edit/:articleId"
-                    component={ArticleEditPage} />
-                <Route path="*" component={NotFound} />
-            </Route>
-        </Router>
+        <Provider store={store}>
+            <Router history={syncHistoryWithStore(hashHistory, store)}>
+                <Route path="/" component={AppShell}>
+                    <IndexRoute component={PublicationFetcher} />
+                    <Route
+                        path="publications/:publicationId/articles"
+                        component={ArticleListPage} />
+                    <Route
+                        path="publications/:publicationId/articles/new"
+                        component={ArticleEditPage} />
+                    <Route
+                        path="publications/:publicationId/articles/edit/:articleId"
+                        component={ArticleEditPage} />
+                    <Route path="*" component={NotFound} />
+                </Route>
+            </Router>
+        </Provider>
     )
 }

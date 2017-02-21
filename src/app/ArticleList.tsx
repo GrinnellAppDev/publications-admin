@@ -34,17 +34,17 @@ export interface StateProps {
     isLoading: boolean
 }
 
-export interface ActionProps {
+export interface DispatchProps {
     onRefresh: () => void
     onArticleDelete: (id: string) => void
 }
 
-type Props = StateProps & ActionProps
+type Props = StateProps & DispatchProps
 
 const b = block("ArticleList")
 
 export default function ArticleList({articles, publications, currentPublication, isLoading,
-                                     onArticleDelete, onRefresh}: Props): JSX.Element {
+                                     ...dispatchProps}: Props): JSX.Element {
     return (currentPublication) ? (
         <div>
             <nav>
@@ -74,7 +74,15 @@ export default function ArticleList({articles, publications, currentPublication,
                     <button>New Article</button>
                 </Link>
 
-                <button onClick={onRefresh}>Refresh</button>
+                <button
+                    onClick={() => {
+                        if (!isLoading) {
+                            dispatchProps.onRefresh()
+                        }
+                    }}>
+
+                    Refresh
+                </button>
 
                 {(isLoading) ? (
                     <section className={b("articles")}>Loading...</section>
@@ -83,13 +91,13 @@ export default function ArticleList({articles, publications, currentPublication,
                         {articles.map(article =>
                             <Article
                                 key={article.id} model={article}
-                                onDelete={onArticleDelete} />
+                                onDelete={dispatchProps.onArticleDelete} />
                         )}
                     </section>
                 )}
             </main>
         </div>
     ) : (
-        null
+        <div />
     )
 }

@@ -1,5 +1,5 @@
 /**
- * models.tsx
+ * models.ts
  *
  * Created by Zander Otavka on 2/8/17.
  * Copyright (C) 2016  Grinnell AppDev.
@@ -18,33 +18,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {RouterState} from "react-router-redux"
+
 export interface AuthorModel {
-    name: string
-    email: string
+    readonly name: string
+    readonly email: string
 }
 
 export interface ArticleBriefModel {
-    id: string
-    publication: string
-    datePublished: Date
-    headerImage: string
-    title: string
-    brief: string
+    readonly id: string
+    readonly publication: string
+    readonly datePublished: Date
+    readonly headerImage: string
+    readonly title: string
+    readonly brief: string
 }
 
 export interface ArticleEditModel {
-    content: string
-    headerImage: string
-    title: string
-    brief: string
-    authors: AuthorModel[]
+    readonly content: string
+    readonly headerImage: string
+    readonly title: string
+    readonly brief: string
+    readonly authors: AuthorModel[]
 }
 
-export interface ArticleModel extends ArticleEditModel, ArticleBriefModel {
-    dateEdited: Date
+export interface FullArticleModel extends ArticleEditModel, ArticleBriefModel {
+    readonly dateEdited: Date
 }
 
 export interface PublicationModel {
-    id: string
-    name: string
+    readonly id: string
+    readonly name: string
+}
+
+export interface IdMapModel<T> {
+    readonly [id: string]: T
+}
+
+export interface StateModel {
+    readonly publicationsById: IdMapModel<PublicationModel>
+    readonly articlesById: IdMapModel<ArticleBriefModel>
+    readonly isLoadingArticles: boolean
+    readonly routing: RouterState
 }
