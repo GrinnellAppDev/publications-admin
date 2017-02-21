@@ -21,9 +21,11 @@
 import {RouteComponentProps} from "react-router"
 import {connect} from "react-redux"
 
-import ArticleList, {StateProps, DispatchProps} from "./ArticleList"
 import {StateModel} from "./state/models"
 import {getPublications, getArticles} from "./state/selectors"
+import {reloadArticles} from "./state/actions"
+
+import ArticleList, {StateProps, DispatchProps} from "./ArticleList"
 
 export interface RouteParams {
     publicationId?: string
@@ -33,16 +35,16 @@ interface OwnProps extends RouteComponentProps<RouteParams, {}> {
 }
 
 const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
-    (state: StateModel, ownProps) => ({
+    (state: StateModel, {params}) => ({
         articles: getArticles(state),
         publications: getPublications(state),
         isLoading: state.isLoadingArticles,
-        currentPublication: state.publicationsById[ownProps.params.publicationId],
+        currentPublication: state.publicationsById[params.publicationId],
     }),
 
-    dispatch => ({
+    (dispatch, {params}) => ({
         onRefresh: () => {
-            return
+            dispatch(reloadArticles(params.publicationId))
         },
         onArticleDelete: id => {
             return

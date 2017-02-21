@@ -93,12 +93,24 @@ export function loadPublications(): AsyncAction<void> {
     }
 }
 
-export function goToPublication(publicationId: string): AsyncAction<void> {
+export function loadArticles(publicationId: string): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
-        dispatch(replace(`/publications/${publicationId}/articles`))
-        dispatch(clearArticles({}))
         dispatch(recieveArticles({
             items: await api.articles.list(publicationId),
         }))
+    }
+}
+
+export function reloadArticles(publicationId: string): AsyncAction<void> {
+    return async (dispatch, getState, {api}) => {
+        dispatch(clearArticles({}))
+        await dispatch(loadArticles(publicationId))
+    }
+}
+
+export function goToPublication(publicationId: string): AsyncAction<void> {
+    return async (dispatch, getState, {api}) => {
+        dispatch(replace(`/publications/${publicationId}/articles`))
+        await dispatch(reloadArticles(publicationId))
     }
 }
