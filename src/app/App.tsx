@@ -19,7 +19,7 @@
  */
 
 import * as React from "react"
-import {Router, Route, IndexRoute, hashHistory} from "react-router"
+import {Router, Route, IndexRoute, hashHistory, RouteComponentProps} from "react-router"
 import {Provider} from "react-redux"
 import {createStore, combineReducers, applyMiddleware} from "redux"
 import {syncHistoryWithStore, routerReducer, routerMiddleware} from "react-router-redux"
@@ -32,7 +32,7 @@ import {StateModel} from "./state/models"
 import {getPublications} from "./state/selectors"
 
 import AppShell from "./AppShell"
-import ArticleListPage from "./ArticleListPage"
+import ArticleListPage, {RouteParams as ArticleListParams} from "./ArticleListPage"
 import ArticleEditPage from "./ArticleEditPage"
 
 const thunkContext: ThunkContext = {api}
@@ -48,16 +48,28 @@ const store = createStore(
     ),
 )
 
-class PublicationFetcher extends React.PureComponent<{}, {}> {
+interface FetcherProps extends RouteComponentProps<ArticleListParams, {}> {}
+
+class PublicationFetcher extends React.PureComponent<FetcherProps, {}> {
+    static get defaultPublicationId(): string {
+        return getPublications(store.getState())[0].id
+    }
+
     async componentDidMount(): Promise<void> {
         await store.dispatch(loadPublications())
         await store.dispatch(goToPublication(
-            getPublications(store.getState())[0].id
+            this.props.params.publicationId || PublicationFetcher.defaultPublicationId
         ))
     }
 
+    async componentWillReceiveProps({params}: FetcherProps): Promise<void> {
+        if (!params.publicationId) {
+            await store.dispatch(goToPublication(PublicationFetcher.defaultPublicationId))
+        }
+    }
+
     render(): JSX.Element {
-        return <div/>
+        return <div>{this.props.children}</div>
     }
 }
 
@@ -78,13 +90,12 @@ export default function App(): JSX.Element {
                     <IndexRoute component={PublicationFetcher} />
                     <Route
                         path="publications/:publicationId/articles"
-                        component={ArticleListPage} />
-                    <Route
-                        path="publications/:publicationId/articles/new"
-                        component={ArticleEditPage} />
-                    <Route
-                        path="publications/:publicationId/articles/edit/:articleId"
-                        component={ArticleEditPage} />
+                        component={PublicationFetcher}>
+
+                        <IndexRoute component={ArticleListPage} />
+                        <Route path="new" component={ArticleEditPage} />
+                        <Route path="edit/:articleId" component={ArticleEditPage} />
+                    </Route>
                     <Route path="*" component={NotFound} />
                 </Route>
             </Router>

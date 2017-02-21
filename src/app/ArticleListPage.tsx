@@ -27,7 +27,7 @@ import {StateModel} from "./state/models"
 import {getPublications, getArticles} from "./state/selectors"
 // import {clearArticlesAction, deleteArticleAction} from "./state/actions"
 
-interface RouteParams {
+export interface RouteParams {
     publicationId?: string
 }
 
