@@ -18,22 +18,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {createErrorClass} from "../util/custom-error"
+
 import {PublicationModel, FullArticleModel, ArticleEditModel, ArticleBriefModel,
         AuthorModel} from "./models"
 
 const API_ROOT = process.env.API_ROOT
 
-export class FetchError extends Error {
-    private isFetchError: boolean = true
-    static isTypeOf = (err: any): err is FetchError => !!(err as FetchError).isFetchError
-
+export interface FetchErrorPayload {
     status: number
-
-    constructor(resp: Response) {
-        super(`Fetch errored with code: ${resp.status} - ${resp.statusText}`)
-        this.status = resp.status
-    }
+    statusText: string
 }
+
+export const FetchError = createErrorClass<FetchErrorPayload>(
+    "FETCH_ERROR",
+    (message, {status, statusText}) => `Fetch errored with code: ${status} - ${statusText}`,
+)
 
 function requestToArray<T>(elementConversion: (element: any) => T, request: any): T[] {
     return (request as any[]).map(elementConversion)
@@ -98,7 +98,10 @@ export const api: Api = {
             })
 
             if (!resp.ok) {
-                throw new FetchError(resp)
+                throw new FetchError("", {
+                    status: resp.status,
+                    statusText: resp.statusText,
+                })
             }
 
             return requestToArray(requestToPublicationModel, await resp.json())
@@ -113,7 +116,10 @@ export const api: Api = {
             })
 
             if (!resp.ok) {
-                throw new FetchError(resp)
+                throw new FetchError("", {
+                    status: resp.status,
+                    statusText: resp.statusText,
+                })
             }
 
             return requestToArray(requestToArticleBriefModel, await resp.json())
@@ -127,7 +133,10 @@ export const api: Api = {
             })
 
             if (!resp.ok) {
-                throw new FetchError(resp)
+                throw new FetchError("", {
+                    status: resp.status,
+                    statusText: resp.statusText,
+                })
             }
 
             return requestToArticleModel(await resp.json())
@@ -141,7 +150,10 @@ export const api: Api = {
             })
 
             if (!resp.ok) {
-                throw new FetchError(resp)
+                throw new FetchError("", {
+                    status: resp.status,
+                    statusText: resp.statusText,
+                })
             }
         },
 
@@ -153,7 +165,10 @@ export const api: Api = {
             })
 
             if (!resp.ok) {
-                throw new FetchError(resp)
+                throw new FetchError("", {
+                    status: resp.status,
+                    statusText: resp.statusText,
+                })
             }
         },
 
@@ -166,7 +181,10 @@ export const api: Api = {
             })
 
             if (!resp.ok) {
-                throw new FetchError(resp)
+                throw new FetchError("", {
+                    status: resp.status,
+                    statusText: resp.statusText,
+                })
             }
         },
     },
