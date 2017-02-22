@@ -19,13 +19,18 @@
  */
 
 import {IdMapModel, PublicationModel, ArticleBriefModel} from "./models"
-import {SyncAction, recievePublications, recieveArticles, clearArticles} from "./actions"
+import {SyncAction, recievePublications, recieveArticles, clearArticles, deleteLocalArticle,
+        undeleteLocalArticle} from "./actions"
+
+interface MutableIdMap<T> {
+    [id: string]: T
+}
 
 export function publicationsById(state: IdMapModel<PublicationModel> = {},
                                  action: SyncAction<any>): IdMapModel<PublicationModel> {
     if (recievePublications.isTypeOf(action)) {
         const {items} = action.payload
-        const newState = {...state} as {[id: string]: PublicationModel}
+        const newState = {...state} as MutableIdMap<PublicationModel>
         items.forEach(publication => {
             newState[publication.id] = publication
         })
@@ -40,7 +45,7 @@ export function articlesById(state: IdMapModel<ArticleBriefModel> = {},
                              action: SyncAction<any>): IdMapModel<ArticleBriefModel> {
     if (recieveArticles.isTypeOf(action)) {
         const {items} = action.payload
-        const newState = {...state} as {[id: string]: ArticleBriefModel}
+        const newState = {...state} as MutableIdMap<ArticleBriefModel>
         items.forEach(article => {
             newState[article.id] = (article.id in state) ? (
                 {...state[article.id], ...article}
@@ -50,6 +55,17 @@ export function articlesById(state: IdMapModel<ArticleBriefModel> = {},
         })
 
         return newState
+    }
+
+    if (deleteLocalArticle.isTypeOf(action)) {
+        const {id} = action.payload
+        const {[id]: removed, ...remainder} = state
+        return remainder
+    }
+
+    if (undeleteLocalArticle.isTypeOf(action)) {
+        const {item} = action.payload
+        return {...state, [item.id]: item}
     }
 
     if (clearArticles.isTypeOf(action)) {

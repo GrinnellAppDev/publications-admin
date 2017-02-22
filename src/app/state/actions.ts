@@ -23,7 +23,7 @@ import {ThunkAction} from "redux-thunk"
 import {replace} from "react-router-redux"
 
 import {PublicationModel, ArticleBriefModel, StateModel} from "./models"
-import {Api} from "./api"
+import {Api, FetchError} from "./api"
 import {createErrorClass} from "../util/custom-error"
 
 export interface SyncAction<T> extends Action {
@@ -64,8 +64,12 @@ interface RecieveArticlesPayload {
 interface ClearArticlesPayload {
 }
 
-interface DeleteArticlePayload {
+interface DeleteLocalArticlePayload {
     id: string
+}
+
+interface UndeleteLocalArticlePayload {
+    item: ArticleBriefModel
 }
 
 export const recievePublications =
@@ -80,8 +84,11 @@ export const recieveArticles =
 export const clearArticles =
     makeSyncActionCreator<ClearArticlesPayload>("CLEAR_ARTICLES")
 
-export const deleteArticle =
-    makeSyncActionCreator<DeleteArticlePayload>("DELETE_ARTICLE")
+export const deleteLocalArticle =
+    makeSyncActionCreator<DeleteLocalArticlePayload>("DELETE_ARTICLE")
+
+export const undeleteLocalArticle =
+    makeSyncActionCreator<UndeleteLocalArticlePayload>("UNDELETE_ARTICLE")
 
 export function loadPublications(): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
@@ -120,5 +127,20 @@ export function goToPublication(publicationId: string): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
         dispatch(replace(`/publications/${publicationId}/articles`))
         await dispatch(reloadArticles(publicationId))
+    }
+}
+
+export function deleteArticle(publicationId: string, articleId: string): AsyncAction<void> {
+    return async (dispatch, getState, {api}) => {
+        const article = getState().articlesById[articleId]
+        dispatch(deleteLocalArticle({id: articleId}))
+
+        try {
+            await api.articles.remove(publicationId, articleId)
+        } catch (err) {
+            if (FetchError.isTypeOf(err)) {
+                dispatch(undeleteLocalArticle({item: article}))
+            }
+        }
     }
 }
