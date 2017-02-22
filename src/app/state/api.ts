@@ -18,10 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createErrorClass} from "../util/custom-error"
-
 import {PublicationModel, FullArticleModel, ArticleEditModel, ArticleBriefModel,
         AuthorModel} from "./models"
+import createErrorClass from "./createErrorClass"
 
 const API_ROOT = process.env.API_ROOT
 

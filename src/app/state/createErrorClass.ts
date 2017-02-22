@@ -1,5 +1,5 @@
 /**
- * custom-error.ts
+ * createErrorClass.ts
  *
  * Created by Zander Otavka on 2/21/17.
  * Copyright (C) 2016  Grinnell AppDev.
@@ -32,10 +32,8 @@ interface CustomErrorClass<T> {
     isTypeOf(err: any): err is CustomError<T>
 }
 
-export function createErrorClass<T>(
-        type: string,
-        messageFunction: MessageFunction<T> = message => message): CustomErrorClass<T> {
-
+export default function createErrorClass<T>(type: string, messageFunction: MessageFunction<T> =
+                                            message => message): CustomErrorClass<T> {
     return class extends Error {
         static isTypeOf(err: CustomError<any>): err is CustomError<T> {
             return err.type === type

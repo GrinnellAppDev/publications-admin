@@ -24,7 +24,7 @@ import {replace} from "react-router-redux"
 
 import {PublicationModel, ArticleBriefModel, FullArticleModel, StateModel} from "./models"
 import {Api, FetchError} from "./api"
-import {createErrorClass} from "../util/custom-error"
+import createErrorClass from "./createErrorClass"
 
 export interface SyncAction<T> extends Action {
     readonly type: string
