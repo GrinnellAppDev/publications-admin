@@ -52,7 +52,8 @@ interface FetcherProps extends RouteComponentProps<ArticleListParams, {}> {}
 
 class PublicationFetcher extends React.PureComponent<FetcherProps, {}> {
     static get defaultPublicationId(): string {
-        return getPublications(store.getState())[0].id
+        const first = getPublications(store.getState())[0]
+        return first ? first.id : ""
     }
 
     async componentDidMount(): Promise<void> {
@@ -64,7 +65,10 @@ class PublicationFetcher extends React.PureComponent<FetcherProps, {}> {
 
     async componentWillReceiveProps({params}: FetcherProps): Promise<void> {
         if (!params.publicationId) {
-            await store.dispatch(goToPublication(PublicationFetcher.defaultPublicationId))
+            const defaultPublicationId = PublicationFetcher.defaultPublicationId
+            if (defaultPublicationId) {
+                await store.dispatch(goToPublication(defaultPublicationId))
+            }
         }
     }
 
