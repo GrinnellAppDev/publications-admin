@@ -20,6 +20,7 @@
 
 import "es6-promise"
 import "whatwg-fetch"
+import "array.prototype.includes"
 
 import {createElement} from "react"
 import {render} from "react-dom"

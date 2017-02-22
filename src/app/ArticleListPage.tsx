@@ -38,7 +38,7 @@ const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
     (state: StateModel, {params}) => ({
         articles: getArticles(state),
         publications: getPublications(state),
-        isLoading: state.isLoadingArticles,
+        isLoading: state.loadingPublications.includes(params.publicationId),
         currentPublication: state.publicationsById[params.publicationId],
     }),
 

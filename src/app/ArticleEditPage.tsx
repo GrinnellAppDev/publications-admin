@@ -37,7 +37,7 @@ interface OwnProps extends RouteComponentProps<RouteParams, {}> {
 const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
     (state: StateModel, {params}) => ({
         model: getSelectedEditArticle(state, params),
-        isLoading: state.loadingArticles.indexOf(params.articleId) !== -1,
+        isLoading: state.loadingArticles.includes(params.articleId),
         submissionState: state.editSubmissionState,
         publicationId: params.publicationId,
     }),

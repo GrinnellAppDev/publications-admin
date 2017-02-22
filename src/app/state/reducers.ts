@@ -19,8 +19,9 @@
  */
 
 import {IdMapModel, PublicationModel, ArticleBriefModel} from "./models"
-import {SyncAction, recievePublications, recieveArticles, recieveFullArticle, clearArticles,
-        deleteLocalArticle, undeleteLocalArticle, startLoadingFullArticle} from "./actions"
+import {SyncAction, receivePublications, startLoadingArticles, receiveArticles,
+        startLoadingFullArticle, recieveFullArticle, clearArticles, deleteLocalArticle,
+        undeleteLocalArticle} from "./actions"
 
 interface MutableIdMap<T> {
     [id: string]: T
@@ -28,7 +29,7 @@ interface MutableIdMap<T> {
 
 export function publicationsById(state: IdMapModel<PublicationModel> = {},
                                  action: SyncAction<any>): IdMapModel<PublicationModel> {
-    if (recievePublications.isTypeOf(action)) {
+    if (receivePublications.isTypeOf(action)) {
         const {items} = action.payload
         const newState = {...state} as MutableIdMap<PublicationModel>
         items.forEach(publication => {
@@ -43,7 +44,7 @@ export function publicationsById(state: IdMapModel<PublicationModel> = {},
 
 export function articlesById(state: IdMapModel<ArticleBriefModel> = {},
                              action: SyncAction<any>): IdMapModel<ArticleBriefModel> {
-    if (recieveArticles.isTypeOf(action)) {
+    if (receiveArticles.isTypeOf(action)) {
         const {items} = action.payload
         const newState = {...state} as MutableIdMap<ArticleBriefModel>
         items.forEach(article => {
@@ -77,13 +78,16 @@ export function articlesById(state: IdMapModel<ArticleBriefModel> = {},
     return state
 }
 
-export function isLoadingArticles(state: boolean = false, action: SyncAction<any>): boolean {
-    if (recieveArticles.isTypeOf(action)) {
-        return false
+export function loadingPublications(state: ReadonlyArray<string> = [],
+                                    action: SyncAction<any>): ReadonlyArray<string> {
+    if (startLoadingArticles.isTypeOf(action)) {
+        const {publicationId} = action.payload
+        return [...state, publicationId]
     }
 
-    if (clearArticles.isTypeOf(action)) {
-        return true
+    if (receiveArticles.isTypeOf(action)) {
+        const {publicationId} = action.payload
+        return state.filter(id => id !== publicationId)
     }
 
     return state

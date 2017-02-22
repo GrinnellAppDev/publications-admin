@@ -52,30 +52,41 @@ function createSyncActionCreator<T>(type: string): SyncActionCreator<T> {
     )
 }
 
-export const recievePublications =
-    createSyncActionCreator<{items: ReadonlyArray<PublicationModel>}>("RECIEVE_PUBLICATIONS")
+type ReceivePublicationsPayload = {items: ReadonlyArray<PublicationModel>}
+export const receivePublications =
+    createSyncActionCreator<ReceivePublicationsPayload>("RECIEVE_PUBLICATIONS")
 
-export const recieveArticles =
-    createSyncActionCreator<{items: ReadonlyArray<ArticleBriefModel>}>("RECIEVE_ARTICLES")
+type StartLoadingArticlesPayload = {publicationId: string}
+export const startLoadingArticles =
+    createSyncActionCreator<StartLoadingArticlesPayload>("START_LOADING_ARTICLES")
 
+type ReceiveArticlesPayload = {publicationId: string, items: ReadonlyArray<ArticleBriefModel>}
+export const receiveArticles =
+    createSyncActionCreator<ReceiveArticlesPayload>("RECIEVE_ARTICLES")
+
+type StartLoadingFullArticlePayload = {id: string}
 export const startLoadingFullArticle =
-    createSyncActionCreator<{id: string}>("START_LOADING_FULL_ARTICLE")
+    createSyncActionCreator<StartLoadingFullArticlePayload>("START_LOADING_FULL_ARTICLE")
 
+type ReceiveFullArticlePayload = {item: FullArticleModel}
 export const recieveFullArticle =
-    createSyncActionCreator<{item: FullArticleModel}>("RECIEVE_FULL_ARTICLE")
+    createSyncActionCreator<ReceiveFullArticlePayload>("RECIEVE_FULL_ARTICLE")
 
+type ClearArticlesPayload = {publicationId: string}
 export const clearArticles =
-    createSyncActionCreator<void>("CLEAR_ARTICLES")
+    createSyncActionCreator<ClearArticlesPayload>("CLEAR_ARTICLES")
 
+type DeleteLocalArticlePayload = {id: string}
 export const deleteLocalArticle =
-    createSyncActionCreator<{id: string}>("DELETE_ARTICLE")
+    createSyncActionCreator<DeleteLocalArticlePayload>("DELETE_ARTICLE")
 
+type UndeleteLocalArticlePayload = {item: ArticleBriefModel}
 export const undeleteLocalArticle =
-    createSyncActionCreator<{item: ArticleBriefModel}>("UNDELETE_ARTICLE")
+    createSyncActionCreator<UndeleteLocalArticlePayload>("UNDELETE_ARTICLE")
 
 export function loadPublications(): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
-        dispatch(recievePublications({
+        dispatch(receivePublications({
             items: await api.publications.list(),
         }))
     }
@@ -88,8 +99,9 @@ export const AlreadyLoadingError = createErrorClass<void>(
 
 export function loadArticles(publicationId: string): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
-        if (!getState().isLoadingArticles) {
-            dispatch(recieveArticles({
+        if (!getState().loadingPublications.includes(publicationId)) {
+            dispatch(receiveArticles({
+                publicationId,
                 items: await api.articles.list(publicationId),
             }))
         } else {
@@ -110,7 +122,7 @@ export function loadFullArticle(publicationId: string, articleId: string): Async
 export function reloadArticles(publicationId: string): AsyncAction<void> {
     return async dispatch => {
         const articlesLoaded = dispatch(loadArticles(publicationId))
-        dispatch(clearArticles(undefined))
+        dispatch(clearArticles({publicationId}))
         await articlesLoaded
     }
 }
