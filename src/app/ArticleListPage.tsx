@@ -23,7 +23,7 @@ import {connect} from "react-redux"
 
 import {StateModel} from "./state/models"
 import {getPublications, getArticles} from "./state/selectors"
-import {reloadArticles} from "./state/actions"
+import {reloadArticles, AlreadyLoadingError} from "./state/actions"
 
 import ArticleList, {StateProps, DispatchProps} from "./ArticleList"
 
@@ -43,10 +43,16 @@ const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
     }),
 
     (dispatch, {params}) => ({
-        onRefresh: () => {
-            dispatch(reloadArticles(params.publicationId))
+        onRefresh: async () => {
+            try {
+                await dispatch(reloadArticles(params.publicationId))
+            } catch (err) {
+                if (!AlreadyLoadingError.isTypeOf(err)) {
+                    throw err
+                }
+            }
         },
-        onArticleDelete: id => {
+        onArticleDelete: async (id) => {
             return
         },
     }),

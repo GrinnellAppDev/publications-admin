@@ -19,12 +19,11 @@
  */
 
 import {IdMapModel, PublicationModel, ArticleBriefModel} from "./models"
-import {SyncAction, actionIsType, recievePublications, recieveArticles,
-        clearArticles} from "./actions"
+import {SyncAction, recievePublications, recieveArticles, clearArticles} from "./actions"
 
 export function publicationsById(state: IdMapModel<PublicationModel> = {},
                                  action: SyncAction<any>): IdMapModel<PublicationModel> {
-    if (actionIsType(action, recievePublications)) {
+    if (recievePublications.isTypeOf(action)) {
         const {items} = action.payload
         const newState = {...state} as {[id: string]: PublicationModel}
         items.forEach(publication => {
@@ -39,7 +38,7 @@ export function publicationsById(state: IdMapModel<PublicationModel> = {},
 
 export function articlesById(state: IdMapModel<ArticleBriefModel> = {},
                              action: SyncAction<any>): IdMapModel<ArticleBriefModel> {
-    if (actionIsType(action, recieveArticles)) {
+    if (recieveArticles.isTypeOf(action)) {
         const {items} = action.payload
         const newState = {...state} as {[id: string]: ArticleBriefModel}
         items.forEach(article => {
@@ -53,7 +52,7 @@ export function articlesById(state: IdMapModel<ArticleBriefModel> = {},
         return newState
     }
 
-    if (actionIsType(action, clearArticles)) {
+    if (clearArticles.isTypeOf(action)) {
         return {}
     }
 
@@ -61,11 +60,11 @@ export function articlesById(state: IdMapModel<ArticleBriefModel> = {},
 }
 
 export function isLoadingArticles(state: boolean = false, action: SyncAction<any>): boolean {
-    if (actionIsType(action, recieveArticles)) {
+    if (recieveArticles.isTypeOf(action)) {
         return false
     }
 
-    if (actionIsType(action, clearArticles)) {
+    if (clearArticles.isTypeOf(action)) {
         return true
     }
 

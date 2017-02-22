@@ -37,8 +37,8 @@ export function createErrorClass<T>(
         messageFunction: MessageFunction<T> = message => message): CustomErrorClass<T> {
 
     return class extends Error {
-        static isTypeOf(err: any): err is CustomError<T> {
-            return (err as CustomError<any>).type === type
+        static isTypeOf(err: CustomError<any>): err is CustomError<T> {
+            return err.type === type
         }
 
         type: string = type

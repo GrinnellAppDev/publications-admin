@@ -74,13 +74,7 @@ export default function ArticleList({articles, publications, currentPublication,
                     <button>New Article</button>
                 </Link>
 
-                <button
-                    onClick={() => {
-                        if (!isLoading) {
-                            dispatchProps.onRefresh()
-                        }
-                    }}>
-
+                <button onClick={dispatchProps.onRefresh}>
                     Refresh
                 </button>
 

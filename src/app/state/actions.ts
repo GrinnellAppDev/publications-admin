@@ -24,6 +24,7 @@ import {replace} from "react-router-redux"
 
 import {PublicationModel, ArticleBriefModel, StateModel} from "./models"
 import {Api} from "./api"
+import {createErrorClass} from "../util/custom-error"
 
 export interface SyncAction<T> extends Action {
     readonly type: string
@@ -39,16 +40,13 @@ export interface AsyncAction<T> extends ThunkAction<Promise<T>, StateModel, Thun
 
 interface SyncActionCreator<T> {
     (payload: T): SyncAction<T>
-    readonly type: string
+    isTypeOf(action: SyncAction<any>): action is SyncAction<T>
 }
 
 function makeSyncActionCreator<T>(type: string): SyncActionCreator<T> {
-    return Object.assign((payload: T): SyncAction<T> => ({type, payload}), {type})
-}
-
-export function actionIsType<T>(action: SyncAction<any>,
-                                creator: SyncActionCreator<T>): action is SyncAction<T> {
-    return action.type === creator.type
+    return Object.assign((payload: T): SyncAction<T> => ({type, payload}), {
+        isTypeOf: (action: SyncAction<any>): action is SyncAction<T> => action.type === type,
+    })
 }
 
 interface RecievePublicationsPayload {
@@ -93,18 +91,28 @@ export function loadPublications(): AsyncAction<void> {
     }
 }
 
+export const AlreadyLoadingError = createErrorClass<void>(
+    "ALREADY_LOADING_ERROR",
+    message => `Cannot load. ${message}`,
+)
+
 export function loadArticles(publicationId: string): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
-        dispatch(recieveArticles({
-            items: await api.articles.list(publicationId),
-        }))
+        if (!getState().isLoadingArticles) {
+            dispatch(recieveArticles({
+                items: await api.articles.list(publicationId),
+            }))
+        } else {
+            throw new AlreadyLoadingError("Already loading articles.")
+        }
     }
 }
 
 export function reloadArticles(publicationId: string): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
+        const articlesLoaded = dispatch(loadArticles(publicationId))
         dispatch(clearArticles({}))
-        await dispatch(loadArticles(publicationId))
+        await articlesLoaded
     }
 }
 
