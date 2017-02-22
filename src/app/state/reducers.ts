@@ -19,8 +19,8 @@
  */
 
 import {IdMapModel, PublicationModel, ArticleBriefModel} from "./models"
-import {SyncAction, recievePublications, recieveArticles, clearArticles, deleteLocalArticle,
-        undeleteLocalArticle} from "./actions"
+import {SyncAction, recievePublications, recieveArticles, recieveFullArticle, clearArticles,
+        deleteLocalArticle, undeleteLocalArticle, startLoadingFullArticle} from "./actions"
 
 interface MutableIdMap<T> {
     [id: string]: T
@@ -63,7 +63,9 @@ export function articlesById(state: IdMapModel<ArticleBriefModel> = {},
         return remainder
     }
 
-    if (undeleteLocalArticle.isTypeOf(action)) {
+    if (recieveFullArticle.isTypeOf(action) ||
+        undeleteLocalArticle.isTypeOf(action)) {
+
         const {item} = action.payload
         return {...state, [item.id]: item}
     }
@@ -82,6 +84,21 @@ export function isLoadingArticles(state: boolean = false, action: SyncAction<any
 
     if (clearArticles.isTypeOf(action)) {
         return true
+    }
+
+    return state
+}
+
+export function loadingArticles(state: ReadonlyArray<string> = [],
+                                action: SyncAction<any>): ReadonlyArray<string> {
+    if (startLoadingFullArticle.isTypeOf(action)) {
+        const {id} = action.payload
+        return [...state, id]
+    }
+
+    if (recieveFullArticle.isTypeOf(action)) {
+        const {item} = action.payload
+        return state.filter(id => id !== item.id)
     }
 
     return state

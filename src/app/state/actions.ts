@@ -22,7 +22,7 @@ import {Action} from "redux"
 import {ThunkAction} from "redux-thunk"
 import {replace} from "react-router-redux"
 
-import {PublicationModel, ArticleBriefModel, StateModel} from "./models"
+import {PublicationModel, ArticleBriefModel, FullArticleModel, StateModel} from "./models"
 import {Api, FetchError} from "./api"
 import {createErrorClass} from "../util/custom-error"
 
@@ -43,52 +43,35 @@ interface SyncActionCreator<T> {
     isTypeOf(action: SyncAction<any>): action is SyncAction<T>
 }
 
-function makeSyncActionCreator<T>(type: string): SyncActionCreator<T> {
-    return Object.assign((payload: T): SyncAction<T> => ({type, payload}), {
-        isTypeOf: (action: SyncAction<any>): action is SyncAction<T> => action.type === type,
-    })
-}
-
-interface RecievePublicationsPayload {
-    items: ReadonlyArray<PublicationModel>
-}
-
-interface SelectPublicationPayload {
-    id: string
-}
-
-interface RecieveArticlesPayload {
-    items: ReadonlyArray<ArticleBriefModel>
-}
-
-interface ClearArticlesPayload {
-}
-
-interface DeleteLocalArticlePayload {
-    id: string
-}
-
-interface UndeleteLocalArticlePayload {
-    item: ArticleBriefModel
+function createSyncActionCreator<T>(type: string): SyncActionCreator<T> {
+    return Object.assign(
+        (payload: T): SyncAction<T> => ({type, payload}),
+        {
+            isTypeOf: (action: SyncAction<any>): action is SyncAction<T> => action.type === type,
+        },
+    )
 }
 
 export const recievePublications =
-    makeSyncActionCreator<RecievePublicationsPayload>("RECIEVE_PUBLICATIONS")
-
-export const selectPublication =
-    makeSyncActionCreator<SelectPublicationPayload>("SELECT_PUBLICATION")
+    createSyncActionCreator<{items: ReadonlyArray<PublicationModel>}>("RECIEVE_PUBLICATIONS")
 
 export const recieveArticles =
-    makeSyncActionCreator<RecieveArticlesPayload>("RECIEVE_ARTICLES")
+    createSyncActionCreator<{items: ReadonlyArray<ArticleBriefModel>}>("RECIEVE_ARTICLES")
+
+export const startLoadingFullArticle =
+    createSyncActionCreator<{id: string}>("START_LOADING_FULL_ARTICLE")
+
+export const recieveFullArticle =
+    createSyncActionCreator<{item: FullArticleModel}>("RECIEVE_FULL_ARTICLE")
 
 export const clearArticles =
-    makeSyncActionCreator<ClearArticlesPayload>("CLEAR_ARTICLES")
+    createSyncActionCreator<void>("CLEAR_ARTICLES")
 
 export const deleteLocalArticle =
-    makeSyncActionCreator<DeleteLocalArticlePayload>("DELETE_ARTICLE")
+    createSyncActionCreator<{id: string}>("DELETE_ARTICLE")
 
 export const undeleteLocalArticle =
-    makeSyncActionCreator<UndeleteLocalArticlePayload>("UNDELETE_ARTICLE")
+    createSyncActionCreator<{item: ArticleBriefModel}>("UNDELETE_ARTICLE")
 
 export function loadPublications(): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
@@ -115,16 +98,25 @@ export function loadArticles(publicationId: string): AsyncAction<void> {
     }
 }
 
-export function reloadArticles(publicationId: string): AsyncAction<void> {
+export function loadFullArticle(publicationId: string, articleId: string): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
+        dispatch(startLoadingFullArticle({id: articleId}))
+        dispatch(recieveFullArticle({
+            item: await api.articles.get(publicationId, articleId),
+        }))
+    }
+}
+
+export function reloadArticles(publicationId: string): AsyncAction<void> {
+    return async dispatch => {
         const articlesLoaded = dispatch(loadArticles(publicationId))
-        dispatch(clearArticles({}))
+        dispatch(clearArticles(undefined))
         await articlesLoaded
     }
 }
 
 export function goToPublication(publicationId: string): AsyncAction<void> {
-    return async (dispatch, getState, {api}) => {
+    return async dispatch => {
         dispatch(replace(`/publications/${publicationId}/articles`))
         await dispatch(reloadArticles(publicationId))
     }

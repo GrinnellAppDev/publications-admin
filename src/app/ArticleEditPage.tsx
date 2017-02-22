@@ -18,20 +18,61 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as React from "react"
 import {RouteComponentProps} from "react-router"
+import {connect} from "react-redux"
 
-import {FullArticleModel, AuthorModel} from "./state/models"
-import {api} from "./state/api"
-import ArticleEditForm, {SubmissionState} from "./ArticleEditForm"
+import {StateModel} from "./state/models"
+import {getSelectedEditArticle} from "./state/selectors"
+
+import ArticleEditForm, {StateProps, DispatchProps} from "./ArticleEditForm"
 
 interface RouteParams {
     publicationId: string
     articleId?: string
 }
 
-type Props = RouteComponentProps<RouteParams, {}>
+interface OwnProps extends RouteComponentProps<RouteParams, {}> {
+}
 
+const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
+    (state: StateModel, {params}) => ({
+        model: getSelectedEditArticle(state, params),
+        isLoading: state.loadingArticles.indexOf(params.articleId) !== -1,
+        submissionState: state.editSubmissionState,
+        publicationId: params.publicationId,
+    }),
+
+    (dispatch, {params}) => ({
+        onAuthorAdd: () => {
+            return
+        },
+        onAuthorChange: () => {
+            return
+        },
+        onAuthorRemove: () => {
+            return
+        },
+        onBriefChange: () => {
+            return
+        },
+        onContentChange: () => {
+            return
+        },
+        onHeaderImageChange: () => {
+            return
+        },
+        onSubmit: () => {
+            return
+        },
+        onTitleChange: () => {
+            return
+        }
+    })
+)
+
+export default withReduxConnect(ArticleEditForm)
+
+/*
 interface State {
     model: FullArticleModel
     isLoading: boolean
@@ -161,3 +202,4 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
             onContentChange={this.onContentChange} onSubmit={this.onSubmit} />
     }
 }
+*/

@@ -23,7 +23,7 @@ import {connect} from "react-redux"
 
 import {StateModel} from "./state/models"
 import {getPublications, getArticles} from "./state/selectors"
-import {reloadArticles, deleteArticle, AlreadyLoadingError} from "./state/actions"
+import {reloadArticles, deleteArticle, loadFullArticle, AlreadyLoadingError} from "./state/actions"
 
 import ArticleList, {StateProps, DispatchProps} from "./ArticleList"
 
@@ -53,8 +53,12 @@ const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
             }
         },
 
-        onArticleDelete: async (id) => {
+        onArticleDelete: async id => {
             await dispatch(deleteArticle(params.publicationId, id))
+        },
+
+        onArticleEdit: async id => {
+            await dispatch(loadFullArticle(params.publicationId, id))
         },
     }),
 )

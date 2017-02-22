@@ -55,9 +55,20 @@ export interface IdMapModel<T> {
     readonly [id: string]: T
 }
 
+export enum SubmissionStateModel {
+    EDITING,
+    SUBMITTING,
+    ERRORED,
+}
+
 export interface StateModel {
     readonly publicationsById: IdMapModel<PublicationModel>
     readonly articlesById: IdMapModel<ArticleBriefModel>
+
     readonly isLoadingArticles: boolean
+    readonly loadingArticles: ReadonlyArray<string>
+
+    readonly editSubmissionState: SubmissionStateModel
+
     readonly routing: RouterState
 }

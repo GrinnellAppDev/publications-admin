@@ -94,7 +94,7 @@ export default function App(): JSX.Element {
 
                         <IndexRoute component={ArticleListPage} />
                         <Route path="new" component={ArticleEditPage} />
-                        <Route path="edit/:articleId" component={ArticleEditPage} />
+                        <Route path=":articleId/edit" component={ArticleEditPage} />
                     </Route>
                     <Route path="*" component={NotFound} />
                 </Route>

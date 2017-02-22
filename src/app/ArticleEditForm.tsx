@@ -22,25 +22,19 @@ import * as React from "react"
 import {block} from "react-bem-helper"
 import {Link} from "react-router"
 
-import {AuthorModel, FullArticleModel} from "./state/models"
+import {AuthorModel, FullArticleModel, SubmissionStateModel} from "./state/models"
 import AuthorInput from "./AuthorInput"
 
 import "./ArticleEditForm.scss"
 
-export enum SubmissionState {
-    EDITING,
-    SUBMITTING,
-    ERRORED,
-}
-
 export interface StateProps {
     model: FullArticleModel
     isLoading: boolean
-    submissionState: SubmissionState
+    submissionState: SubmissionStateModel
     publicationId: string
 }
 
-export interface ActionProps {
+export interface DispatchProps {
     onSubmit: (ev: React.FormEvent<HTMLFormElement>) => void
     onTitleChange: (ev: React.ChangeEvent<HTMLInputElement>) => void
     onHeaderImageChange: (ev: React.ChangeEvent<HTMLInputElement>) => void
@@ -51,7 +45,7 @@ export interface ActionProps {
     onContentChange: (ev: React.ChangeEvent<HTMLTextAreaElement>) => void
 }
 
-type Props = StateProps & ActionProps
+type Props = StateProps & DispatchProps
 
 const b = block("ArticleEditForm")
 
@@ -106,13 +100,13 @@ export default function ArticleEditForm({isLoading, submissionState, model, publ
             <div
                 className={b("submit-status", {
                     "error": true,
-                    "hidden": submissionState !== SubmissionState.ERRORED
+                    "hidden": submissionState !== SubmissionStateModel.ERRORED
                 })}>
                 There was a problem submitting your article.
             </div>
             <div
                 className={b("submit-status", {
-                    "hidden": submissionState !== SubmissionState.SUBMITTING
+                    "hidden": submissionState !== SubmissionStateModel.SUBMITTING
                 })}>
                 Submitting...
             </div>
