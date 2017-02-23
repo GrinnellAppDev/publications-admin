@@ -87,7 +87,7 @@ type ClearArticlesPayload = {publicationId: string}
 export const clearArticles =
     createSyncActionCreator<ClearArticlesPayload>("CLEAR_ARTICLES")
 
-type DeleteLocalArticlePayload = {id: string}
+type DeleteLocalArticlePayload = {item: ArticleBriefModel}
 export const deleteLocalArticle =
     createSyncActionCreator<DeleteLocalArticlePayload>("DELETE_LOCAL_ARTICLE")
 
@@ -216,17 +216,19 @@ export function submitArticleDraft(publicationId: string, articleId: string): As
 
 export function deleteArticle(publicationId: string, articleId: string): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
-        const article = getState().articlesById[articleId]
-        dispatch(deleteLocalArticle({id: articleId}))
+        const item = getState().articlesById[articleId]
+        dispatch(deleteLocalArticle({item}))
 
-        try {
-            await api.articles.remove(publicationId, articleId)
-        } catch (err) {
-            if (FetchError.isTypeOf(err)) {
-                dispatch(undeleteLocalArticle({item: article}))
-                console.error(err.message)
-            } else {
-                throw err
+        if (confirm(`Are you sure you want to delete "${item.title}"?`)) {
+            try {
+                await api.articles.remove(publicationId, articleId)
+            } catch (err) {
+                if (FetchError.isTypeOf(err)) {
+                    dispatch(undeleteLocalArticle({item}))
+                    console.error(err.message)
+                } else {
+                    throw err
+                }
             }
         }
     }

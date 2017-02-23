@@ -60,8 +60,8 @@ export function articlesById(state: IdMapModel<ArticleBriefModel> = {},
     }
 
     if (actions.deleteLocalArticle.isTypeOf(action)) {
-        const {id} = action.payload
-        const {[id]: _, ...newState} = state
+        const {item} = action.payload
+        const {[item.id]: _, ...newState} = state
         return newState
     }
 
