@@ -20,12 +20,10 @@
 
 import {createSelector} from "reselect"
 
-import {FullArticleModel, StateModel} from "./models"
+import {StateModel} from "./models"
 
 const getPublicationsById = (state: StateModel) => state.publicationsById
 const getArticlesById = (state: StateModel) => state.articlesById
-const getSelectedArticle = (state: StateModel, {articleId}: {articleId?: string}) =>
-    state.articlesById[articleId]
 
 export const getPublications = createSelector(
     getPublicationsById,
@@ -44,24 +42,4 @@ export const getArticles = createSelector(
 export const getDefaultPublicationId = createSelector(
     getPublications,
     publications => publications[0] ? publications[0].id : ""
-)
-
-const defaultFullArticle: FullArticleModel = {
-    id: "",
-    publication: "",
-    title: "",
-    content: "",
-    brief: "",
-    authors: [{name: "", email: ""}],
-    headerImage: "",
-    dateEdited: new Date(0),
-    datePublished: new Date(0),
-}
-
-export const getSelectedEditArticle = createSelector(
-    getSelectedArticle,
-    (selectedArticle): FullArticleModel => ({
-        ...defaultFullArticle,
-        ...(selectedArticle || {}),
-    })
 )

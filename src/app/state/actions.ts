@@ -22,7 +22,8 @@ import {Action} from "redux"
 import {ThunkAction} from "redux-thunk"
 import {replace} from "react-router-redux"
 
-import {PublicationModel, ArticleBriefModel, FullArticleModel, StateModel} from "./models"
+import {PublicationModel, ArticleBriefModel, ArticleEditModel, FullArticleModel,
+        StateModel} from "./models"
 import {Api, FetchError} from "./api"
 import createErrorClass from "./createErrorClass"
 import {getDefaultPublicationId} from "./selectors"
@@ -88,11 +89,34 @@ export const clearArticles =
 
 type DeleteLocalArticlePayload = {id: string}
 export const deleteLocalArticle =
-    createSyncActionCreator<DeleteLocalArticlePayload>("DELETE_ARTICLE")
+    createSyncActionCreator<DeleteLocalArticlePayload>("DELETE_LOCAL_ARTICLE")
 
 type UndeleteLocalArticlePayload = {item: ArticleBriefModel}
 export const undeleteLocalArticle =
-    createSyncActionCreator<UndeleteLocalArticlePayload>("UNDELETE_ARTICLE")
+    createSyncActionCreator<UndeleteLocalArticlePayload>("UNDELETE_LOCAL_ARTICLE")
+
+type CreateArticleDraftPayload = {id?: string, item?: ArticleEditModel}
+export const createArticleDraft =
+    createSyncActionCreator<CreateArticleDraftPayload>("CREATE_ARTICLE_DRAFT")
+
+type UpdateArticleDraftPayload = {
+    id: string,
+    update: (draft: ArticleEditModel) => Partial<ArticleEditModel>
+}
+export const updateArticleDraft =
+    createSyncActionCreator<UpdateArticleDraftPayload>("UPDATE_ARTICLE_DRAFT")
+
+type StartSubmittingArticleDraftPayload = {}
+export const startSubmittingArticleDraft =
+    createSyncActionCreator<StartSubmittingArticleDraftPayload>("START_SUBMITTING_ARTICLE_DRAFT")
+
+type ReceiveArticleSubmitErrorPayload = {}
+export const receiveArticleSubmitError =
+    createSyncActionCreator<ReceiveArticleSubmitErrorPayload>("RECEIVE_ARTICLE_SUBMIT_ERROR")
+
+type ReceiveArticleSubmitSuccessPayload = {item: FullArticleModel}
+export const receiveArticleSubmitSuccess =
+    createSyncActionCreator<ReceiveArticleSubmitSuccessPayload>("RECEIVE_ARTICLE_SUBMIT_SUCCESS")
 
 
 export const AlreadyLoadingError = createErrorClass<void>(
@@ -134,12 +158,14 @@ export function reloadArticles(publicationId: string): AsyncAction<void> {
     }
 }
 
-export function loadFullArticle(publicationId: string, articleId: string): AsyncAction<void> {
+export function loadFullArticle(publicationId: string,
+                                articleId: string): AsyncAction<FullArticleModel> {
     return async (dispatch, getState, {api}) => {
         dispatch(startLoadingFullArticle({id: articleId}))
-        dispatch(recieveFullArticle({
-            item: await api.articles.get(publicationId, articleId),
-        }))
+
+        const item = await api.articles.get(publicationId, articleId)
+        dispatch(recieveFullArticle({item}))
+        return item
     }
 }
 
@@ -151,6 +177,27 @@ export function maybeDoInitialLoad(publicationId: string = ""): AsyncAction<void
             publicationId = publicationId || getDefaultPublicationId(getState())
             dispatch(replace(`/publications/${publicationId}/articles`))
             await dispatch(reloadArticles(publicationId))
+        }
+    }
+}
+
+export function submitArticleDraft(publicationId: string, articleId: string): AsyncAction<void> {
+    return async (dispatch, getState, {api}) => {
+        const draft = getState().articleDraftsById[articleId]
+        dispatch(startSubmittingArticleDraft({}))
+
+        try {
+            dispatch(receiveArticleSubmitSuccess({
+                item: (articleId) ? (
+                    await api.articles.edit(publicationId, articleId, draft)
+                ) : (
+                    await api.articles.create(publicationId, draft)
+                ),
+            }))
+        } catch (err) {
+            if (FetchError.isTypeOf(err)) {
+                dispatch(receiveArticleSubmitError({}))
+            }
         }
     }
 }

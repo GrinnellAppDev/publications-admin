@@ -20,9 +20,10 @@
 
 import {RouteComponentProps} from "react-router"
 import {connect} from "react-redux"
+import {goBack} from "react-router-redux"
 
 import {StateModel} from "./state/models"
-import {getSelectedEditArticle} from "./state/selectors"
+import {updateArticleDraft, submitArticleDraft} from "./state/actions"
 
 import ArticleEditForm, {StateProps, DispatchProps} from "./ArticleEditForm"
 
@@ -36,170 +37,82 @@ interface OwnProps extends RouteComponentProps<RouteParams, {}> {
 
 const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
     (state: StateModel, {params}) => ({
-        model: getSelectedEditArticle(state, params),
-        isLoading: state.loadingArticles.includes(params.articleId),
-        submissionState: state.editSubmissionState,
         publicationId: params.publicationId,
+        articleId: params.articleId || "",
+        model: state.articleDraftsById[params.articleId || ""],
+        isLoading: state.loadingArticles.includes(params.articleId),
+        submissionState: state.articleDraftSubmissionState,
     }),
 
     (dispatch, {params}) => ({
-        onAuthorAdd: () => {
-            return
+        onAuthorAdd: ev => {
+            ev.preventDefault()
+            dispatch(updateArticleDraft({
+                id: params.articleId || "",
+                update: draft => ({
+                    authors: [...draft.authors, {name: "", email: ""}],
+                })
+            }))
         },
-        onAuthorChange: () => {
-            return
+
+        onAuthorChange: (newAuthorIndex, newAuthor) => {
+            dispatch(updateArticleDraft({
+                id: params.articleId || "",
+                update: draft => ({
+                    authors: draft.authors.map((author, index) =>
+                        (index === newAuthorIndex) ? newAuthor : author
+                    ),
+                })
+            }))
         },
-        onAuthorRemove: () => {
-            return
+
+        onAuthorRemove: removeIndex => {
+            dispatch(updateArticleDraft({
+                id: params.articleId || "",
+                update: draft => ({
+                    authors: draft.authors.filter((author, index) => index !== removeIndex),
+                })
+            }))
         },
-        onBriefChange: () => {
-            return
+
+        onBriefChange: ev => {
+            ev.preventDefault()
+            dispatch(updateArticleDraft({
+                id: params.articleId || "",
+                update: draft => ({brief: ev.target.value})
+            }))
         },
-        onContentChange: () => {
-            return
+
+        onContentChange: ev => {
+            ev.preventDefault()
+            dispatch(updateArticleDraft({
+                id: params.articleId || "",
+                update: draft => ({content: ev.target.value})
+            }))
         },
-        onHeaderImageChange: () => {
-            return
+
+        onHeaderImageChange: ev => {
+            ev.preventDefault()
+            dispatch(updateArticleDraft({
+                id: params.articleId || "",
+                update: draft => ({headerImage: ev.target.value})
+            }))
         },
-        onSubmit: () => {
-            return
+
+        onTitleChange: ev => {
+            ev.preventDefault()
+            dispatch(updateArticleDraft({
+                id: params.articleId || "",
+                update: draft => ({title: ev.target.value})
+            }))
         },
-        onTitleChange: () => {
-            return
-        }
+
+        onSubmit: async ev => {
+            ev.preventDefault()
+            await dispatch(submitArticleDraft(params.publicationId, params.articleId || ""))
+            dispatch(goBack())
+        },
     })
 )
 
 export default withReduxConnect(ArticleEditForm)
-
-/*
-interface State {
-    model: FullArticleModel
-    isLoading: boolean
-    submissionState: SubmissionState
-}
-
-export default class ArticleEditPage extends React.PureComponent<Props, State> {
-    state: State = {
-        isLoading: false,
-        submissionState: SubmissionState.EDITING,
-        model: {
-            id: "",
-            publication: "",
-            title: "",
-            content: "",
-            brief: "",
-            authors: [{name: "", email: ""}],
-            headerImage: "",
-            dateEdited: new Date(),
-            datePublished: new Date(),
-        },
-    }
-
-    async componentDidMount(): Promise<void> {
-        const {params} = this.props
-        this.setState({submissionState: SubmissionState.EDITING})
-
-        if (params.articleId) {
-            this.setState({isLoading: true})
-            this.setState({
-                model: await api.articles.get(params.publicationId, params.articleId),
-                isLoading: false,
-            })
-        }
-    }
-
-    private onTitleChange = (ev: React.ChangeEvent<HTMLInputElement>): void => {
-        const title = ev.target.value
-        this.setState(({model}) => ({
-            model: {...model, title},
-        }))
-    }
-
-    private onHeaderImageChange = (ev: React.ChangeEvent<HTMLInputElement>): void => {
-        const headerImage = ev.target.value
-        this.setState(({model}) => ({
-            model: {...model, headerImage},
-        }))
-    }
-
-    private onAuthorAdd = (ev: React.MouseEvent<HTMLButtonElement>): void => {
-        ev.preventDefault()
-        this.setState(({model}) => ({
-            model: {
-                ...model,
-                authors: [...model.authors, {name: "", email: ""}],
-            },
-        }))
-    }
-
-    private onAuthorChange = (newAuthorIndex: number, newAuthor: AuthorModel): void => {
-        this.setState(({model}) => ({
-            model: {
-                ...model,
-                authors: model.authors.map((author, index) =>
-                    (index === newAuthorIndex) ? newAuthor : author
-                ),
-            },
-        }))
-    }
-
-    private onAuthorRemove = (removeIndex: number): void => {
-        this.setState(({model}) => ({
-            model: {
-                ...model,
-                authors: model.authors.filter((author, index) => index !== removeIndex),
-            },
-        }))
-    }
-
-    private onBriefChange = (ev: React.ChangeEvent<HTMLInputElement>): void => {
-        const brief = ev.target.value
-        this.setState(({model}) => ({
-            model: {...model, brief},
-        }))
-    }
-
-    private onContentChange = (ev: React.ChangeEvent<HTMLTextAreaElement>): void => {
-        const content = ev.target.value
-        this.setState(({model}) => ({
-            model: {...model, content},
-        }))
-    }
-
-    private onSubmit = async (ev: React.FormEvent<HTMLFormElement>): Promise<void> => {
-        ev.preventDefault()
-
-        this.setState({submissionState: SubmissionState.SUBMITTING})
-
-        const {params, router} = this.props
-        const model = {
-            ...this.state.model,
-            authors: this.state.model.authors.filter(author => author.name || author.email),
-        }
-
-        try {
-            if (model.id) {
-                await api.articles.edit(params.publicationId, model.id, model)
-            } else {
-                await api.articles.create(params.publicationId, model)
-            }
-
-            router.goBack()
-        } catch (err) {
-            this.setState({submissionState: SubmissionState.ERRORED})
-        }
-    }
-
-    render(): JSX.Element {
-        const {params} = this.props
-        const {model, isLoading, submissionState} = this.state
-        return <ArticleEditForm
-            {...{model, isLoading, submissionState}} publicationId={params.publicationId}
-            onTitleChange={this.onTitleChange} onHeaderImageChange={this.onHeaderImageChange}
-            onAuthorAdd={this.onAuthorAdd} onAuthorChange={this.onAuthorChange}
-            onAuthorRemove={this.onAuthorRemove} onBriefChange={this.onBriefChange}
-            onContentChange={this.onContentChange} onSubmit={this.onSubmit}/>
-    }
-}
-*/

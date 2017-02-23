@@ -61,16 +61,18 @@ export enum SubmissionStateModel {
     ERRORED,
 }
 
+// TODO: refactor into api data and metadata
 export interface StateModel {
     readonly publicationsById: IdMapModel<PublicationModel>
     readonly articlesById: IdMapModel<ArticleBriefModel>
+    readonly articleDraftsById: IdMapModel<ArticleEditModel>
 
     readonly didInitialLoad: boolean
     readonly isLoadingPublications: boolean
     readonly loadingPublications: ReadonlyArray<string>
     readonly loadingArticles: ReadonlyArray<string>
 
-    readonly editSubmissionState: SubmissionStateModel
+    readonly articleDraftSubmissionState: SubmissionStateModel
 
     readonly routing: RouterState
 }

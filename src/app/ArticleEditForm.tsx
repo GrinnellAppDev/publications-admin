@@ -22,16 +22,17 @@ import * as React from "react"
 import {block} from "react-bem-helper"
 import {Link} from "react-router"
 
-import {AuthorModel, FullArticleModel, SubmissionStateModel} from "./state/models"
+import {AuthorModel, ArticleEditModel, SubmissionStateModel} from "./state/models"
 import AuthorInput from "./AuthorInput"
 
 import "./ArticleEditForm.scss"
 
 export interface StateProps {
-    model: FullArticleModel
+    articleId: string
+    publicationId: string
+    model: ArticleEditModel
     isLoading: boolean
     submissionState: SubmissionStateModel
-    publicationId: string
 }
 
 export interface DispatchProps {
@@ -49,9 +50,9 @@ type Props = StateProps & DispatchProps
 
 const b = block("ArticleEditForm")
 
-export default function ArticleEditForm({isLoading, submissionState, model, publicationId,
-                                         ...actions}: Props): JSX.Element {
-    return (isLoading) ? (
+export default function ArticleEditForm({articleId, publicationId, model, isLoading,
+                                         submissionState, ...actions}: Props): JSX.Element {
+    return (isLoading || !model) ? (
         <div className={b("", "loading")}>Loading...</div>
     ) : (
         <form className={b()} onSubmit={actions.onSubmit}>
@@ -60,7 +61,7 @@ export default function ArticleEditForm({isLoading, submissionState, model, publ
             </Link>
 
             <h1>
-                {model.id ? "Edit" : "Create"} Article
+                {articleId ? "Edit" : "Create"} Article
             </h1>
 
             <input
@@ -117,7 +118,7 @@ export default function ArticleEditForm({isLoading, submissionState, model, publ
                 value={model.content}
             />
 
-            <input type="submit" value={(model.id ? "Update" : "Create") + " Article"}/>
+            <input type="submit" value={(articleId ? "Update" : "Create") + " Article"}/>
 
             <div
                 className={b("submit-status", {

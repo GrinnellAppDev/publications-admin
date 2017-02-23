@@ -84,8 +84,9 @@ export interface Api {
         list(publicationId: string): Promise<ArticleBriefModel[]>
         get(publicationId: string, articleId: string): Promise<FullArticleModel>
         remove(publicationId: string, articleId: string): Promise<void>
-        create(publicationId: string, model: ArticleEditModel): Promise<void>
-        edit(publicationId: string, articleId: string, model: ArticleEditModel): Promise<void>
+        create(publicationId: string, model: ArticleEditModel): Promise<FullArticleModel>
+        edit(publicationId: string, articleId: string,
+             model: ArticleEditModel): Promise<FullArticleModel>
     }
 }
 
@@ -170,6 +171,8 @@ export const api: Api = {
                     statusText: resp.statusText,
                 })
             }
+
+            return requestToArticleModel(await resp.json())
         },
 
         edit: async (publicationId, articleId, model) => {
@@ -186,6 +189,8 @@ export const api: Api = {
                     statusText: resp.statusText,
                 })
             }
+
+            return requestToArticleModel(await resp.json())
         },
     },
 }

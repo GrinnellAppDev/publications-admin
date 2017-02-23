@@ -28,7 +28,7 @@ import {composeWithDevTools} from "redux-devtools-extension/developmentOnly"
 
 import * as reducers from "./state/reducers"
 import {api} from "./state/api"
-import {ThunkContext, maybeDoInitialLoad, loadArticles, loadFullArticle} from "./state/actions"
+import * as actions from "./state/actions"
 import {StateModel} from "./state/models"
 
 import AppShell from "./AppShell"
@@ -37,9 +37,9 @@ import ArticleEditPage from "./ArticleEditPage"
 import IndexPage from "./IndexPage"
 import NotFoundPage from "./NotFoundPage"
 
-const thunkContext: ThunkContext = {api}
+const thunkContext: actions.ThunkContext = {api}
 
-const store = createStore(
+const store = createStore<StateModel>(
     combineReducers<StateModel>({
         ...reducers,
         routing: routerReducer,
@@ -56,12 +56,16 @@ async function onPublicationChange({params: oldParams}: RouterState,
                                    {params}: RouterState): Promise<void> {
     const {publicationId} = params
     if (oldParams.publicationId !== publicationId) {
-        await store.dispatch(loadArticles(publicationId))
+        await store.dispatch(actions.loadArticles(publicationId))
     }
 }
 
 async function onPublicationEnter({params}: RouterState): Promise<void> {
-    await store.dispatch(maybeDoInitialLoad(params.publicationId))
+    await store.dispatch(actions.maybeDoInitialLoad(params.publicationId))
+}
+
+async function onNewArticleNavTo(): Promise<void> {
+    await store.dispatch(actions.createArticleDraft({}))
 }
 
 async function onArticleChange({params: oldParams}: RouterState,
@@ -70,7 +74,9 @@ async function onArticleChange({params: oldParams}: RouterState,
     if (oldParams.publicationId !== publicationId ||
         oldParams.articleId !== articleId) {
 
-        await store.dispatch(loadFullArticle(publicationId, articleId))
+        const item = store.getState().articleDraftsById[articleId] ||
+                     await store.dispatch(actions.loadFullArticle(publicationId, articleId))
+        await store.dispatch(actions.createArticleDraft({id: articleId, item}))
     }
 }
 
@@ -94,7 +100,12 @@ export default function App(): JSX.Element {
                         onChange={onPublicationChange}
                     >
                         <IndexRoute component={ArticleListPage}/>
-                        <Route path="new" component={ArticleEditPage}/>
+                        <Route
+                            path="new"
+                            component={ArticleEditPage}
+                            onEnter={onNewArticleNavTo}
+                            onChange={onNewArticleNavTo}
+                        />
                         <Route
                             path=":articleId/edit"
                             component={ArticleEditPage}
