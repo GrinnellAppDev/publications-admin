@@ -25,15 +25,25 @@ import createErrorClass from "./createErrorClass"
 const API_ROOT = process.env.API_ROOT
 
 export interface FetchErrorPayload {
-    status: number
-    statusText: string
+    resp?: Response
 }
 
 export const FetchError = createErrorClass<FetchErrorPayload>(
     "FETCH_ERROR",
-    (message, {status, statusText}) =>
-        `Fetch errored with code: ${status} - ${statusText}. ${message}`,
+    (message, {resp}) => (resp) ? (
+        `Fetch errored with code: ${resp.status} - ${resp.statusText}. ${message}`
+    ) : (
+        message
+    )
 )
+
+function toFetchError(err: any): any {
+    if (err instanceof TypeError) {
+        return new FetchError(err.message, {})
+    } else {
+        return err
+    }
+}
 
 function requestToArray<T>(elementConversion: (element: any) => T, request: any): T[] {
     return (request as any[]).map(elementConversion)
@@ -93,104 +103,110 @@ export interface Api {
 export const api: Api = {
     publications: {
         list: async () => {
-            const resp = await fetch(`${API_ROOT}/publications`, {
-                method: "GET",
-                mode: "cors",
-            })
-
-            if (!resp.ok) {
-                throw new FetchError("", {
-                    status: resp.status,
-                    statusText: resp.statusText,
+            try {
+                const resp = await fetch(`${API_ROOT}/publications`, {
+                    method: "GET",
+                    mode: "cors",
                 })
-            }
 
-            return requestToArray(requestToPublicationModel, await resp.json())
+                if (!resp.ok) {
+                    throw new FetchError("", {resp})
+                }
+
+                return requestToArray(requestToPublicationModel, await resp.json())
+            } catch (err) {
+                throw toFetchError(err)
+            }
         },
     },
 
     articles: {
         list: async publicationId => {
-            const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
-                method: "GET",
-                mode: "cors",
-            })
-
-            if (!resp.ok) {
-                throw new FetchError("", {
-                    status: resp.status,
-                    statusText: resp.statusText,
+            try {
+                const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
+                    method: "GET",
+                    mode: "cors",
                 })
-            }
 
-            return requestToArray(requestToArticleBriefModel, await resp.json())
+                if (!resp.ok) {
+                    throw new FetchError("", {resp})
+                }
+
+                return requestToArray(requestToArticleBriefModel, await resp.json())
+            } catch (err) {
+                throw toFetchError(err)
+            }
         },
 
         get: async (publicationId, articleId) => {
-            const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
-                                     `${articleId}`, {
-                method: "GET",
-                mode: "cors",
-            })
-
-            if (!resp.ok) {
-                throw new FetchError("", {
-                    status: resp.status,
-                    statusText: resp.statusText,
+            try {
+                const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
+                                        `${articleId}`, {
+                    method: "GET",
+                    mode: "cors",
                 })
-            }
 
-            return requestToArticleModel(await resp.json())
+                if (!resp.ok) {
+                    throw new FetchError("", {resp})
+                }
+
+                return requestToArticleModel(await resp.json())
+            } catch (err) {
+                throw toFetchError(err)
+            }
         },
 
         remove: async (publicationId, articleId) => {
-            const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
-                                     `${articleId}`, {
-                method: "DELETE",
-                mode: "cors",
-            })
-
-            if (!resp.ok) {
-                throw new FetchError("", {
-                    status: resp.status,
-                    statusText: resp.statusText,
+            try {
+                const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
+                                        `${articleId}`, {
+                    method: "DELETE",
+                    mode: "cors",
                 })
+
+                if (!resp.ok) {
+                    throw new FetchError("", {resp})
+                }
+            } catch (err) {
+                throw toFetchError(err)
             }
         },
 
         create: async (publicationId, model) => {
-            const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
-                method: "POST",
-                mode: "cors",
-                body: JSON.stringify(articleEditModelToRequest(model)),
-            })
-
-            if (!resp.ok) {
-                throw new FetchError("", {
-                    status: resp.status,
-                    statusText: resp.statusText,
+            try {
+                const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
+                    method: "POST",
+                    mode: "cors",
+                    body: JSON.stringify(articleEditModelToRequest(model)),
                 })
-            }
 
-            return requestToArticleModel(await resp.json())
+                if (!resp.ok) {
+                    throw new FetchError("", {resp})
+                }
+
+                return requestToArticleModel(await resp.json())
+            } catch (err) {
+                throw toFetchError(err)
+            }
         },
 
         edit: async (publicationId, articleId, model) => {
-            const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
-                                     `${articleId}`, {
-                method: "PATCH",
-                mode: "cors",
-                body: JSON.stringify(articleEditModelToRequest(model)),
-            })
-
-            if (!resp.ok) {
-                throw new FetchError("", {
-                    status: resp.status,
-                    statusText: resp.statusText,
+            try {
+                const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
+                                        `${articleId}`, {
+                    method: "PATCH",
+                    mode: "cors",
+                    body: JSON.stringify(articleEditModelToRequest(model)),
                 })
-            }
 
-            return requestToArticleModel(await resp.json())
+                if (!resp.ok) {
+                    throw new FetchError("", {resp})
+                }
+
+                return requestToArticleModel(await resp.json())
+            } catch (err) {
+                throw toFetchError(err)
+            }
         },
     },
 }

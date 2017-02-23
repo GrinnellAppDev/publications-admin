@@ -200,6 +200,9 @@ export function submitArticleDraft(publicationId: string, articleId: string): As
         } catch (err) {
             if (FetchError.isTypeOf(err)) {
                 dispatch(receiveArticleSubmitError({}))
+                throw err
+            } else {
+                throw err
             }
         }
     }
@@ -215,6 +218,9 @@ export function deleteArticle(publicationId: string, articleId: string): AsyncAc
         } catch (err) {
             if (FetchError.isTypeOf(err)) {
                 dispatch(undeleteLocalArticle({item: article}))
+                console.error(err.message)
+            } else {
+                throw err
             }
         }
     }

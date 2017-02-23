@@ -47,7 +47,9 @@ const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
             try {
                 await dispatch(reloadArticles(params.publicationId))
             } catch (err) {
-                if (!AlreadyLoadingError.isTypeOf(err)) {
+                if (AlreadyLoadingError.isTypeOf(err)) {
+                    console.error(err.message)
+                } else {
                     throw err
                 }
             }
