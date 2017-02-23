@@ -31,7 +31,8 @@ export interface FetchErrorPayload {
 
 export const FetchError = createErrorClass<FetchErrorPayload>(
     "FETCH_ERROR",
-    (message, {status, statusText}) => `Fetch errored with code: ${status} - ${statusText}`,
+    (message, {status, statusText}) =>
+        `Fetch errored with code: ${status} - ${statusText}. ${message}`,
 )
 
 function requestToArray<T>(elementConversion: (element: any) => T, request: any): T[] {

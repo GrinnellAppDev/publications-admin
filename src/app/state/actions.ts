@@ -25,6 +25,7 @@ import {replace} from "react-router-redux"
 import {PublicationModel, ArticleBriefModel, FullArticleModel, StateModel} from "./models"
 import {Api, FetchError} from "./api"
 import createErrorClass from "./createErrorClass"
+import {getDefaultPublicationId} from "./selectors"
 
 export interface SyncAction<T> extends Action {
     readonly type: string
@@ -37,6 +38,7 @@ export interface ThunkContext {
 
 export interface AsyncAction<T> extends ThunkAction<Promise<T>, StateModel, ThunkContext> {
 }
+
 
 interface SyncActionCreator<T> {
     (payload: T): SyncAction<T>
@@ -51,6 +53,14 @@ function createSyncActionCreator<T>(type: string): SyncActionCreator<T> {
         },
     )
 }
+
+type StartInitialLoadPayload = {}
+export const startInitialLoad =
+    createSyncActionCreator<StartInitialLoadPayload>("START_INITIAL_LOAD")
+
+type StartLoadingPublicationsPayload = {}
+export const startLoadingPublications =
+    createSyncActionCreator<StartLoadingPublicationsPayload>("START_LOADING_PUBLICATIONS")
 
 type ReceivePublicationsPayload = {items: ReadonlyArray<PublicationModel>}
 export const receivePublications =
@@ -84,29 +94,43 @@ type UndeleteLocalArticlePayload = {item: ArticleBriefModel}
 export const undeleteLocalArticle =
     createSyncActionCreator<UndeleteLocalArticlePayload>("UNDELETE_ARTICLE")
 
-export function loadPublications(): AsyncAction<void> {
-    return async (dispatch, getState, {api}) => {
-        dispatch(receivePublications({
-            items: await api.publications.list(),
-        }))
-    }
-}
 
 export const AlreadyLoadingError = createErrorClass<void>(
     "ALREADY_LOADING_ERROR",
     message => `Cannot load. ${message}`,
 )
 
-export function loadArticles(publicationId: string): AsyncAction<void> {
+export function loadPublications(): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
-        if (!getState().loadingPublications.includes(publicationId)) {
-            dispatch(receiveArticles({
-                publicationId,
-                items: await api.articles.list(publicationId),
+        if (!getState().isLoadingPublications) {
+            dispatch(startLoadingPublications({}))
+            dispatch(receivePublications({
+                items: await api.publications.list(),
             }))
         } else {
+            throw new AlreadyLoadingError("Already loading publications.")
+        }
+    }
+}
+
+export function loadArticles(publicationId: string): AsyncAction<void> {
+    return async (dispatch, getState, {api}) => {
+        if (getState().loadingPublications.includes(publicationId)) {
             throw new AlreadyLoadingError("Already loading articles.")
         }
+
+        dispatch(startLoadingArticles({publicationId}))
+        dispatch(receiveArticles({
+            publicationId,
+            items: await api.articles.list(publicationId),
+        }))
+    }
+}
+
+export function reloadArticles(publicationId: string): AsyncAction<void> {
+    return async dispatch => {
+        dispatch(clearArticles({publicationId}))
+        await dispatch(loadArticles(publicationId))
     }
 }
 
@@ -119,18 +143,15 @@ export function loadFullArticle(publicationId: string, articleId: string): Async
     }
 }
 
-export function reloadArticles(publicationId: string): AsyncAction<void> {
-    return async dispatch => {
-        const articlesLoaded = dispatch(loadArticles(publicationId))
-        dispatch(clearArticles({publicationId}))
-        await articlesLoaded
-    }
-}
+export function maybeDoInitialLoad(publicationId: string = ""): AsyncAction<void> {
+    return async (dispatch, getState) => {
+        if (!getState().didInitialLoad) {
+            await dispatch(loadPublications())
 
-export function goToPublication(publicationId: string): AsyncAction<void> {
-    return async dispatch => {
-        dispatch(replace(`/publications/${publicationId}/articles`))
-        await dispatch(reloadArticles(publicationId))
+            publicationId = publicationId || getDefaultPublicationId(getState())
+            dispatch(replace(`/publications/${publicationId}/articles`))
+            await dispatch(reloadArticles(publicationId))
+        }
     }
 }
 

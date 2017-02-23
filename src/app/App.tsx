@@ -19,21 +19,23 @@
  */
 
 import * as React from "react"
-import {Router, Route, IndexRoute, hashHistory, RouteComponentProps} from "react-router"
+import {Router, Route, IndexRoute, hashHistory} from "react-router"
 import {Provider} from "react-redux"
 import {createStore, combineReducers, applyMiddleware} from "redux"
 import {syncHistoryWithStore, routerReducer, routerMiddleware} from "react-router-redux"
 import thunk from "redux-thunk"
+import {composeWithDevTools} from "redux-devtools-extension/developmentOnly"
 
 import * as reducers from "./state/reducers"
 import {api} from "./state/api"
-import {ThunkContext, loadPublications, goToPublication} from "./state/actions"
+import {ThunkContext, maybeDoInitialLoad, loadArticles, loadFullArticle} from "./state/actions"
 import {StateModel} from "./state/models"
-import {getPublications} from "./state/selectors"
 
 import AppShell from "./AppShell"
-import ArticleListPage, {RouteParams as ArticleListParams} from "./ArticleListPage"
+import ArticleListPage from "./ArticleListPage"
 import ArticleEditPage from "./ArticleEditPage"
+import IndexPage from "./IndexPage"
+import NotFoundPage from "./NotFoundPage"
 
 const thunkContext: ThunkContext = {api}
 
@@ -42,65 +44,57 @@ const store = createStore(
         ...reducers,
         routing: routerReducer,
     }),
-    applyMiddleware(
-        routerMiddleware(hashHistory),
-        thunk.withExtraArgument(thunkContext),
+    composeWithDevTools(
+        applyMiddleware(
+            routerMiddleware(hashHistory),
+            thunk.withExtraArgument(thunkContext),
+        ),
     ),
 )
-
-interface FetcherProps extends RouteComponentProps<ArticleListParams, {}> {}
-
-class PublicationFetcher extends React.PureComponent<FetcherProps, {}> {
-    static get defaultPublicationId(): string {
-        const first = getPublications(store.getState())[0]
-        return first ? first.id : ""
-    }
-
-    async componentDidMount(): Promise<void> {
-        await store.dispatch(loadPublications())
-        await store.dispatch(goToPublication(
-            this.props.params.publicationId || PublicationFetcher.defaultPublicationId
-        ))
-    }
-
-    async componentWillReceiveProps({params}: FetcherProps): Promise<void> {
-        if (!params.publicationId) {
-            const defaultPublicationId = PublicationFetcher.defaultPublicationId
-            if (defaultPublicationId) {
-                await store.dispatch(goToPublication(defaultPublicationId))
-            }
-        }
-    }
-
-    render(): JSX.Element {
-        return <div>{this.props.children}</div>
-    }
-}
-
-function NotFound(): JSX.Element {
-    return (
-        <div>
-            <h1>404 Not Found</h1>
-            <a href="#">Home</a>
-        </div>
-    )
-}
 
 export default function App(): JSX.Element {
     return (
         <Provider store={store}>
             <Router history={syncHistoryWithStore(hashHistory, store)}>
                 <Route path="/" component={AppShell}>
-                    <IndexRoute component={PublicationFetcher} />
+                    <IndexRoute
+                        component={IndexPage}
+                        onEnter={() => {
+                            store.dispatch(maybeDoInitialLoad())
+                        }} />
+
                     <Route
                         path="publications/:publicationId/articles"
-                        component={PublicationFetcher}>
+                        onEnter={({params}) => {
+                            store.dispatch(maybeDoInitialLoad(params.publicationId))
+                        }}
+                        onChange={({params: oldParams}, {params}) => {
+                            const {publicationId} = params
+                            if (oldParams.publicationId !== publicationId) {
+                                store.dispatch(loadArticles(publicationId))
+                            }
+                        }}>
 
                         <IndexRoute component={ArticleListPage} />
                         <Route path="new" component={ArticleEditPage} />
-                        <Route path=":articleId/edit" component={ArticleEditPage} />
+                        <Route
+                            path=":articleId/edit"
+                            component={ArticleEditPage}
+                            onEnter={({params}) => {
+                                store.dispatch(loadFullArticle(params.publicationId,
+                                                               params.articleId))
+                            }}
+                            onChange={({params: oldParams}, {params}) => {
+                                const {publicationId, articleId} = params
+                                if (oldParams.publicationId !== publicationId ||
+                                    oldParams.articleId !== articleId) {
+
+                                    store.dispatch(loadFullArticle(publicationId, articleId))
+                                }
+                            }} />
                     </Route>
-                    <Route path="*" component={NotFound} />
+
+                    <Route path="*" component={NotFoundPage} />
                 </Route>
             </Router>
         </Provider>

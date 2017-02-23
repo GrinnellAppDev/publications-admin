@@ -41,6 +41,11 @@ export const getArticles = createSelector(
         .sort((a, b) => a.datePublished.valueOf() - b.datePublished.valueOf())
 )
 
+export const getDefaultPublicationId = createSelector(
+    getPublications,
+    publications => publications[0] ? publications[0].id : ""
+)
+
 const defaultFullArticle: FullArticleModel = {
     id: "",
     publication: "",

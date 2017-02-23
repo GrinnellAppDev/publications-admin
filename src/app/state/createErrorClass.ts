@@ -28,7 +28,7 @@ interface MessageFunction<T> {
 }
 
 interface CustomErrorClass<T> {
-    new (message: string, payload?: T): CustomError<T>
+    new (message?: string, payload?: T): CustomError<T>
     isTypeOf(err: any): err is CustomError<T>
 }
 
@@ -41,7 +41,7 @@ export default function createErrorClass<T>(type: string, messageFunction: Messa
 
         type: string = type
 
-        constructor(message: string, public payload: T) {
+        constructor(message: string = "", public payload: T = undefined) {
             super(messageFunction(message, payload))
         }
     }

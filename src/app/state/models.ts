@@ -65,6 +65,8 @@ export interface StateModel {
     readonly publicationsById: IdMapModel<PublicationModel>
     readonly articlesById: IdMapModel<ArticleBriefModel>
 
+    readonly didInitialLoad: boolean
+    readonly isLoadingPublications: boolean
     readonly loadingPublications: ReadonlyArray<string>
     readonly loadingArticles: ReadonlyArray<string>
 

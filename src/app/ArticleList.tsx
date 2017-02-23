@@ -37,7 +37,6 @@ export interface StateProps {
 export interface DispatchProps {
     onRefresh: () => void
     onArticleDelete: (id: string) => void
-    onArticleEdit: (id: string) => void
 }
 
 type Props = StateProps & DispatchProps
@@ -86,8 +85,7 @@ export default function ArticleList({articles, publications, currentPublication,
                         {articles.map(article =>
                             <Article
                                 key={article.id} model={article}
-                                onDelete={dispatchProps.onArticleDelete}
-                                onEdit={dispatchProps.onArticleEdit} />
+                                onDelete={dispatchProps.onArticleDelete} />
                         )}
                     </section>
                 )}

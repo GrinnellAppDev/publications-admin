@@ -29,7 +29,6 @@ import "./Article.scss"
 interface Props {
     model: ArticleBriefModel
     onDelete: (id: string) => void
-    onEdit: (id: string) => void
 }
 
 const b = block("Article")
@@ -37,7 +36,7 @@ const b = block("Article")
 const SHORT_MONTHS = ["Jan", "Feb", "Mar", "April", "May", "June", "July", "Aug", "Sep", "Oct",
                       "Nov", "Dec"]
 
-export default function Article({model, onDelete, onEdit}: Props): JSX.Element {
+export default function Article({model, onDelete}: Props): JSX.Element {
     return (
         <article className={b()}>
             <div className={b("header-image-wrapper")}>
@@ -49,10 +48,7 @@ export default function Article({model, onDelete, onEdit}: Props): JSX.Element {
                 <h2 className={b("title")}>{model.title}</h2>
 
                 <div>
-                    <Link
-                        to={`/publications/${model.publication}/articles/${model.id}/edit`}
-                        onClick={() => onEdit(model.id)}>
-
+                    <Link to={`/publications/${model.publication}/articles/${model.id}/edit`}>
                         <button>Edit</button>
                     </Link>
                     <button onClick={() => onDelete(model.id)}>Delete</button>
