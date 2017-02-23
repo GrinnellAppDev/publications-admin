@@ -33,7 +33,7 @@ export const FetchError = createErrorClass<FetchErrorPayload>(
     (message, {resp}) => (resp) ? (
         `Fetch errored with code: ${resp.status} - ${resp.statusText}. ${message}`
     ) : (
-        message
+        `Fetch errored. ${message}`
     )
 )
 
