@@ -95,7 +95,7 @@ type UndeleteLocalArticlePayload = {item: ArticleBriefModel}
 export const undeleteLocalArticle =
     createSyncActionCreator<UndeleteLocalArticlePayload>("UNDELETE_LOCAL_ARTICLE")
 
-type CreateArticleDraftPayload = {id?: string, item?: ArticleEditModel}
+type CreateArticleDraftPayload = {id: string, item: ArticleEditModel}
 export const createArticleDraft =
     createSyncActionCreator<CreateArticleDraftPayload>("CREATE_ARTICLE_DRAFT")
 
@@ -114,7 +114,7 @@ type ReceiveArticleSubmitErrorPayload = {}
 export const receiveArticleSubmitError =
     createSyncActionCreator<ReceiveArticleSubmitErrorPayload>("RECEIVE_ARTICLE_SUBMIT_ERROR")
 
-type ReceiveArticleSubmitSuccessPayload = {item: FullArticleModel}
+type ReceiveArticleSubmitSuccessPayload = {item: FullArticleModel, isNew: boolean}
 export const receiveArticleSubmitSuccess =
     createSyncActionCreator<ReceiveArticleSubmitSuccessPayload>("RECEIVE_ARTICLE_SUBMIT_SUCCESS")
 
@@ -186,15 +186,17 @@ export function maybeDoInitialLoad(publicationId: string = ""): AsyncAction<void
 
 export function submitArticleDraft(publicationId: string, articleId: string): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
-        const draft = getState().articleDraftsById[articleId]
+        const draft = getState().articleDraftsById[articleId || ""]
         dispatch(startSubmittingArticleDraft({}))
 
         try {
+            const isNew = !articleId
             dispatch(receiveArticleSubmitSuccess({
-                item: (articleId) ? (
-                    await api.articles.edit(publicationId, articleId, draft)
-                ) : (
+                isNew,
+                item: (isNew) ? (
                     await api.articles.create(publicationId, draft)
+                ) : (
+                    await api.articles.edit(publicationId, articleId, draft)
                 ),
             }))
         } catch (err) {

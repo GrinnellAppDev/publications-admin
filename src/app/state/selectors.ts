@@ -24,6 +24,7 @@ import {StateModel} from "./models"
 
 const getPublicationsById = (state: StateModel) => state.publicationsById
 const getArticlesById = (state: StateModel) => state.articlesById
+const getSelectedPublicationId = (state: StateModel, {publicationId}: any) => publicationId || ""
 
 export const getPublications = createSelector(
     getPublicationsById,
@@ -33,9 +34,10 @@ export const getPublications = createSelector(
 )
 
 export const getArticles = createSelector(
-    getArticlesById,
-    articlesById => Object.keys(articlesById)
+    getArticlesById, getSelectedPublicationId,
+    (articlesById, selectedPublicationId) => Object.keys(articlesById)
         .map(id => articlesById[id])
+        .filter(({publication}) => publication === selectedPublicationId)
         .sort((a, b) => a.datePublished.valueOf() - b.datePublished.valueOf())
 )
 

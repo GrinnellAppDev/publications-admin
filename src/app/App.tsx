@@ -65,7 +65,9 @@ async function onPublicationEnter({params}: RouterState): Promise<void> {
 }
 
 async function onNewArticleNavTo(): Promise<void> {
-    await store.dispatch(actions.createArticleDraft({}))
+    const id = ""
+    const item = store.getState().articleDraftsById[id]
+    await store.dispatch(actions.createArticleDraft({id, item}))
 }
 
 async function onArticleChange({params: oldParams}: RouterState,

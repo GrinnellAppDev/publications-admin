@@ -61,8 +61,8 @@ export function articlesById(state: IdMapModel<ArticleBriefModel> = {},
 
     if (actions.deleteLocalArticle.isTypeOf(action)) {
         const {id} = action.payload
-        const {[id]: removed, ...remainder} = state
-        return remainder
+        const {[id]: _, ...newState} = state
+        return newState
     }
 
     if (actions.recieveFullArticle.isTypeOf(action) ||
@@ -75,13 +75,7 @@ export function articlesById(state: IdMapModel<ArticleBriefModel> = {},
 
     if (actions.clearArticles.isTypeOf(action)) {
         const {publicationId} = action.payload
-        const newState = {...state} as Mutable<IdMapModel<ArticleBriefModel>>
-        Object.keys(newState).forEach(id => {
-            if (newState[id].publication == publicationId) {
-                delete newState[id]
-            }
-        })
-
+        const {[publicationId]: _, ...newState} = state
         return newState
     }
 
@@ -100,17 +94,23 @@ export function articleDraftsById(state: IdMapModel<ArticleEditModel> = {},
                                   action: Action): IdMapModel<ArticleEditModel> {
     if (actions.createArticleDraft.isTypeOf(action)) {
         const {id, item} = action.payload
-        if (id && item) {
+        if (item) {
             const {title, brief, authors, content, headerImage} = item
             return {...state, [id]: {title, brief, authors, content, headerImage}}
         } else {
-            return {...state, "": emptyArticleEdit}
+            return {...state, [id]: emptyArticleEdit}
         }
     }
 
     if (actions.updateArticleDraft.isTypeOf(action)) {
         const {id, update} = action.payload
-        return {...state, [id]: {...state[id], ...update(state[id])}}
+        return {...state, [id || ""]: {...state[id || ""], ...update(state[id || ""])}}
+    }
+
+    if (actions.receiveArticleSubmitSuccess.isTypeOf(action)) {
+        const {item, isNew} = action.payload
+        const {[isNew ? "" : item.id]: _, ...newState} = state
+        return newState
     }
 
     return state
