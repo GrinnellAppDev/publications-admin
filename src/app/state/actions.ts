@@ -106,6 +106,10 @@ type UpdateArticleDraftPayload = {
 export const updateArticleDraft =
     createSyncActionCreator<UpdateArticleDraftPayload>("UPDATE_ARTICLE_DRAFT")
 
+type DiscardArticleDraftPayload = {id: string}
+export const discardArticleDraft =
+    createSyncActionCreator<DiscardArticleDraftPayload>("DISCARD_ARTICLE_DRAFT")
+
 type StartSubmittingArticleDraftPayload = {}
 export const startSubmittingArticleDraft =
     createSyncActionCreator<StartSubmittingArticleDraftPayload>("START_SUBMITTING_ARTICLE_DRAFT")

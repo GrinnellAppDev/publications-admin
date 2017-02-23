@@ -36,12 +36,13 @@ export interface StateProps {
 }
 
 export interface DispatchProps {
-    onSubmit: (ev: React.FormEvent<HTMLFormElement>) => void
+    onSubmit: () => void
+    onDiscard: () => void
     onTitleChange: (ev: React.ChangeEvent<HTMLInputElement>) => void
     onHeaderImageChange: (ev: React.ChangeEvent<HTMLInputElement>) => void
     onAuthorChange: (index: number, newModel: AuthorModel) => void
     onAuthorRemove: (index: number) => void
-    onAuthorAdd: (ev: React.MouseEvent<HTMLButtonElement>) => void
+    onAuthorAdd: () => void
     onBriefChange: (ev: React.ChangeEvent<HTMLInputElement>) => void
     onContentChange: (ev: React.ChangeEvent<HTMLTextAreaElement>) => void
 }
@@ -55,10 +56,25 @@ export default function ArticleEditView({articleId, publicationId, model, isLoad
     return (isLoading || !model) ? (
         <div className={b("", "loading")}>Loading...</div>
     ) : (
-        <form className={b()} onSubmit={actions.onSubmit}>
+        <form
+            className={b()}
+            onSubmit={ev => {
+                ev.preventDefault()
+                actions.onSubmit()
+            }}
+        >
             <Link to={`/publications/${publicationId}/articles`}>
                 <button>Back</button>
             </Link>
+
+            <button
+                onClick={ev => {
+                    ev.preventDefault()
+                    actions.onDiscard()
+                }}
+            >
+                Discard Draft
+            </button>
 
             <h1>
                 {articleId ? "Edit" : "Create"} Article
@@ -98,7 +114,14 @@ export default function ArticleEditView({articleId, publicationId, model, isLoad
                 )}
             </div>
 
-            <button onClick={actions.onAuthorAdd}>Add Author</button>
+            <button
+                onClick={ev => {
+                    ev.preventDefault()
+                    actions.onAuthorAdd()
+                }}
+            >
+                Add Author
+            </button>
 
             <input
                 className={b("input", "block")}
@@ -135,6 +158,6 @@ export default function ArticleEditView({articleId, publicationId, model, isLoad
             >
                 Submitting...
             </div>
-        </form>
+        </form >
     )
 }

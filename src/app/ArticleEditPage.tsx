@@ -23,7 +23,7 @@ import {connect} from "react-redux"
 import {goBack} from "react-router-redux"
 
 import {StateModel} from "./state/models"
-import {updateArticleDraft, submitArticleDraft} from "./state/actions"
+import {updateArticleDraft, submitArticleDraft, discardArticleDraft} from "./state/actions"
 
 import ArticleEditView, {StateProps, DispatchProps} from "./ArticleEditView"
 
@@ -45,8 +45,7 @@ const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
     }),
 
     (dispatch, {params}) => ({
-        onAuthorAdd: ev => {
-            ev.preventDefault()
+        onAuthorAdd: () => {
             dispatch(updateArticleDraft({
                 id: params.articleId || "",
                 update: draft => ({
@@ -76,7 +75,6 @@ const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
         },
 
         onBriefChange: ev => {
-            ev.preventDefault()
             dispatch(updateArticleDraft({
                 id: params.articleId || "",
                 update: draft => ({brief: ev.target.value})
@@ -84,7 +82,6 @@ const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
         },
 
         onContentChange: ev => {
-            ev.preventDefault()
             dispatch(updateArticleDraft({
                 id: params.articleId || "",
                 update: draft => ({content: ev.target.value})
@@ -92,7 +89,6 @@ const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
         },
 
         onHeaderImageChange: ev => {
-            ev.preventDefault()
             dispatch(updateArticleDraft({
                 id: params.articleId || "",
                 update: draft => ({headerImage: ev.target.value})
@@ -100,16 +96,19 @@ const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
         },
 
         onTitleChange: ev => {
-            ev.preventDefault()
             dispatch(updateArticleDraft({
                 id: params.articleId || "",
                 update: draft => ({title: ev.target.value})
             }))
         },
 
-        onSubmit: async ev => {
-            ev.preventDefault()
+        onSubmit: async () => {
             await dispatch(submitArticleDraft(params.publicationId, params.articleId || ""))
+            dispatch(goBack())
+        },
+
+        onDiscard: () => {
+            dispatch(discardArticleDraft({id: params.articleId}))
             dispatch(goBack())
         },
     })

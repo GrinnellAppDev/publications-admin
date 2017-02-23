@@ -107,6 +107,12 @@ export function articleDraftsById(state: IdMapModel<ArticleEditModel> = {},
         return {...state, [id || ""]: {...state[id || ""], ...update(state[id || ""])}}
     }
 
+    if (actions.discardArticleDraft.isTypeOf(action)) {
+        const {id} = action.payload
+        const {[id]: _, ...newState} = state
+        return newState
+    }
+
     if (actions.receiveArticleSubmitSuccess.isTypeOf(action)) {
         const {item, isNew} = action.payload
         const {[isNew ? "" : item.id]: _, ...newState} = state
