@@ -25,7 +25,7 @@ import {goBack} from "react-router-redux"
 import {StateModel} from "./state/models"
 import {updateArticleDraft, submitArticleDraft} from "./state/actions"
 
-import ArticleEditForm, {StateProps, DispatchProps} from "./ArticleEditForm"
+import ArticleEditView, {StateProps, DispatchProps} from "./ArticleEditView"
 
 interface RouteParams {
     publicationId: string
@@ -115,4 +115,4 @@ const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
     })
 )
 
-export default withReduxConnect(ArticleEditForm)
+export default withReduxConnect(ArticleEditView)

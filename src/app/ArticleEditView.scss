@@ -1,7 +1,7 @@
 /**
- * IndexPage.tsx
+ * ArticleEditView.scss
  *
- * Created by Zander Otavka on 2/22/17.
+ * Created by Zander Otavka on 2/11/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,21 +18,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {connect} from "react-redux"
+.ArticleEditView {
+    &__input {
+        font-size: 0.9rem;
 
-import {StateModel} from "./state/models"
-import {getPublications} from "./state/selectors"
+        &--block {
+            display: block;
+            width: 100%;
+        }
 
-import IndexView, {StateProps, DispatchProps} from "./IndexView"
+        &--title {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
 
-interface OwnProps {
+        &--content {
+            height: 50vh;
+            margin-top: 4px;
+        }
+    }
+
+    &__author {
+        display: flex;
+        flex-direction: row;
+
+        input {
+            flex: 1;
+        }
+    }
+
+    &__submit-status {
+        &--hidden {
+            display: none;
+        }
+
+        &--error {
+            color: red;
+        }
+    }
 }
-
-const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
-    (state: StateModel) => ({
-        isLoading: state.isLoadingPublications,
-        hasPublications: !!getPublications(state).length,
-    }),
-)
-
-export default withReduxConnect(IndexView)

@@ -1,5 +1,5 @@
 /**
- * Article.tsx
+ * ArticleView.tsx
  *
  * Created by Zander Otavka on 2/8/16.
  * Copyright (C) 2016  Grinnell AppDev.
@@ -24,19 +24,19 @@ import {Link} from "react-router"
 
 import {ArticleBriefModel} from "./state/models"
 
-import "./Article.scss"
+import "./ArticleView.scss"
 
 interface Props {
     model: ArticleBriefModel
     onDelete: (id: string) => void
 }
 
-const b = block("Article")
+const b = block("ArticleView")
 
 const SHORT_MONTHS = ["Jan", "Feb", "Mar", "April", "May", "June", "July", "Aug", "Sep", "Oct",
                       "Nov", "Dec"]
 
-export default function Article({model, onDelete}: Props): JSX.Element {
+export default function ArticleView({model, onDelete}: Props): JSX.Element {
     return (
         <article className={b()}>
             <div className={b("header-image-wrapper")}>

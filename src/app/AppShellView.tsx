@@ -1,7 +1,7 @@
 /**
- * ArticleList.scss
+ * AppShellView.tsx
  *
- * Created by Zander Otavka on 2/11/17.
+ * Created by Zander Otavka on 2/10/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,19 +18,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.ArticleList {
-    &__publication-link {
-        &--active {
-            font-weight: bold;
-            cursor: text;
+import * as React from "react"
+import {block} from "react-bem-helper"
+import {RouteComponentProps} from "react-router"
 
-            &:hover {
-                text-decoration: none;
-            }
-        }
-    }
+import "./AppShellView.scss"
 
-    &__articles {
-        margin-top: 20px;
-    }
+const b = block("AppShellView")
+
+type Props = RouteComponentProps<{}, {}> & {children?: React.ReactNode}
+
+export default function AppShellView(props: Props): JSX.Element {
+    return (
+        <div className={b()}>
+            {props.children}
+        </div>
+    )
 }

@@ -1,5 +1,5 @@
 /**
- * ArticleEditForm.tsx
+ * ArticleEditView.tsx
  *
  * Created by Zander Otavka on 2/17/17.
  * Copyright (C) 2016  Grinnell AppDev.
@@ -23,9 +23,9 @@ import {block} from "react-bem-helper"
 import {Link} from "react-router"
 
 import {AuthorModel, ArticleEditModel, SubmissionStateModel} from "./state/models"
-import AuthorInput from "./AuthorInput"
+import AuthorInputView from "./AuthorInputView"
 
-import "./ArticleEditForm.scss"
+import "./ArticleEditView.scss"
 
 export interface StateProps {
     articleId: string
@@ -48,9 +48,9 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps
 
-const b = block("ArticleEditForm")
+const b = block("ArticleEditView")
 
-export default function ArticleEditForm({articleId, publicationId, model, isLoading,
+export default function ArticleEditView({articleId, publicationId, model, isLoading,
                                          submissionState, ...actions}: Props): JSX.Element {
     return (isLoading || !model) ? (
         <div className={b("", "loading")}>Loading...</div>
@@ -86,7 +86,7 @@ export default function ArticleEditForm({articleId, publicationId, model, isLoad
 
             <div className={b("authors")}>
                 {model.authors.map((model, index) =>
-                    <AuthorInput
+                    <AuthorInputView
                         {...{model, index}}
                         key={index}
                         containerClass={b("author")}

@@ -25,7 +25,7 @@ import {StateModel} from "./state/models"
 import {getPublications, getArticles} from "./state/selectors"
 import {reloadArticles, deleteArticle, AlreadyLoadingError} from "./state/actions"
 
-import ArticleList, {StateProps, DispatchProps} from "./ArticleList"
+import ArticleListView, {StateProps, DispatchProps} from "./ArticleListView"
 
 export interface RouteParams {
     publicationId?: string
@@ -59,4 +59,4 @@ const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
     }),
 )
 
-export default withReduxConnect(ArticleList)
+export default withReduxConnect(ArticleListView)

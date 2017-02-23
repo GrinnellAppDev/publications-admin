@@ -1,7 +1,7 @@
 /**
- * AppShell.scss
+ * IndexView.tsx
  *
- * Created by Zander Otavka on 1/16/17.
+ * Created by Zander Otavka on 2/23/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.AppShell {
-    margin: 16px 20%;
+import * as React from "react"
+
+export interface StateProps {
+    isLoading: boolean
+    hasPublications: boolean
+}
+
+export interface DispatchProps {
+}
+
+type Props = StateProps & DispatchProps
+
+export default function IndexPage({isLoading, hasPublications}: Props): JSX.Element {
+    return (isLoading || hasPublications) ? (
+        <div>Loading...</div>
+    ) : (
+        <div>
+            <h1>No Publications</h1>
+            <p>Couldn't find any publications.</p>
+        </div>
+    )
 }

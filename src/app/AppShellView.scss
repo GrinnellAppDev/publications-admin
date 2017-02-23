@@ -1,7 +1,7 @@
 /**
- * ArticleEditForm.scss
+ * AppShellView.scss
  *
- * Created by Zander Otavka on 2/11/17.
+ * Created by Zander Otavka on 1/16/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,42 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.ArticleEditForm {
-    &__input {
-        font-size: 0.9rem;
-
-        &--block {
-            display: block;
-            width: 100%;
-        }
-
-        &--title {
-            font-size: 1.3rem;
-            font-weight: bold;
-        }
-
-        &--content {
-            height: 50vh;
-            margin-top: 4px;
-        }
-    }
-
-    &__author {
-        display: flex;
-        flex-direction: row;
-
-        input {
-            flex: 1;
-        }
-    }
-
-    &__submit-status {
-        &--hidden {
-            display: none;
-        }
-
-        &--error {
-            color: red;
-        }
-    }
+.AppShellView {
+    margin: 16px 20%;
 }

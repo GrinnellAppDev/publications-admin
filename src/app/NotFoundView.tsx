@@ -1,7 +1,7 @@
 /**
- * Article.scss
+ * NotFoundView.tsx
  *
- * Created by Zander Otavka on 2/11/17.
+ * Created by Zander Otavka on 2/22/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,40 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.Article {
-    display: flex;
-    flex-direction: row;
+import * as React from "react"
 
-    &__title {
-        margin: 0;
-    }
-
-    &__header-image-wrapper {
-        width: 20%;
-        flex: 1;
-    }
-
-    &__header-image-container {
-        position: relative;
-        width: 100%;
-        padding-bottom: 100%;
-    }
-
-    &__header-image {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        background-color: #ddd;
-    }
-
-    &__detail-wrapper {
-        width: 20%;
-        flex: 4;
-        padding-left: 10px;
-    }
-
-    &__date {
-        font-style: italic;
-    }
+export default function NotFoundView(): JSX.Element {
+    return (
+        <div>
+            <h1>404 Not Found</h1>
+            <a href="#">Home</a>
+        </div>
+    )
 }
+

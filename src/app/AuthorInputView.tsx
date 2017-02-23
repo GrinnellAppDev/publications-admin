@@ -1,5 +1,5 @@
 /**
- * AuthorInput.tsx
+ * AuthorInputView.tsx
  *
  * Created by Zander Otavka on 2/17/17.
  * Copyright (C) 2016  Grinnell AppDev.
@@ -22,7 +22,7 @@ import * as React from "react"
 
 import {AuthorModel} from "./state/models"
 
-interface StateProps {
+export interface StateProps {
     index: number
     model: AuthorModel
     containerClass: string
@@ -30,15 +30,15 @@ interface StateProps {
     emailClass: string
 }
 
-interface ActionProps {
+export interface DispatchProps {
     onChange: (index: number, newModel: AuthorModel) => void
     onRemove: (index: number) => void
 }
 
-type Props = StateProps & ActionProps
+type Props = StateProps & DispatchProps
 
-export default function AuthorInput({model, index, onChange, onRemove, containerClass, nameClass,
-                                     emailClass}: Props): JSX.Element {
+export default function AuthorInputView({model, index, onChange, onRemove, containerClass,
+                                         nameClass, emailClass}: Props): JSX.Element {
     return (
         <div className={containerClass}>
             <input

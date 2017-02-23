@@ -31,11 +31,11 @@ import {api} from "./state/api"
 import * as actions from "./state/actions"
 import {StateModel} from "./state/models"
 
-import AppShell from "./AppShell"
+import AppShellView from "./AppShellView"
 import ArticleListPage from "./ArticleListPage"
 import ArticleEditPage from "./ArticleEditPage"
 import IndexPage from "./IndexPage"
-import NotFoundPage from "./NotFoundPage"
+import NotFoundView from "./NotFoundView"
 
 const thunkContext: actions.ThunkContext = {api}
 
@@ -88,7 +88,7 @@ export default function App(): JSX.Element {
     return (
         <Provider store={store}>
             <Router history={syncHistoryWithStore(hashHistory, store)}>
-                <Route path="/" component={AppShell}>
+                <Route path="/" component={AppShellView}>
                     <IndexRoute
                         component={IndexPage}
                         onEnter={onPublicationEnter}
@@ -114,7 +114,7 @@ export default function App(): JSX.Element {
                         />
                     </Route>
 
-                    <Route path="*" component={NotFoundPage}/>
+                    <Route path="*" component={NotFoundView}/>
                 </Route>
             </Router>
         </Provider>

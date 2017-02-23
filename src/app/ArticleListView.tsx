@@ -1,5 +1,5 @@
 /**
- * ArticleList.tsx
+ * ArticleListView.tsx
  *
  * Created by Zander Otavka on 2/17/17.
  * Copyright (C) 2016  Grinnell AppDev.
@@ -23,9 +23,9 @@ import {block} from "react-bem-helper"
 import {Link} from "react-router"
 
 import {ArticleBriefModel, PublicationModel} from "./state/models"
-import Article from "./Article"
+import ArticleView from "./ArticleView"
 
-import "./ArticleList.scss"
+import "./ArticleListView.scss"
 
 export interface StateProps {
     articles: ArticleBriefModel[]
@@ -41,9 +41,9 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps
 
-const b = block("ArticleList")
+const b = block("ArticleListView")
 
-export default function ArticleList({articles, publications, currentPublication, isLoading,
+export default function ArticleListView({articles, publications, currentPublication, isLoading,
                                      ...dispatchProps}: Props): JSX.Element {
     return (currentPublication) ? (
         <div>
@@ -84,7 +84,7 @@ export default function ArticleList({articles, publications, currentPublication,
                 ) : (
                     <section className={b("articles")}>
                         {articles.map(article =>
-                            <Article
+                            <ArticleView
                                 key={article.id}
                                 model={article}
                                 onDelete={dispatchProps.onArticleDelete}
