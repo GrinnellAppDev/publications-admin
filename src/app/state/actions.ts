@@ -174,8 +174,11 @@ export function maybeDoInitialLoad(publicationId: string = ""): AsyncAction<void
         if (!getState().didInitialLoad) {
             await dispatch(loadPublications())
 
-            publicationId = publicationId || getDefaultPublicationId(getState())
-            dispatch(replace(`/publications/${publicationId}/articles`))
+            if (!publicationId) {
+                const defaultPublicationId = getDefaultPublicationId(getState())
+                dispatch(replace(`/publications/${defaultPublicationId}/articles`))
+            }
+
             await dispatch(reloadArticles(publicationId))
         }
     }
