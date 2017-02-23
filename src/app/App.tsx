@@ -19,7 +19,7 @@
  */
 
 import * as React from "react"
-import {Router, Route, IndexRoute, hashHistory} from "react-router"
+import {Router, Route, IndexRoute, hashHistory, RouterState} from "react-router"
 import {Provider} from "react-redux"
 import {createStore, combineReducers, applyMiddleware} from "redux"
 import {syncHistoryWithStore, routerReducer, routerMiddleware} from "react-router-redux"
@@ -52,6 +52,32 @@ const store = createStore(
     ),
 )
 
+async function onPublicationChange({params: oldParams}: RouterState,
+                                   {params}: RouterState): Promise<void> {
+    const {publicationId} = params
+    if (oldParams.publicationId !== publicationId) {
+        await store.dispatch(loadArticles(publicationId))
+    }
+}
+
+async function onPublicationEnter({params}: RouterState): Promise<void> {
+    await store.dispatch(maybeDoInitialLoad(params.publicationId))
+}
+
+async function onArticleChange({params: oldParams}: RouterState,
+                               {params}: RouterState): Promise<void> {
+    const {publicationId, articleId} = params
+    if (oldParams.publicationId !== publicationId ||
+        oldParams.articleId !== articleId) {
+
+        await store.dispatch(loadFullArticle(publicationId, articleId))
+    }
+}
+
+async function onArticleEnter(routerState: RouterState): Promise<void> {
+    await onArticleChange({...routerState, params: {}}, routerState)
+}
+
 export default function App(): JSX.Element {
     return (
         <Provider store={store}>
@@ -59,39 +85,20 @@ export default function App(): JSX.Element {
                 <Route path="/" component={AppShell}>
                     <IndexRoute
                         component={IndexPage}
-                        onEnter={() => {
-                            store.dispatch(maybeDoInitialLoad())
-                        }} />
+                        onEnter={onPublicationEnter} />
 
                     <Route
                         path="publications/:publicationId/articles"
-                        onEnter={({params}) => {
-                            store.dispatch(maybeDoInitialLoad(params.publicationId))
-                        }}
-                        onChange={({params: oldParams}, {params}) => {
-                            const {publicationId} = params
-                            if (oldParams.publicationId !== publicationId) {
-                                store.dispatch(loadArticles(publicationId))
-                            }
-                        }}>
+                        onEnter={onPublicationEnter}
+                        onChange={onPublicationChange}>
 
                         <IndexRoute component={ArticleListPage} />
                         <Route path="new" component={ArticleEditPage} />
                         <Route
                             path=":articleId/edit"
                             component={ArticleEditPage}
-                            onEnter={({params}) => {
-                                store.dispatch(loadFullArticle(params.publicationId,
-                                                               params.articleId))
-                            }}
-                            onChange={({params: oldParams}, {params}) => {
-                                const {publicationId, articleId} = params
-                                if (oldParams.publicationId !== publicationId ||
-                                    oldParams.articleId !== articleId) {
-
-                                    store.dispatch(loadFullArticle(publicationId, articleId))
-                                }
-                            }} />
+                            onEnter={onArticleEnter}
+                            onChange={onArticleChange} />
                     </Route>
 
                     <Route path="*" component={NotFoundPage} />
