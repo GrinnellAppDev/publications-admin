@@ -64,50 +64,74 @@ export default function ArticleEditForm({isLoading, submissionState, model, publ
             </h1>
 
             <input
-                name="title" type="text" onChange={actions.onTitleChange} value={model.title}
-                placeholder="Title" autoComplete="off"
-                className={b("input", "block title")} />
+                className={b("input", "block title")}
+                name="title"
+                type="text"
+                onChange={actions.onTitleChange}
+                value={model.title}
+                placeholder="Title"
+                autoComplete="off"
+            />
 
             <input
-                name="headerImage" type="url" value={model.headerImage}
-                onChange={actions.onHeaderImageChange} placeholder="Header Image URL"
-                autoComplete="off" className={b("input", "block")} />
+                className={b("input", "block")}
+                name="headerImage"
+                type="url"
+                value={model.headerImage}
+                onChange={actions.onHeaderImageChange}
+                placeholder="Header Image URL"
+                autoComplete="off"
+            />
 
             <div className={b("authors")}>
                 {model.authors.map((model, index) =>
                     <AuthorInput
-                        {...{model, index}} key={index}
+                        {...{model, index}}
+                        key={index}
                         containerClass={b("author")}
                         nameClass={b("input")}
                         emailClass={b("input")}
-                        onChange={actions.onAuthorChange} onRemove={actions.onAuthorRemove} />
+                        onChange={actions.onAuthorChange}
+                        onRemove={actions.onAuthorRemove}
+                    />
                 )}
             </div>
 
             <button onClick={actions.onAuthorAdd}>Add Author</button>
 
             <input
-                name="brief" type="text" value={model.brief} onChange={actions.onBriefChange}
-                placeholder="Brief" autoComplete="off" maxLength={140}
-                className={b("input", "block")} />
+                className={b("input", "block")}
+                name="brief"
+                type="text"
+                value={model.brief}
+                onChange={actions.onBriefChange}
+                placeholder="Brief"
+                autoComplete="off"
+                maxLength={140}
+            />
 
             <textarea
-                name="content" onChange={actions.onContentChange} value={model.content}
-                className={b("input", "block content")} />
+                className={b("input", "block content")}
+                name="content"
+                onChange={actions.onContentChange}
+                value={model.content}
+            />
 
-            <input type="submit" value={(model.id ? "Update" : "Create") + " Article"} />
+            <input type="submit" value={(model.id ? "Update" : "Create") + " Article"}/>
 
             <div
                 className={b("submit-status", {
                     "error": true,
                     "hidden": submissionState !== SubmissionStateModel.ERRORED
-                })}>
+                })}
+            >
                 There was a problem submitting your article.
             </div>
             <div
                 className={b("submit-status", {
                     "hidden": submissionState !== SubmissionStateModel.SUBMITTING
-                })}>
+                })}
+            >
                 Submitting...
             </div>
         </form>

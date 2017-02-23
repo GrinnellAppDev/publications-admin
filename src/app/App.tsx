@@ -85,23 +85,25 @@ export default function App(): JSX.Element {
                 <Route path="/" component={AppShell}>
                     <IndexRoute
                         component={IndexPage}
-                        onEnter={onPublicationEnter} />
+                        onEnter={onPublicationEnter}
+                    />
 
                     <Route
                         path="publications/:publicationId/articles"
                         onEnter={onPublicationEnter}
-                        onChange={onPublicationChange}>
-
-                        <IndexRoute component={ArticleListPage} />
-                        <Route path="new" component={ArticleEditPage} />
+                        onChange={onPublicationChange}
+                    >
+                        <IndexRoute component={ArticleListPage}/>
+                        <Route path="new" component={ArticleEditPage}/>
                         <Route
                             path=":articleId/edit"
                             component={ArticleEditPage}
                             onEnter={onArticleEnter}
-                            onChange={onArticleChange} />
+                            onChange={onArticleChange}
+                        />
                     </Route>
 
-                    <Route path="*" component={NotFoundPage} />
+                    <Route path="*" component={NotFoundPage}/>
                 </Route>
             </Router>
         </Provider>

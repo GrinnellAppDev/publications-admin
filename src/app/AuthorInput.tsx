@@ -42,21 +42,32 @@ export default function AuthorInput({model, index, onChange, onRemove, container
     return (
         <div className={containerClass}>
             <input
-                name="authorName" type="text" value={model.name}
+                className={nameClass}
+                name="authorName"
+                type="text"
+                value={model.name}
                 onChange={ev => onChange(index, {...model, name: ev.target.value})}
-                placeholder="Author Name" autoComplete="off" autoCapitalize="word"
-                className={nameClass} />
+                placeholder="Author Name"
+                autoComplete="off"
+                autoCapitalize="word"
+            />
+
             <input
-                name="authorEmail" type="email" value={model.email}
+                className={emailClass}
+                name="authorEmail"
+                type="email"
+                value={model.email}
                 onChange={ev => onChange(index, {...model, email: ev.target.value})}
-                placeholder="Author Email" autoComplete="off"
-                className={emailClass} />
+                placeholder="Author Email"
+                autoComplete="off"
+            />
+
             <button
                 onClick={ev => {
                     ev.preventDefault()
                     onRemove(index)
-                }}>
-
+                }}
+            >
                 Remove
             </button>
         </div>

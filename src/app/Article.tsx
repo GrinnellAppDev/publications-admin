@@ -41,7 +41,7 @@ export default function Article({model, onDelete}: Props): JSX.Element {
         <article className={b()}>
             <div className={b("header-image-wrapper")}>
                 <div className={b("header-image-container")}>
-                    <img className={b("header-image")} src={model.headerImage || ""} />
+                    <img className={b("header-image")} src={model.headerImage || ""}/>
                 </div>
             </div>
             <section className={b("detail-wrapper")}>

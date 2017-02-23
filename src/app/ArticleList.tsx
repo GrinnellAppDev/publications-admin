@@ -54,7 +54,8 @@ export default function ArticleList({articles, publications, currentPublication,
                             <Link
                                 to={`/publications/${publication.id}/articles`}
                                 className={b("publication-link")}
-                                activeClassName={b("publication-link", "active")}>
+                                activeClassName={b("publication-link", "active")}
+                            >
 
                                 {publication.name}
                             </Link>
@@ -84,14 +85,16 @@ export default function ArticleList({articles, publications, currentPublication,
                     <section className={b("articles")}>
                         {articles.map(article =>
                             <Article
-                                key={article.id} model={article}
-                                onDelete={dispatchProps.onArticleDelete} />
+                                key={article.id}
+                                model={article}
+                                onDelete={dispatchProps.onArticleDelete}
+                            />
                         )}
                     </section>
                 )}
             </main>
         </div>
     ) : (
-        <div />
+        <div/>
     )
 }

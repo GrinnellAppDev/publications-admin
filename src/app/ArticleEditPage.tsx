@@ -199,7 +199,7 @@ export default class ArticleEditPage extends React.PureComponent<Props, State> {
             onTitleChange={this.onTitleChange} onHeaderImageChange={this.onHeaderImageChange}
             onAuthorAdd={this.onAuthorAdd} onAuthorChange={this.onAuthorChange}
             onAuthorRemove={this.onAuthorRemove} onBriefChange={this.onBriefChange}
-            onContentChange={this.onContentChange} onSubmit={this.onSubmit} />
+            onContentChange={this.onContentChange} onSubmit={this.onSubmit}/>
     }
 }
 */

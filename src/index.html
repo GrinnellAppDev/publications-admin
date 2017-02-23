@@ -28,7 +28,7 @@
     <meta name="viewport" content="width=device-width">
 
     <% for (let key in htmlWebpackPlugin.files.css) { %>
-        <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[key] %>" />
+        <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[key] %>"/>
     <% } %>
 
     <%= htmlWebpackPlugin.files.webpackManifest %>
