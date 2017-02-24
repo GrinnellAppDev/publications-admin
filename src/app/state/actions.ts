@@ -230,12 +230,10 @@ export function submitArticleDraft(publicationId: string, articleId: string): As
     }
 }
 
-export function deleteRemoteArticle(publicationId: string, articleId: string): AsyncAction<void> {
+export function deleteRemoteArticle(item: ArticleBriefModel): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
-        const item = getState().articlesById[articleId]
-
         try {
-            await api.articles.remove(publicationId, articleId)
+            await api.articles.remove(item.publication, item.id)
         } catch (err) {
             if (FetchError.isTypeOf(err)) {
                 dispatch(undeleteArticle({item}))
