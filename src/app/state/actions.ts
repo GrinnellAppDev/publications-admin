@@ -23,7 +23,7 @@ import {ThunkAction} from "redux-thunk"
 import {replace} from "react-router-redux"
 
 import {PublicationModel, ArticleBriefModel, ArticleEditModel, FullArticleModel,
-        StateModel} from "./models"
+        ToastActionTypeModel, StateModel} from "./models"
 import {Api, FetchError} from "./api"
 import createErrorClass from "./createErrorClass"
 import {getDefaultPublicationId} from "./selectors"
@@ -37,8 +37,16 @@ export interface ThunkContext {
     api: Api
 }
 
-export interface AsyncAction<T> extends ThunkAction<Promise<T>, StateModel, ThunkContext> {
+interface BaseThunkAction<T> extends ThunkAction<T, StateModel, ThunkContext> {
 }
+
+export interface SyncThunkAction<T> extends BaseThunkAction<SyncAction<T>> {
+}
+
+export interface AsyncAction<T> extends BaseThunkAction<Promise<T>> {
+}
+
+export type AnyAction = SyncAction<any> | AsyncAction<any>
 
 
 interface SyncActionCreator<T> {
@@ -87,13 +95,17 @@ type ClearArticlesPayload = {publicationId: string}
 export const clearArticles =
     createSyncActionCreator<ClearArticlesPayload>("CLEAR_ARTICLES")
 
-type DeleteLocalArticlePayload = {item: ArticleBriefModel}
-export const deleteLocalArticle =
-    createSyncActionCreator<DeleteLocalArticlePayload>("DELETE_LOCAL_ARTICLE")
+type DeleteArticlePayload = {item: ArticleBriefModel}
+export const deleteArticle =
+    createSyncActionCreator<DeleteArticlePayload>("DELETE_ARTICLE")
 
-type UndeleteLocalArticlePayload = {item: ArticleBriefModel}
-export const undeleteLocalArticle =
-    createSyncActionCreator<UndeleteLocalArticlePayload>("UNDELETE_LOCAL_ARTICLE")
+export const deleteArticleById =
+    ({id}: {id: string}): SyncThunkAction<DeleteArticlePayload> => (dispatch, getState) =>
+        dispatch(deleteArticle({item: getState().articlesById[id]}))
+
+type UndeleteArticlePayload = {item: ArticleBriefModel}
+export const undeleteArticle =
+    createSyncActionCreator<UndeleteArticlePayload>("UNDELETE_ARTICLE")
 
 type CreateArticleDraftPayload = {id: string, item: ArticleEditModel}
 export const createArticleDraft =
@@ -121,6 +133,10 @@ export const receiveArticleSubmitError =
 type ReceiveArticleSubmitSuccessPayload = {item: FullArticleModel, isNew: boolean}
 export const receiveArticleSubmitSuccess =
     createSyncActionCreator<ReceiveArticleSubmitSuccessPayload>("RECEIVE_ARTICLE_SUBMIT_SUCCESS")
+
+type CloseToastPayload = {id: string}
+export const closeToast =
+    createSyncActionCreator<CloseToastPayload>("CLOSE_TOAST")
 
 
 export const AlreadyLoadingError = createErrorClass<void>(
@@ -214,22 +230,24 @@ export function submitArticleDraft(publicationId: string, articleId: string): As
     }
 }
 
-export function deleteArticle(publicationId: string, articleId: string): AsyncAction<void> {
+export function deleteRemoteArticle(publicationId: string, articleId: string): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
         const item = getState().articlesById[articleId]
-        dispatch(deleteLocalArticle({item}))
 
-        if (confirm(`Are you sure you want to delete "${item.title}"?`)) {
-            try {
-                await api.articles.remove(publicationId, articleId)
-            } catch (err) {
-                if (FetchError.isTypeOf(err)) {
-                    dispatch(undeleteLocalArticle({item}))
-                    console.error(err.message)
-                } else {
-                    throw err
-                }
+        try {
+            await api.articles.remove(publicationId, articleId)
+        } catch (err) {
+            if (FetchError.isTypeOf(err)) {
+                dispatch(undeleteArticle({item}))
+                console.error(err.message)
+            } else {
+                throw err
             }
         }
     }
+}
+
+export const toastActions: {[action: number]: (...args: any[]) => AnyAction} = {
+    [ToastActionTypeModel.DELETE_REMOTE_ARTICLE]: deleteRemoteArticle,
+    [ToastActionTypeModel.UNDELETE_ARTICLE]: undeleteArticle,
 }

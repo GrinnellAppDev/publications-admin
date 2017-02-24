@@ -29,21 +29,23 @@ export interface ArticleBriefModel {
     readonly id: string
     readonly publication: string
     readonly datePublished: Date
-    readonly headerImage: string
+    readonly headerImage?: string
     readonly title: string
-    readonly brief: string
+    readonly brief?: string
+}
+
+export interface FullArticleModel extends ArticleBriefModel {
+    readonly dateEdited: Date
+    readonly authors: AuthorModel[]
+    readonly content: string
 }
 
 export interface ArticleEditModel {
-    readonly content: string
-    readonly headerImage: string
-    readonly title: string
-    readonly brief: string
-    readonly authors: AuthorModel[]
-}
-
-export interface FullArticleModel extends ArticleEditModel, ArticleBriefModel {
-    readonly dateEdited: Date
+    readonly content?: string
+    readonly headerImage?: string
+    readonly title?: string
+    readonly brief?: string
+    readonly authors?: AuthorModel[]
 }
 
 export interface PublicationModel {
@@ -61,6 +63,31 @@ export enum SubmissionStateModel {
     ERRORED,
 }
 
+export enum ToastActionTypeModel {
+    DELETE_REMOTE_ARTICLE,
+    UNDELETE_ARTICLE,
+}
+
+export interface ToastActionModel {
+    readonly type: ToastActionTypeModel
+    readonly args: ReadonlyArray<any>
+}
+
+export interface ToastButtonModel {
+    readonly text: string
+    readonly action: ToastActionModel
+}
+
+export interface ToastModel {
+    readonly id: string
+    readonly timeCreated: Date
+    readonly duration: number
+    readonly text: string
+    readonly expireAction: ToastActionModel
+    readonly cancelAction: ToastActionModel
+    readonly buttons: ReadonlyArray<ToastButtonModel>
+}
+
 export interface StateModel {
     readonly publicationsById: IdMapModel<PublicationModel>
     readonly articlesById: IdMapModel<ArticleBriefModel>
@@ -72,6 +99,8 @@ export interface StateModel {
     readonly loadingArticles: ReadonlyArray<string>
 
     readonly articleDraftSubmissionState: SubmissionStateModel
+
+    readonly toasts: ReadonlyArray<ToastModel>
 
     readonly routing: RouterState
 }

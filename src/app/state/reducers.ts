@@ -18,8 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {v4 as uuid} from "uuid"
+
 import {IdMapModel, PublicationModel, ArticleBriefModel, ArticleEditModel,
-        SubmissionStateModel} from "./models"
+        SubmissionStateModel, ToastActionTypeModel, ToastModel} from "./models"
 import * as actions from "./actions"
 
 type Action = actions.SyncAction<any>
@@ -59,14 +61,14 @@ export function articlesById(state: IdMapModel<ArticleBriefModel> = {},
         return newState
     }
 
-    if (actions.deleteLocalArticle.isTypeOf(action)) {
+    if (actions.deleteArticle.isTypeOf(action)) {
         const {item} = action.payload
         const {[item.id]: _, ...newState} = state
         return newState
     }
 
     if (actions.recieveFullArticle.isTypeOf(action) ||
-        actions.undeleteLocalArticle.isTypeOf(action) ||
+        actions.undeleteArticle.isTypeOf(action) ||
         actions.receiveArticleSubmitSuccess.isTypeOf(action)) {
 
         const {item} = action.payload
@@ -96,7 +98,8 @@ export function articleDraftsById(state: IdMapModel<ArticleEditModel> = {},
         const {id, item} = action.payload
         if (item) {
             const {title, brief, authors, content, headerImage} = item
-            return {...state, [id]: {title, brief, authors, content, headerImage}}
+            const newDraft = {...emptyArticleEdit, title, brief, authors, content, headerImage}
+            return {...state, [id]: newDraft}
         } else {
             return {...state, [id]: emptyArticleEdit}
         }
@@ -109,7 +112,7 @@ export function articleDraftsById(state: IdMapModel<ArticleEditModel> = {},
 
     if (actions.discardArticleDraft.isTypeOf(action)) {
         const {id} = action.payload
-        const {[id]: _, ...newState} = state
+        const {[id || ""]: _, ...newState} = state
         return newState
     }
 
@@ -187,6 +190,41 @@ export function articleDraftSubmissionState(state: SubmissionStateModel =
 
     if (actions.receiveArticleSubmitError.isTypeOf(action)) {
         return SubmissionStateModel.ERRORED
+    }
+
+    return state
+}
+
+export function toasts(state: ReadonlyArray<ToastModel> = [],
+                       action: Action): ReadonlyArray<ToastModel> {
+    if (actions.closeToast.isTypeOf(action)) {
+        const {id} = action.payload
+        return state.filter(toast => toast.id !== id)
+    }
+
+    if (actions.deleteArticle.isTypeOf(action)) {
+        const {item} = action.payload
+        return [...state, {
+            id: uuid(),
+            timeCreated: new Date(),
+            duration: 3000,
+            text: "Article deleted.",
+            expireAction: {
+                type: ToastActionTypeModel.DELETE_REMOTE_ARTICLE,
+                args: [item.publication, item.id],
+            },
+            cancelAction: {
+                type: ToastActionTypeModel.DELETE_REMOTE_ARTICLE,
+                args: [item.publication, item.id],
+            },
+            buttons: [{
+                text: "Undo",
+                action: {
+                    type: ToastActionTypeModel.UNDELETE_ARTICLE,
+                    args: [{item}]
+                },
+            }],
+        }]
     }
 
     return state

@@ -1,7 +1,7 @@
 /**
- * AppShellView.scss
+ * AppShell.tsx
  *
- * Created by Zander Otavka on 1/16/17.
+ * Created by Zander Otavka on 2/23/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,12 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.AppShellView {
-    margin: 16px 20%;
+import {connect} from "react-redux"
 
-    &__toasts {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-    }
-}
+import {StateModel} from "./state/models"
+
+import AppShellView, {StateProps, DispatchProps} from "./AppShellView"
+
+const withReduxConnect = connect<StateProps, DispatchProps, {}>(
+    ({toasts}: StateModel) => ({toasts}),
+    dispatch => ({}),
+)
+
+export default withReduxConnect(AppShellView)

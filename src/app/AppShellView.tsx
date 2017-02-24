@@ -20,18 +20,35 @@
 
 import * as React from "react"
 import {block} from "react-bem-helper"
-import {RouteComponentProps} from "react-router"
+
+import {ToastModel} from "./state/models"
+
+import Toast from "./Toast"
 
 import "./AppShellView.scss"
 
 const b = block("AppShellView")
 
-type Props = RouteComponentProps<{}, {}> & {children?: React.ReactNode}
+export interface StateProps {
+    children?: React.ReactNode
+    toasts: ReadonlyArray<ToastModel>
+}
 
-export default function AppShellView(props: Props): JSX.Element {
+export interface DispatchProps {
+}
+
+type Props = StateProps & DispatchProps
+
+export default function AppShellView({children, toasts}: Props): JSX.Element {
     return (
         <div className={b()}>
-            {props.children}
+            <aside className={b("toasts")}>
+                {toasts.map(toast =>
+                    <Toast key={toast.id} model={toast}/>
+                )}
+            </aside>
+
+            {children}
         </div>
     )
 }

@@ -31,7 +31,7 @@ import {api} from "./state/api"
 import * as actions from "./state/actions"
 import {StateModel} from "./state/models"
 
-import AppShellView from "./AppShellView"
+import AppShell from "./AppShell"
 import ArticleListPage from "./ArticleListPage"
 import ArticleEditPage from "./ArticleEditPage"
 import IndexPage from "./IndexPage"
@@ -90,7 +90,7 @@ export default function App(): JSX.Element {
     return (
         <Provider store={store}>
             <Router history={syncHistoryWithStore(hashHistory, store)}>
-                <Route path="/" component={AppShellView}>
+                <Route path="/" component={AppShell}>
                     <IndexRoute
                         component={IndexPage}
                         onEnter={onPublicationEnter}
