@@ -103,6 +103,10 @@ export const deleteArticleById =
     ({id}: {id: string}): SyncThunkAction<DeleteArticlePayload> => (dispatch, getState) =>
         dispatch(deleteArticle({item: getState().articlesById[id]}))
 
+type ReceiveArticleDeleteErrorPayload = {}
+export const recieveArticleDeleteError =
+    createSyncActionCreator<ReceiveArticleDeleteErrorPayload>("RECEIVE_ARTICLE_DELETE_ERROR")
+
 type UndeleteArticlePayload = {item: ArticleBriefModel}
 export const undeleteArticle =
     createSyncActionCreator<UndeleteArticlePayload>("UNDELETE_ARTICLE")
@@ -236,8 +240,8 @@ export function deleteRemoteArticle(item: ArticleBriefModel): AsyncAction<void> 
             await api.articles.remove(item.publication, item.id)
         } catch (err) {
             if (FetchError.isTypeOf(err)) {
+                dispatch(recieveArticleDeleteError({}))
                 dispatch(undeleteArticle({item}))
-                console.error(err.message)
             } else {
                 throw err
             }

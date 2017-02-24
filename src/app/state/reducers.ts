@@ -227,7 +227,7 @@ export function toasts(state: ReadonlyArray<ToastModel> = [],
         }]
     }
 
-    if (actions.undeleteArticle.isTypeOf(action)) {
+    if (actions.recieveArticleDeleteError.isTypeOf(action)) {
         return [...state, createInfoToast("There was a problem deleting the article.")]
     }
 
