@@ -85,7 +85,10 @@ export default {
             {
                 test: /\.js/,
                 loader: "babel-loader",
-                include: path.resolve('node_modules/preact-compat/src'),
+                include: [
+                    path.resolve('node_modules/preact-compat/src'),
+                    path.resolve('node_modules/especially'),
+                ],
             },
         ],
     },
