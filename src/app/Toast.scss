@@ -19,18 +19,50 @@
  */
 
 .Toast {
+    display: inline-block;
     margin: 8px;
-    padding: 12px;
+    padding: 8px;
     background: #333;
     border-radius: 2px;
 
     &__text {
         color: white;
         font-size: 1rem;
-        margin-right: 8px;
+        margin: 0 8px;
     }
 
     &__button {
+        position: relative;
         margin-left: 8px;
+        padding: 8px;
+        text-transform: uppercase;
+        color: white;
+        background: none;
+        border: none;
+        outline: none;
+
+        &::after {
+            content: "";
+            position: absolute;
+            display: block;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            pointer-events: none;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            opacity: 0;
+            transition: opacity 400ms;
+        }
+
+        &:hover::after,
+        &:focus::after {
+            opacity: 0.5;
+        }
+
+        &:active::after {
+            opacity: 1;
+        }
     }
 }
