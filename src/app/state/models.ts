@@ -57,12 +57,6 @@ export interface IdMapModel<T> {
     readonly [id: string]: T
 }
 
-export enum SubmissionStateModel {
-    EDITING,
-    SUBMITTING,
-    ERRORED,
-}
-
 export enum ToastActionTypeModel {
     DELETE_REMOTE_ARTICLE,
     UNDELETE_ARTICLE,
@@ -97,8 +91,6 @@ export interface StateModel {
     readonly isLoadingPublications: boolean
     readonly loadingPublications: ReadonlyArray<string>
     readonly loadingArticles: ReadonlyArray<string>
-
-    readonly articleDraftSubmissionState: SubmissionStateModel
 
     readonly toasts: ReadonlyArray<ToastModel>
 

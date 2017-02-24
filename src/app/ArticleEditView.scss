@@ -46,14 +46,4 @@
             flex: 1;
         }
     }
-
-    &__submit-status {
-        &--hidden {
-            display: none;
-        }
-
-        &--error {
-            color: red;
-        }
-    }
 }

@@ -20,8 +20,8 @@
 
 import {v4 as uuid} from "uuid"
 
-import {IdMapModel, PublicationModel, ArticleBriefModel, ArticleEditModel,
-        SubmissionStateModel, ToastActionTypeModel, ToastModel} from "./models"
+import {IdMapModel, PublicationModel, ArticleBriefModel, ArticleEditModel, ToastActionTypeModel,
+        ToastModel} from "./models"
 import * as actions from "./actions"
 
 type Action = actions.SyncAction<any>
@@ -175,24 +175,16 @@ export function loadingArticles(state: ReadonlyArray<string> = [],
     return state
 }
 
-export function articleDraftSubmissionState(state: SubmissionStateModel =
-                                                SubmissionStateModel.EDITING,
-                                            action: Action): SubmissionStateModel {
-    if (actions.startSubmittingArticleDraft.isTypeOf(action)) {
-        return SubmissionStateModel.SUBMITTING
+function createInfoToast(text: string, duration: number): ToastModel {
+    return {
+        id: uuid(),
+        timeCreated: new Date(),
+        expireAction: undefined,
+        cancelAction: undefined,
+        buttons: [],
+        duration,
+        text,
     }
-
-    if (actions.receiveArticleSubmitSuccess.isTypeOf(action) ||
-        actions.createArticleDraft.isTypeOf(action)) {
-
-        return SubmissionStateModel.EDITING
-    }
-
-    if (actions.receiveArticleSubmitError.isTypeOf(action)) {
-        return SubmissionStateModel.ERRORED
-    }
-
-    return state
 }
 
 export function toasts(state: ReadonlyArray<ToastModel> = [],
@@ -233,6 +225,14 @@ export function toasts(state: ReadonlyArray<ToastModel> = [],
                 },
             }],
         }]
+    }
+
+    if (actions.startSubmittingArticleDraft.isTypeOf(action)) {
+        return [...state, createInfoToast("Submitting...", 1000)]
+    }
+
+    if (actions.receiveArticleSubmitError.isTypeOf(action)) {
+        return [...state, createInfoToast("There was a problem submitting your article.", 5000)]
     }
 
     return state

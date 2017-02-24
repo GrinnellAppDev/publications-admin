@@ -41,7 +41,6 @@ const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
         articleId: params.articleId || "",
         model: state.articleDraftsById[params.articleId || ""],
         isLoading: state.loadingArticles.includes(params.articleId),
-        submissionState: state.articleDraftSubmissionState,
     }),
 
     (dispatch, {params}) => ({

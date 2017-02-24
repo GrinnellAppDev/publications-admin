@@ -22,7 +22,7 @@ import * as React from "react"
 import {block} from "react-bem-helper"
 import {Link} from "react-router"
 
-import {AuthorModel, ArticleEditModel, SubmissionStateModel} from "./state/models"
+import {AuthorModel, ArticleEditModel} from "./state/models"
 import AuthorInputView from "./AuthorInputView"
 
 import "./ArticleEditView.scss"
@@ -32,7 +32,6 @@ export interface StateProps {
     publicationId: string
     model: ArticleEditModel
     isLoading: boolean
-    submissionState: SubmissionStateModel
 }
 
 export interface DispatchProps {
@@ -52,7 +51,7 @@ type Props = StateProps & DispatchProps
 const b = block("ArticleEditView")
 
 export default function ArticleEditView({articleId, publicationId, model, isLoading,
-                                         submissionState, ...actions}: Props): JSX.Element {
+                                         ...actions}: Props): JSX.Element {
     return (isLoading || !model) ? (
         <div className={b("", "loading")}>Loading...</div>
     ) : (
@@ -142,22 +141,6 @@ export default function ArticleEditView({articleId, publicationId, model, isLoad
             />
 
             <input type="submit" value={(articleId ? "Update" : "Create") + " Article"}/>
-
-            <div
-                className={b("submit-status", {
-                    "error": true,
-                    "hidden": submissionState !== SubmissionStateModel.ERRORED
-                })}
-            >
-                There was a problem submitting your article.
-            </div>
-            <div
-                className={b("submit-status", {
-                    "hidden": submissionState !== SubmissionStateModel.SUBMITTING
-                })}
-            >
-                Submitting...
-            </div>
         </form >
     )
 }
