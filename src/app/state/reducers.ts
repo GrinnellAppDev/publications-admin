@@ -211,20 +211,24 @@ export function toasts(state: ReadonlyArray<ToastModel> = [],
             text: `Deleting "${title}"...`,
             expireAction: {
                 type: ToastActionTypeModel.DELETE_REMOTE_ARTICLE,
-                args: [item.publication, item.id],
+                args: [item],
             },
             cancelAction: {
                 type: ToastActionTypeModel.DELETE_REMOTE_ARTICLE,
-                args: [item.publication, item.id],
+                args: [item],
             },
             buttons: [{
                 text: "Undo",
                 action: {
                     type: ToastActionTypeModel.UNDELETE_ARTICLE,
-                    args: [{item}]
+                    args: [{item}],
                 },
             }],
         }]
+    }
+
+    if (actions.undeleteArticle.isTypeOf(action)) {
+        return [...state, createInfoToast("There was a problem deleting the article.")]
     }
 
     if (actions.startSubmittingArticleDraft.isTypeOf(action)) {
