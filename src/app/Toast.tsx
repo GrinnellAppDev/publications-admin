@@ -50,7 +50,7 @@ export default connect<{}, DispatchProps, OwnProps>(undefined, dispatch => ({dis
             dispatch(closeToast({id: model.id}))
             window.clearTimeout(this.state.timeoutId)
 
-            if (action !== undefined) {
+            if (action) {
                 dispatch(toastActions[action.type](...action.args))
             }
         }
