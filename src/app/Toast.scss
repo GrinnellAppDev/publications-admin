@@ -1,7 +1,7 @@
 /**
- * AppShellView.scss
+ * Toast.scss
  *
- * Created by Zander Otavka on 1/16/17.
+ * Created by Zander Otavka on 2/23/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,13 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.AppShellView {
-    margin: 16px 20%;
+.Toast {
+    margin: 8px;
+    padding: 12px;
+    background: #333;
+    border-radius: 2px;
 
-    &__toasts {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        z-index: 999;
+    &__text {
+        color: white;
+        font-size: 1rem;
+        margin-right: 8px;
+    }
+
+    &__button {
+        margin-left: 8px;
     }
 }

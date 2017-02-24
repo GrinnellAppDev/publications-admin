@@ -20,9 +20,12 @@
 
 import * as React from "react"
 import {connect} from "react-redux"
+import {block} from "react-bem-helper"
 
 import {ToastModel, ToastActionModel} from "./state/models"
 import {toastActions, closeToast, AnyAction} from "./state/actions"
+
+import "./Toast.scss"
 
 interface DispatchProps {
     dispatch: (action: AnyAction) => any
@@ -37,6 +40,8 @@ type Props = OwnProps & DispatchProps
 interface ComponentState {
     timeoutId: number
 }
+
+const b = block("Toast")
 
 export default connect<{}, DispatchProps, OwnProps>(undefined, dispatch => ({dispatch}))(
     class Toast extends React.PureComponent<Props, ComponentState> {
@@ -63,16 +68,22 @@ export default connect<{}, DispatchProps, OwnProps>(undefined, dispatch => ({dis
         render(): JSX.Element {
             const {model} = this.props
             return (
-                <div>
-                    <span>{model.text}</span>
+                <div className={b()}>
+                    <span className={b("text")}>{model.text}</span>
 
                     {model.buttons.map(button =>
-                        <button onClick={() => this.dispatch(button.action)}>
+                        <button
+                            className={b("button")}
+                            onClick={() => this.dispatch(button.action)}
+                        >
                             {button.text}
                         </button>
                     )}
 
-                    <button onClick={() => this.dispatch(model.cancelAction)}>
+                    <button
+                        className={b("button", "close")}
+                        onClick={() => this.dispatch(model.cancelAction)}
+                    >
                         Close
                     </button>
                 </div>
