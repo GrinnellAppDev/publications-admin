@@ -204,11 +204,19 @@ export function toasts(state: ReadonlyArray<ToastModel> = [],
 
     if (actions.deleteArticle.isTypeOf(action)) {
         const {item} = action.payload
+        // console.assert(item.title !== undefined)  // todo: uncomment when server validates
+        const titleLength = (item.title || "").length
+        const title = (titleLength > 20) ? (
+            item.title.substring(0, 10) + "..." + item.title.substring(titleLength - 10)
+        ) : (
+            item.title
+        )
+
         return [...state, {
             id: uuid(),
             timeCreated: new Date(),
             duration: 3000,
-            text: "Article deleted.",
+            text: `Deleting "${title}"...`,
             expireAction: {
                 type: ToastActionTypeModel.DELETE_REMOTE_ARTICLE,
                 args: [item.publication, item.id],
