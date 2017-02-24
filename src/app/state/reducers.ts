@@ -175,7 +175,7 @@ export function loadingArticles(state: ReadonlyArray<string> = [],
     return state
 }
 
-function createInfoToast(text: string, duration: number): ToastModel {
+function createInfoToast(text: string, duration: number = 4000): ToastModel {
     return {
         id: uuid(),
         timeCreated: new Date(),
@@ -207,7 +207,7 @@ export function toasts(state: ReadonlyArray<ToastModel> = [],
         return [...state, {
             id: uuid(),
             timeCreated: new Date(),
-            duration: 3000,
+            duration: 4000,
             text: `Deleting "${title}"...`,
             expireAction: {
                 type: ToastActionTypeModel.DELETE_REMOTE_ARTICLE,
@@ -232,7 +232,7 @@ export function toasts(state: ReadonlyArray<ToastModel> = [],
     }
 
     if (actions.receiveArticleSubmitError.isTypeOf(action)) {
-        return [...state, createInfoToast("There was a problem submitting your article.", 5000)]
+        return [...state, createInfoToast("There was a problem submitting your article.")]
     }
 
     return state
