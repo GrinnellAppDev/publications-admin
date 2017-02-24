@@ -73,6 +73,7 @@ export default connect<{}, DispatchProps, OwnProps>(undefined, dispatch => ({dis
 
                     {model.buttons.map(button =>
                         <button
+                            key={button.text + button.action}
                             className={b("button")}
                             onClick={() => this.dispatch(button.action)}
                         >
