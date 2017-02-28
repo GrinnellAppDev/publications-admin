@@ -1,7 +1,7 @@
 /**
- * AppShellView.scss
+ * react-flip-move.d.ts
  *
- * Created by Zander Otavka on 1/16/17.
+ * Created by Zander Otavka on 2/27/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,18 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.AppShellView {
-    margin: 16px 20%;
-
-    &__toasts {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        z-index: 999;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        align-items: flex-start;
-        margin: 8px;
-    }
+declare module "react-flip-move" {
+    const FlipMove: any
+    export default FlipMove
 }

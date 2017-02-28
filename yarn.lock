@@ -3382,6 +3382,10 @@ react-dom@^15.4.2:
     loose-envify "^1.1.0"
     object-assign "^4.1.0"
 
+react-flip-move@^2.9.1:
+  version "2.9.1"
+  resolved "https://registry.yarnpkg.com/react-flip-move/-/react-flip-move-2.9.1.tgz#075bbf7957286c13b35029f23f42cf1db0b951ec"
+
 react-redux@^5.0.2:
   version "5.0.2"
   resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-5.0.2.tgz#3d9878f5f71c6fafcd45de1fbb162ea31f389814"

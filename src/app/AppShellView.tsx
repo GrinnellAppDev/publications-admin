@@ -19,9 +19,9 @@
  */
 
 import * as React from "react"
+import FlipMove from "react-flip-move"
 
 import {ToastModel} from "./state/models"
-
 import Toast from "./Toast"
 import block from "./bem"
 
@@ -43,9 +43,25 @@ export default function AppShellView({children, toasts}: Props): JSX.Element {
     return (
         <div className={b()}>
             <aside className={b("toasts")}>
-                {toasts.map(toast =>
-                    <Toast key={toast.id} model={toast}/>
-                )}
+                <FlipMove
+                    maintainContainerHeight={false}
+                    leaveAnimation={{
+                        from: {
+                            transform: "translate(0, -100%)",
+                            opacity: "1",
+                        },
+                        to: {
+                            transform: "translate(-100%, -100%)",
+                            opacity: "0",
+                        },
+                    }}
+                >
+                    {toasts.map(toast =>
+                        <div className={b("toast-wrapper")} key={toast.id}>
+                            <Toast model={toast}/>
+                        </div>
+                    )}
+                </FlipMove>
             </aside>
 
             {children}

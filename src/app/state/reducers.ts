@@ -187,7 +187,7 @@ function createInfoToast(text: string, duration: number = 4000): ToastModel {
     }
 }
 
-export function toasts(state: ReadonlyArray<ToastModel> = [],
+export function toasts(state: ReadonlyArray<ToastModel> = [createInfoToast("foo", 1000000), createInfoToast("bar", 1000000), createInfoToast("baz", 1000000), createInfoToast("zip", 1000000)],
                        action: Action): ReadonlyArray<ToastModel> {
     if (actions.closeToast.isTypeOf(action)) {
         const {id} = action.payload
