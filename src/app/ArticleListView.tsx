@@ -19,11 +19,11 @@
  */
 
 import * as React from "react"
-import {block} from "react-bem-helper"
 import {Link} from "react-router"
 
 import {ArticleBriefModel, PublicationModel} from "./state/models"
 import ArticleView from "./ArticleView"
+import block from "./bem"
 
 import "./ArticleListView.scss"
 

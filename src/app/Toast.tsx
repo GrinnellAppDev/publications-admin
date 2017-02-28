@@ -20,10 +20,11 @@
 
 import * as React from "react"
 import {connect} from "react-redux"
-import {block} from "react-bem-helper"
 
 import {ToastModel, ToastActionModel} from "./state/models"
 import {toastActions, closeToast, AnyAction} from "./state/actions"
+
+import block from "./bem"
 
 import "./Toast.scss"
 

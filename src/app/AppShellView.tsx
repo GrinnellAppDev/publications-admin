@@ -19,11 +19,11 @@
  */
 
 import * as React from "react"
-import {block} from "react-bem-helper"
 
 import {ToastModel} from "./state/models"
 
 import Toast from "./Toast"
+import block from "./bem"
 
 import "./AppShellView.scss"
 

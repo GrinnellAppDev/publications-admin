@@ -19,11 +19,11 @@
  */
 
 import * as React from "react"
-import {block} from "react-bem-helper"
 import {Link} from "react-router"
 
 import {AuthorModel, ArticleEditModel} from "./state/models"
 import AuthorInputView from "./AuthorInputView"
+import block from "./bem"
 
 import "./ArticleEditView.scss"
 
