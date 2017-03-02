@@ -27,8 +27,6 @@ import block from "./bem"
 
 import "./AppShellView.scss"
 
-const b = block("AppShellView")
-
 export interface StateProps {
     children?: React.ReactNode
     toasts: ReadonlyArray<ToastModel>
@@ -62,6 +60,8 @@ const toastLeaveAnimation: any = {
 }
 
 export default function AppShellView({children, toasts}: Props): JSX.Element {
+    const b = block("AppShellView")
+
     return (
         <div className={b()}>
             <aside className={b("toasts")}>

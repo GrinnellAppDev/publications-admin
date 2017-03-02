@@ -42,8 +42,6 @@ interface ComponentState {
     timeoutId: number
 }
 
-const b = block("Toast")
-
 export default connect<{}, DispatchProps, OwnProps>(undefined, dispatch => ({dispatch}))(
     class Toast extends React.PureComponent<Props, ComponentState> {
         private dispatch(action: ToastActionModel): void {
@@ -67,7 +65,9 @@ export default connect<{}, DispatchProps, OwnProps>(undefined, dispatch => ({dis
         }
 
         render(): JSX.Element {
+            const b = block("Toast")
             const {model} = this.props
+
             return (
                 <div className={b()}>
                     <span className={b("text")}>{model.text}</span>

@@ -32,12 +32,12 @@ interface Props {
     onDelete: (id: string) => void
 }
 
-const b = block("ArticleView")
-
 const SHORT_MONTHS = ["Jan", "Feb", "Mar", "April", "May", "June", "July", "Aug", "Sep", "Oct",
                       "Nov", "Dec"]
 
 export default function ArticleView({model, onDelete}: Props): JSX.Element {
+    const b = block("ArticleView")
+
     return (
         <article className={b()}>
             <div className={b("header-image-wrapper")}>

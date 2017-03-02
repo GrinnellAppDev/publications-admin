@@ -48,10 +48,10 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps
 
-const b = block("ArticleEditView")
-
 export default function ArticleEditView({articleId, publicationId, model, isLoading,
                                          ...actions}: Props): JSX.Element {
+    const b = block("ArticleEditView")
+
     return (isLoading || !model) ? (
         <div className={b("", "loading")}>Loading...</div>
     ) : (

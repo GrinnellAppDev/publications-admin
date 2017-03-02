@@ -41,10 +41,10 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps
 
-const b = block("ArticleListView")
-
 export default function ArticleListView({articles, publications, currentPublication, isLoading,
                                      ...dispatchProps}: Props): JSX.Element {
+    const b = block("ArticleListView")
+
     return (currentPublication) ? (
         <div>
             <nav>
