@@ -20,6 +20,7 @@
 
 import * as React from "react"
 import {Link} from "react-router"
+import FlipMove from "react-flip-move"
 
 import {ArticleBriefModel, PublicationModel} from "./state/models"
 import ArticleView from "./ArticleView"
@@ -42,7 +43,7 @@ export interface DispatchProps {
 type Props = StateProps & DispatchProps
 
 export default function ArticleListView({articles, publications, currentPublication, isLoading,
-                                     ...dispatchProps}: Props): JSX.Element {
+                                         ...dispatchProps}: Props): JSX.Element {
     const b = block("ArticleListView")
 
     return (currentPublication) ? (
@@ -79,19 +80,25 @@ export default function ArticleListView({articles, publications, currentPublicat
                     Refresh
                 </button>
 
-                {(isLoading) ? (
-                    <section className={b("articles")}>Loading...</section>
-                ) : (
-                    <section className={b("articles")}>
-                        {articles.map(article =>
-                            <ArticleView
-                                key={article.id}
-                                model={article}
-                                onDelete={dispatchProps.onArticleDelete}
-                            />
-                        )}
-                    </section>
+                {(isLoading) && (
+                    <span> Loading...</span>
                 )}
+
+                <section className={b("articles")}>
+                    <FlipMove
+                        enterAnimation="fade"
+                        leaveAnimation="fade"
+                    >
+                        {articles.map(article =>
+                            <div key={article.id}>
+                                <ArticleView
+                                    model={article}
+                                    onDelete={dispatchProps.onArticleDelete}
+                                />
+                            </div>
+                        )}
+                    </FlipMove>
+                </section>
             </main>
         </div>
     ) : (
