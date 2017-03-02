@@ -39,27 +39,42 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps
 
+const toastEnterAnimation: any = {
+    from: {
+        transform: "translateX(-100%)",
+        opacity: "0",
+    },
+    to: {
+        transform: "",
+        opacity: "1",
+    },
+}
+
+const toastLeaveAnimation: any = {
+    from: {
+        transform: "translate(0, -100%)",
+        opacity: "1",
+    },
+    to: {
+        transform: "translate(-100%, -100%)",
+        opacity: "0",
+    },
+}
+
 export default function AppShellView({children, toasts}: Props): JSX.Element {
     return (
         <div className={b()}>
             <aside className={b("toasts")}>
                 <FlipMove
-                    maintainContainerHeight={false}
-                    leaveAnimation={{
-                        from: {
-                            transform: "translate(0, -100%)",
-                            opacity: "1",
-                        },
-                        to: {
-                            transform: "translate(-100%, -100%)",
-                            opacity: "0",
-                        },
-                    }}
+                    appearAnimation={toastEnterAnimation}
+                    enterAnimation={toastEnterAnimation}
+                    leaveAnimation={toastLeaveAnimation}
+                    typeName="ul"
                 >
                     {toasts.map(toast =>
-                        <div className={b("toast-wrapper")} key={toast.id}>
+                        <li className={b("toast-wrapper")} key={toast.id}>
                             <Toast model={toast}/>
-                        </div>
+                        </li>
                     )}
                 </FlipMove>
             </aside>
