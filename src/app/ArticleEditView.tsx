@@ -23,7 +23,7 @@ import {Link} from "react-router"
 
 import {AuthorModel, ArticleEditModel} from "./state/models"
 import AuthorInputView from "./AuthorInputView"
-import block from "./bem"
+import block from "./style/bem"
 
 import "./ArticleEditView.scss"
 

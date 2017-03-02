@@ -24,7 +24,7 @@ import {connect} from "react-redux"
 import {ToastModel, ToastActionModel} from "./state/models"
 import {toastActions, closeToast, AnyAction} from "./state/actions"
 
-import block from "./bem"
+import block from "./style/bem"
 
 import "./Toast.scss"
 

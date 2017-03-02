@@ -23,7 +23,7 @@ import FlipMove from "react-flip-move"
 
 import {ToastModel} from "./state/models"
 import Toast from "./Toast"
-import block from "./bem"
+import block from "./style/bem"
 
 import "./AppShellView.scss"
 

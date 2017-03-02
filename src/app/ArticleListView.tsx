@@ -24,7 +24,7 @@ import FlipMove from "react-flip-move"
 
 import {ArticleBriefModel, PublicationModel} from "./state/models"
 import ArticleView from "./ArticleView"
-import block from "./bem"
+import block from "./style/bem"
 
 import "./ArticleListView.scss"
 

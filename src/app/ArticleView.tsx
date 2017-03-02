@@ -23,7 +23,7 @@ import {Link} from "react-router"
 
 import {ArticleBriefModel} from "./state/models"
 
-import block from "./bem"
+import block from "./style/bem"
 
 import "./ArticleView.scss"
 
