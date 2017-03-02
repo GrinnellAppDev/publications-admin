@@ -197,9 +197,8 @@ export function toasts(state: ReadonlyArray<ToastModel> = [],
     if (actions.deleteArticle.isTypeOf(action)) {
         const {item} = action.payload
         // console.assert(item.title !== undefined)  // todo: uncomment when server validates
-        const titleLength = (item.title || "").length
-        const title = (titleLength > 20) ? (
-            item.title.substring(0, 15) + "..." + item.title.substring(titleLength - 5)
+        const title = ((item.title || "").length > 20) ? (
+            item.title.substring(0, 15) + "..." + item.title.substring(item.title.length - 5)
         ) : (
             item.title || "Untitled"
         )
