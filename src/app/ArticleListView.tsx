@@ -85,10 +85,7 @@ export default function ArticleListView({articles, publications, currentPublicat
                 )}
 
                 <section className={b("articles")}>
-                    <FlipMove
-                        enterAnimation="fade"
-                        leaveAnimation="fade"
-                    >
+                    <FlipMove enterAnimation="fade" leaveAnimation="fade">
                         {articles.map(article =>
                             <div key={article.id}>
                                 <ArticleView
