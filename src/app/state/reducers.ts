@@ -201,7 +201,7 @@ export function toasts(state: ReadonlyArray<ToastModel> = [],
         const title = (titleLength > 20) ? (
             item.title.substring(0, 15) + "..." + item.title.substring(titleLength - 5)
         ) : (
-            item.title || ""
+            item.title || "Untitled"
         )
 
         return [...state, {
