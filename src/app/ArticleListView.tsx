@@ -46,7 +46,7 @@ export default function ArticleListView({articles, publications, currentPublicat
                                          ...dispatchProps}: Props): JSX.Element {
     const b = block("ArticleListView")
 
-    return (currentPublication) ? (
+    return (
         <div>
             <nav>
                 <ul>
@@ -67,20 +67,24 @@ export default function ArticleListView({articles, publications, currentPublicat
 
             <header>
                 <h1>
-                    {currentPublication.name} Articles
+                    {currentPublication && currentPublication.name} Articles
                 </h1>
             </header>
 
             <main>
-                <Link to={`/publications/${currentPublication.id}/articles/new`}>
-                    <button>New Article</button>
-                </Link>
+                {(currentPublication) && (
+                    <Link to={`/publications/${currentPublication.id}/articles/new`}>
+                        <button>New Article</button>
+                    </Link>
+                )}
 
-                <button onClick={dispatchProps.onRefresh}>
-                    Refresh
-                </button>
+                {(currentPublication) && (
+                    <button onClick={dispatchProps.onRefresh}>
+                        Refresh
+                    </button>
+                )}
 
-                {(isLoading) && (
+                {(isLoading || !currentPublication) && (
                     <span> Loading...</span>
                 )}
 
@@ -98,7 +102,5 @@ export default function ArticleListView({articles, publications, currentPublicat
                 </section>
             </main>
         </div>
-    ) : (
-        <div/>
     )
 }
