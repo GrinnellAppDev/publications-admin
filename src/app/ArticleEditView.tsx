@@ -86,6 +86,7 @@ export default function ArticleEditView({articleId, publicationId, model, isLoad
                 value={model.title}
                 placeholder="Title"
                 autoComplete="off"
+                required={true}
             />
 
             <input
@@ -126,6 +127,7 @@ export default function ArticleEditView({articleId, publicationId, model, isLoad
                 name="content"
                 onChange={actions.onContentChange}
                 value={model.content}
+                required={true}
             />
 
             <input type="submit" value={(articleId ? "Update" : "Create") + " Article"}/>
