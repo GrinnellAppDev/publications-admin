@@ -77,7 +77,13 @@ export function articlesById(state: IdMapModel<ShortArticleModel> = {},
 
     if (actions.clearArticles.isTypeOf(action)) {
         const {publicationId} = action.payload
-        const {[publicationId]: _, ...newState} = state
+        const newState = {} as Mutable<IdMapModel<ShortArticleModel>>
+        Object.keys(state).forEach(articleId => {
+            if (state[articleId].publication !== publicationId) {
+                newState[articleId] = state[articleId]
+            }
+        })
+
         return newState
     }
 
