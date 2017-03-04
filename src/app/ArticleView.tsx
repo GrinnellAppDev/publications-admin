@@ -38,6 +38,10 @@ const SHORT_MONTHS = ["Jan", "Feb", "Mar", "April", "May", "June", "July", "Aug"
 export default function ArticleView({model, onDelete}: Props): JSX.Element {
     const b = block("ArticleView")
 
+    const authors = model.authors
+        .map(author => author.name)
+        .filter(author => author && author.length !== 0)
+
     return (
         <article className={b()}>
             <div className={b("header-image-wrapper")}>
@@ -62,8 +66,8 @@ export default function ArticleView({model, onDelete}: Props): JSX.Element {
                         {model.datePublished.getDate()}
                     </span>
                     <span>
-                        {(model.authors.length != 0) ? (
-                            " • " + model.authors.map(author => author.name).join(", ")
+                        {(authors.length != 0) ? (
+                            " • " + authors.join(", ")
                         ) : (
                             ""
                         )}
