@@ -39,11 +39,14 @@ export interface FullArticleModel extends ShortArticleModel {
     readonly content: string
 }
 
-export interface ArticleEditModel {
+export interface ArticleCreateModel {
     readonly content?: string
     readonly headerImage?: string
     readonly title?: string
     readonly authors?: AuthorModel[]
+}
+
+export interface ArticleEditModel extends Partial<ArticleCreateModel> {
 }
 
 export interface PublicationModel {

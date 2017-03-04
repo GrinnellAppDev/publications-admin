@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PublicationModel, FullArticleModel, ArticleEditModel, ShortArticleModel,
+import {PublicationModel, FullArticleModel, ArticleCreateModel, ArticleEditModel, ShortArticleModel,
         AuthorModel} from "./models"
 import createErrorClass from "./createErrorClass"
 
@@ -94,7 +94,7 @@ export interface Api {
         list(publicationId: string): Promise<ShortArticleModel[]>
         get(publicationId: string, articleId: string): Promise<FullArticleModel>
         remove(publicationId: string, articleId: string): Promise<void>
-        create(publicationId: string, model: ArticleEditModel): Promise<FullArticleModel>
+        create(publicationId: string, model: ArticleCreateModel): Promise<FullArticleModel>
         edit(publicationId: string, articleId: string,
              model: ArticleEditModel): Promise<FullArticleModel>
     }
