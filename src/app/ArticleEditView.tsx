@@ -42,7 +42,6 @@ export interface DispatchProps {
     onAuthorChange: (index: number, newModel: AuthorModel) => void
     onAuthorRemove: (index: number) => void
     onAuthorAdd: () => void
-    onBriefChange: (ev: React.ChangeEvent<HTMLInputElement>) => void
     onContentChange: (ev: React.ChangeEvent<HTMLTextAreaElement>) => void
 }
 
@@ -121,17 +120,6 @@ export default function ArticleEditView({articleId, publicationId, model, isLoad
             >
                 Add Author
             </button>
-
-            <input
-                className={b("input", "block")}
-                name="brief"
-                type="text"
-                value={model.brief}
-                onChange={actions.onBriefChange}
-                placeholder="Brief"
-                autoComplete="off"
-                maxLength={140}
-            />
 
             <textarea
                 className={b("input", "block content")}

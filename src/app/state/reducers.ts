@@ -20,7 +20,7 @@
 
 import {v4 as uuid} from "uuid"
 
-import {IdMapModel, PublicationModel, ArticleBriefModel, ArticleEditModel, ToastActionTypeModel,
+import {IdMapModel, PublicationModel, ShortArticleModel, ArticleEditModel, ToastActionTypeModel,
         ToastModel} from "./models"
 import * as actions from "./actions"
 
@@ -45,11 +45,11 @@ export function publicationsById(state: IdMapModel<PublicationModel> = {},
     return state
 }
 
-export function articlesById(state: IdMapModel<ArticleBriefModel> = {},
-                             action: Action): IdMapModel<ArticleBriefModel> {
+export function articlesById(state: IdMapModel<ShortArticleModel> = {},
+                             action: Action): IdMapModel<ShortArticleModel> {
     if (actions.receiveArticles.isTypeOf(action)) {
         const {items} = action.payload
-        const newState = {...state} as Mutable<IdMapModel<ArticleBriefModel>>
+        const newState = {...state} as Mutable<IdMapModel<ShortArticleModel>>
         items.forEach(article => {
             newState[article.id] = (article.id in state) ? (
                 {...state[article.id], ...article}
@@ -87,7 +87,6 @@ export function articlesById(state: IdMapModel<ArticleBriefModel> = {},
 const emptyArticleEdit: ArticleEditModel = {
     title: "",
     content: "",
-    brief: "",
     authors: [{name: "", email: ""}],
     headerImage: "",
 }
@@ -97,8 +96,8 @@ export function articleDraftsById(state: IdMapModel<ArticleEditModel> = {},
     if (actions.createArticleDraft.isTypeOf(action)) {
         const {id, item} = action.payload
         if (item) {
-            const {title, brief, authors, content, headerImage} = item
-            const newDraft = {...emptyArticleEdit, title, brief, authors, content, headerImage}
+            const {title, authors, content, headerImage} = item
+            const newDraft = {...emptyArticleEdit, title, authors, content, headerImage}
             return {...state, [id]: newDraft}
         } else {
             return {...state, [id]: emptyArticleEdit}

@@ -25,18 +25,17 @@ export interface AuthorModel {
     readonly email: string
 }
 
-export interface ArticleBriefModel {
+export interface ShortArticleModel {
     readonly id: string
     readonly publication: string
     readonly datePublished: Date
     readonly headerImage?: string
     readonly title: string
-    readonly brief?: string
+    readonly authors: AuthorModel[]
 }
 
-export interface FullArticleModel extends ArticleBriefModel {
+export interface FullArticleModel extends ShortArticleModel {
     readonly dateEdited: Date
-    readonly authors: AuthorModel[]
     readonly content: string
 }
 
@@ -44,7 +43,6 @@ export interface ArticleEditModel {
     readonly content?: string
     readonly headerImage?: string
     readonly title?: string
-    readonly brief?: string
     readonly authors?: AuthorModel[]
 }
 
@@ -84,7 +82,7 @@ export interface ToastModel {
 
 export interface StateModel {
     readonly publicationsById: IdMapModel<PublicationModel>
-    readonly articlesById: IdMapModel<ArticleBriefModel>
+    readonly articlesById: IdMapModel<ShortArticleModel>
     readonly articleDraftsById: IdMapModel<ArticleEditModel>
 
     readonly didInitialLoad: boolean

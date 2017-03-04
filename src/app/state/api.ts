@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PublicationModel, FullArticleModel, ArticleEditModel, ArticleBriefModel,
+import {PublicationModel, FullArticleModel, ArticleEditModel, ShortArticleModel,
         AuthorModel} from "./models"
 import createErrorClass from "./createErrorClass"
 
@@ -61,9 +61,9 @@ function requestToArticleModel(request: any): FullArticleModel {
     }
 }
 
-function requestToArticleBriefModel(request: any): ArticleBriefModel {
+function requestToArticleBriefModel(request: any): ShortArticleModel {
     return {
-        ...request as ArticleBriefModel,
+        ...request as ShortArticleModel,
         datePublished: new Date(request.datePublished),
     }
 }
@@ -78,10 +78,10 @@ function authorModelToRequest(model: AuthorModel): any {
 }
 
 function articleEditModelToRequest(model: ArticleEditModel): any {
-    const {content, title, authors, headerImage, brief} = model
+    const {content, title, authors, headerImage} = model
     return {
         authors: arrayToRequest(authorModelToRequest, authors),
-        content, title, headerImage, brief,
+        content, title, headerImage,
     }
 }
 
@@ -91,7 +91,7 @@ export interface Api {
     }
 
     articles: {
-        list(publicationId: string): Promise<ArticleBriefModel[]>
+        list(publicationId: string): Promise<ShortArticleModel[]>
         get(publicationId: string, articleId: string): Promise<FullArticleModel>
         remove(publicationId: string, articleId: string): Promise<void>
         create(publicationId: string, model: ArticleEditModel): Promise<FullArticleModel>

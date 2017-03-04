@@ -21,14 +21,14 @@
 import * as React from "react"
 import {Link} from "react-router"
 
-import {ArticleBriefModel} from "./state/models"
+import {ShortArticleModel} from "./state/models"
 
 import block from "./style/bem"
 
 import "./ArticleView.scss"
 
 interface Props {
-    model: ArticleBriefModel
+    model: ShortArticleModel
     onDelete: (id: string) => void
 }
 
@@ -61,7 +61,13 @@ export default function ArticleView({model, onDelete}: Props): JSX.Element {
                         {" "}
                         {model.datePublished.getDate()}
                     </span>
-                    {model.brief ? " • " + model.brief : ""}
+                    <span>
+                        {(model.authors.length != 0) ? (
+                            " • " + model.authors.map(author => author.name).join(", ")
+                        ) : (
+                            ""
+                        )}
+                    </span>
                 </div>
             </section>
         </article>

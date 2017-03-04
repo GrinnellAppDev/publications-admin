@@ -22,7 +22,7 @@ import {Action} from "redux"
 import {ThunkAction} from "redux-thunk"
 import {replace} from "react-router-redux"
 
-import {PublicationModel, ArticleBriefModel, ArticleEditModel, FullArticleModel,
+import {PublicationModel, ShortArticleModel, ArticleEditModel, FullArticleModel,
         ToastActionTypeModel, StateModel} from "./models"
 import {Api, FetchError} from "./api"
 import createErrorClass from "./createErrorClass"
@@ -79,7 +79,7 @@ type StartLoadingArticlesPayload = {publicationId: string}
 export const startLoadingArticles =
     createSyncActionCreator<StartLoadingArticlesPayload>("START_LOADING_ARTICLES")
 
-type ReceiveArticlesPayload = {publicationId: string, items: ReadonlyArray<ArticleBriefModel>}
+type ReceiveArticlesPayload = {publicationId: string, items: ReadonlyArray<ShortArticleModel>}
 export const receiveArticles =
     createSyncActionCreator<ReceiveArticlesPayload>("RECIEVE_ARTICLES")
 
@@ -95,7 +95,7 @@ type ClearArticlesPayload = {publicationId: string}
 export const clearArticles =
     createSyncActionCreator<ClearArticlesPayload>("CLEAR_ARTICLES")
 
-type DeleteArticlePayload = {item: ArticleBriefModel}
+type DeleteArticlePayload = {item: ShortArticleModel}
 export const deleteArticle =
     createSyncActionCreator<DeleteArticlePayload>("DELETE_ARTICLE")
 
@@ -107,7 +107,7 @@ type ReceiveArticleDeleteErrorPayload = {}
 export const recieveArticleDeleteError =
     createSyncActionCreator<ReceiveArticleDeleteErrorPayload>("RECEIVE_ARTICLE_DELETE_ERROR")
 
-type UndeleteArticlePayload = {item: ArticleBriefModel}
+type UndeleteArticlePayload = {item: ShortArticleModel}
 export const undeleteArticle =
     createSyncActionCreator<UndeleteArticlePayload>("UNDELETE_ARTICLE")
 
@@ -234,7 +234,7 @@ export function submitArticleDraft(publicationId: string, articleId: string): As
     }
 }
 
-export function deleteRemoteArticle(item: ArticleBriefModel): AsyncAction<void> {
+export function deleteRemoteArticle(item: ShortArticleModel): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
         try {
             await api.articles.remove(item.publication, item.id)

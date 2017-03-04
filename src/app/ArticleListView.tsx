@@ -22,14 +22,14 @@ import * as React from "react"
 import {Link} from "react-router"
 import FlipMove from "react-flip-move"
 
-import {ArticleBriefModel, PublicationModel} from "./state/models"
+import {ShortArticleModel, PublicationModel} from "./state/models"
 import ArticleView from "./ArticleView"
 import block from "./style/bem"
 
 import "./ArticleListView.scss"
 
 export interface StateProps {
-    articles: ArticleBriefModel[]
+    articles: ShortArticleModel[]
     publications: PublicationModel[]
     currentPublication: PublicationModel
     isLoading: boolean

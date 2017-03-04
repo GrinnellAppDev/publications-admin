@@ -73,13 +73,6 @@ const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
             }))
         },
 
-        onBriefChange: ev => {
-            dispatch(updateArticleDraft({
-                id: params.articleId || "",
-                update: draft => ({brief: ev.target.value})
-            }))
-        },
-
         onContentChange: ev => {
             dispatch(updateArticleDraft({
                 id: params.articleId || "",
