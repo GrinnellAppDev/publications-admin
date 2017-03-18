@@ -20,7 +20,7 @@
 
 import {v4 as uuid} from "uuid"
 
-import {IdMapModel, PublicationModel, ShortArticleModel, ArticleEditModel, ToastActionTypeModel,
+import {IdMapModel, PublicationModel, ShortArticleModel, ArticleCreateModel, ToastActionTypeModel,
         ToastModel} from "./models"
 import * as actions from "./actions"
 
@@ -90,23 +90,23 @@ export function articlesById(state: IdMapModel<ShortArticleModel> = {},
     return state
 }
 
-const emptyArticleEdit: ArticleEditModel = {
+const emptyDraft: ArticleCreateModel = {
     title: "",
     content: "",
     authors: [{name: "", email: ""}],
     headerImage: "",
 }
 
-export function articleDraftsById(state: IdMapModel<ArticleEditModel> = {},
-                                  action: Action): IdMapModel<ArticleEditModel> {
+export function articleDraftsById(state: IdMapModel<ArticleCreateModel> = {},
+                                  action: Action): IdMapModel<ArticleCreateModel> {
     if (actions.createArticleDraft.isTypeOf(action)) {
         const {id, item} = action.payload
         if (item) {
             const {title, authors, content, headerImage} = item
-            const newDraft = {...emptyArticleEdit, title, authors, content, headerImage}
+            const newDraft = {...emptyDraft, title, authors, content, headerImage}
             return {...state, [id]: newDraft}
         } else {
-            return {...state, [id]: emptyArticleEdit}
+            return {...state, [id]: emptyDraft}
         }
     }
 
