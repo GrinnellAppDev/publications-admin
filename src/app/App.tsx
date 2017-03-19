@@ -22,14 +22,14 @@ import * as React from "react"
 import {Router, Route, IndexRoute, hashHistory, RouterState} from "react-router"
 import {Provider} from "react-redux"
 import {createStore, combineReducers, applyMiddleware} from "redux"
-import {syncHistoryWithStore, routerReducer, routerMiddleware} from "react-router-redux"
+import {syncHistoryWithStore, routerMiddleware} from "react-router-redux"
 import thunk from "redux-thunk"
 import {composeWithDevTools} from "redux-devtools-extension/developmentOnly"
 
-import * as reducers from "./state/reducers"
-import {api} from "./state/api"
-import * as actions from "./state/actions"
 import {StateModel} from "./state/models"
+import * as reducers from "./state/reducers"
+import * as actions from "./state/actions"
+import {api} from "./state/api"
 
 import AppShell from "./AppShell"
 import ArticleListPage from "./ArticleListPage"
@@ -39,12 +39,9 @@ import NotFoundView from "./NotFoundView"
 
 const thunkContext: actions.ThunkContext = {api}
 
-const store = createStore<StateModel>(
-    combineReducers<StateModel>({
-        ...reducers,
-        routing: routerReducer,
-    }),
-    composeWithDevTools(
+const store = createStore(
+    combineReducers<StateModel>(reducers),
+    composeWithDevTools<StateModel>(
         applyMiddleware(
             routerMiddleware(hashHistory),
             thunk.withExtraArgument(thunkContext),

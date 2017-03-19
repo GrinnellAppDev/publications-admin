@@ -1,8 +1,7 @@
 /**
- * @file
- * redux-dev-tool.d.ts
+ * redux.d.ts
  *
- * Created by Zander Otavka on 2/22/17.
+ * Created by Zander Otavka on 3/19/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,10 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-declare module "redux-devtools-extension/developmentOnly" {
-    import {StoreEnhancer, GenericStoreEnhancer} from "redux";
+import {Reducer} from "redux";
 
-    export function composeWithDevTools<TState>(
-        ...args: StoreEnhancer<TState>[]): StoreEnhancer<TState>
-    export const devToolsEnhancer: GenericStoreEnhancer
+declare module "redux" {
+    export type ReducerMapObject<TState> = {
+        [P in keyof TState]: Reducer<TState[P]>
+    }
+
+    export function combineReducers<TState>(reducers: ReducerMapObject<TState>): Reducer<TState>
 }

@@ -24,6 +24,8 @@ import {IdMapModel, PublicationModel, ShortArticleModel, ArticleCreateModel, Toa
         ToastModel} from "./models"
 import * as actions from "./actions"
 
+export {routerReducer as routing} from "react-router-redux"
+
 type Action = actions.SyncAction<any>
 
 type Mutable<T> = {
