@@ -39,8 +39,8 @@ import NotFoundView from "./NotFoundView"
 
 const thunkContext: actions.ThunkContext = {api}
 
-const store = createStore(
-    combineReducers<StateModel>(reducers),
+const store = createStore<StateModel>(
+    combineReducers(reducers),
     composeWithDevTools<StateModel>(
         applyMiddleware(
             routerMiddleware(hashHistory),
