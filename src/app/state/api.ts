@@ -98,24 +98,9 @@ function articleEditModelToRequest(model: ArticleEditModel): any {
     }
 }
 
-export interface Api {
+export default {
     publications: {
-        list(pageToken: string): Promise<PaginatedArray<PublicationModel>>
-    }
-
-    articles: {
-        list(publicationId: string, pageToken: string): Promise<PaginatedArray<ShortArticleModel>>
-        get(publicationId: string, articleId: string): Promise<FullArticleModel>
-        remove(publicationId: string, articleId: string): Promise<void>
-        create(publicationId: string, model: ArticleCreateModel): Promise<FullArticleModel>
-        edit(publicationId: string, articleId: string,
-             model: ArticleEditModel): Promise<FullArticleModel>
-    }
-}
-
-export const api: Api = {
-    publications: {
-        list: async pageToken => {
+        list: async (pageToken: string): Promise<PaginatedArray<PublicationModel>> => {
             try {
                 const params = pageToken ? `?pageToken=${pageToken}` : ""
                 const resp = await fetch(`${API_ROOT}/publications${params}`, {
@@ -135,7 +120,8 @@ export const api: Api = {
     },
 
     articles: {
-        list: async (publicationId, pageToken) => {
+        list: async (publicationId: string,
+                     pageToken: string): Promise<PaginatedArray<ShortArticleModel>> => {
             try {
                 const params = pageToken ? `?pageToken=${pageToken}` : ""
                 const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles` +
@@ -154,7 +140,7 @@ export const api: Api = {
             }
         },
 
-        get: async (publicationId, articleId) => {
+        get: async (publicationId: string, articleId: string): Promise<FullArticleModel> => {
             try {
                 const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
                                          `${articleId}`, {
@@ -172,7 +158,7 @@ export const api: Api = {
             }
         },
 
-        remove: async (publicationId, articleId) => {
+        remove: async (publicationId: string, articleId: string): Promise<void> => {
             try {
                 const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
                                          `${articleId}`, {
@@ -188,7 +174,8 @@ export const api: Api = {
             }
         },
 
-        create: async (publicationId, model) => {
+        create: async (publicationId: string,
+                       model: ArticleCreateModel): Promise<FullArticleModel> => {
             try {
                 const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
                     method: "POST",
@@ -206,7 +193,8 @@ export const api: Api = {
             }
         },
 
-        edit: async (publicationId, articleId, model) => {
+        edit: async (publicationId: string, articleId: string,
+                     model: ArticleEditModel): Promise<FullArticleModel> => {
             try {
                 const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
                                          `${articleId}`, {

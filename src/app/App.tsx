@@ -29,7 +29,7 @@ import {composeWithDevTools} from "redux-devtools-extension/developmentOnly"
 import {StateModel} from "./state/models"
 import * as reducers from "./state/reducers"
 import * as actions from "./state/actions"
-import {api} from "./state/api"
+import api from "./state/api"
 
 import AppShell from "./AppShell"
 import ArticleListPage from "./ArticleListPage"

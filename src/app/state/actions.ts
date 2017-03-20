@@ -24,7 +24,7 @@ import {replace} from "react-router-redux"
 
 import {PublicationModel, ShortArticleModel, ArticleEditModel, FullArticleModel,
         ToastActionTypeModel, StateModel} from "./models"
-import {Api, FetchError, PaginatedArray} from "./api"
+import api, {FetchError, PaginatedArray} from "./api"
 import createErrorClass from "./createErrorClass"
 import {getDefaultPublicationId} from "./selectors"
 
@@ -34,7 +34,7 @@ export interface SyncAction<T> extends Action {
 }
 
 export interface ThunkContext {
-    api: Api
+    api: typeof api
 }
 
 interface BaseThunkAction<T> extends ThunkAction<T, StateModel, ThunkContext> {
