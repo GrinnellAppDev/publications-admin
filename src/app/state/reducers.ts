@@ -35,9 +35,9 @@ type Mutable<T> = {
 export function publicationsById(state: IdMapModel<PublicationModel> = {},
                                  action: Action): IdMapModel<PublicationModel> {
     if (actions.receivePublications.isTypeOf(action)) {
-        const {items} = action.payload
+        const {page} = action.payload
         const newState = {...state} as Mutable<IdMapModel<PublicationModel>>
-        items.forEach(publication => {
+        page.items.forEach(publication => {
             newState[publication.id] = publication
         })
 
@@ -50,9 +50,9 @@ export function publicationsById(state: IdMapModel<PublicationModel> = {},
 export function articlesById(state: IdMapModel<ShortArticleModel> = {},
                              action: Action): IdMapModel<ShortArticleModel> {
     if (actions.receiveArticles.isTypeOf(action)) {
-        const {items} = action.payload
+        const {page} = action.payload
         const newState = {...state} as Mutable<IdMapModel<ShortArticleModel>>
-        items.forEach(article => {
+        page.items.forEach(article => {
             newState[article.id] = (article.id in state) ? (
                 {...state[article.id], ...article}
             ) : (
@@ -126,6 +126,34 @@ export function articleDraftsById(state: IdMapModel<ArticleCreateModel> = {},
     if (actions.receiveArticleSubmitSuccess.isTypeOf(action)) {
         const {item, isNew} = action.payload
         const {[isNew ? "" : item.id]: _, ...newState} = state
+        return newState
+    }
+
+    return state
+}
+
+export function publicationsPageToken(state: string = "", action: Action): string {
+    if (actions.receivePublications.isTypeOf(action)) {
+        const {page} = action.payload
+        return page.nextPageToken
+    }
+
+    return state
+}
+
+export function articlesPageTokensByParentId(state: IdMapModel<string> = {},
+                                             action: Action): IdMapModel<string> {
+    if (actions.receiveArticles.isTypeOf(action)) {
+        const {publicationId, page} = action.payload
+        return {
+            ...state,
+            [publicationId]: page.nextPageToken
+        }
+    }
+
+    if (actions.clearArticles.isTypeOf(action)) {
+        const {publicationId} = action.payload
+        const {[publicationId]: _, ...newState} = state
         return newState
     }
 

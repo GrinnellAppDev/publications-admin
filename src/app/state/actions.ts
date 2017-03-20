@@ -24,7 +24,7 @@ import {replace} from "react-router-redux"
 
 import {PublicationModel, ShortArticleModel, ArticleEditModel, FullArticleModel,
         ToastActionTypeModel, StateModel} from "./models"
-import {Api, FetchError} from "./api"
+import {Api, FetchError, PaginatedArray} from "./api"
 import createErrorClass from "./createErrorClass"
 import {getDefaultPublicationId} from "./selectors"
 
@@ -71,7 +71,7 @@ type StartLoadingPublicationsPayload = {}
 export const startLoadingPublications =
     createSyncActionCreator<StartLoadingPublicationsPayload>("START_LOADING_PUBLICATIONS")
 
-type ReceivePublicationsPayload = {items: ReadonlyArray<PublicationModel>}
+type ReceivePublicationsPayload = {page: PaginatedArray<PublicationModel>}
 export const receivePublications =
     createSyncActionCreator<ReceivePublicationsPayload>("RECIEVE_PUBLICATIONS")
 
@@ -79,7 +79,7 @@ type StartLoadingArticlesPayload = {publicationId: string}
 export const startLoadingArticles =
     createSyncActionCreator<StartLoadingArticlesPayload>("START_LOADING_ARTICLES")
 
-type ReceiveArticlesPayload = {publicationId: string, items: ReadonlyArray<ShortArticleModel>}
+type ReceiveArticlesPayload = {publicationId: string, page: PaginatedArray<ShortArticleModel>}
 export const receiveArticles =
     createSyncActionCreator<ReceiveArticlesPayload>("RECIEVE_ARTICLES")
 
@@ -153,7 +153,7 @@ export function loadPublications(): AsyncAction<void> {
         if (!getState().isLoadingPublications) {
             dispatch(startLoadingPublications({}))
             dispatch(receivePublications({
-                items: await api.publications.list(),
+                page: await api.publications.list(getState().publicationsPageToken),
             }))
         } else {
             throw new AlreadyLoadingError("Already loading publications.")
@@ -170,7 +170,8 @@ export function loadArticles(publicationId: string): AsyncAction<void> {
         dispatch(startLoadingArticles({publicationId}))
         dispatch(receiveArticles({
             publicationId,
-            items: await api.articles.list(publicationId),
+            page: await api.articles.list(publicationId,
+                                          getState().articlesPageTokensByParentId[publicationId]),
         }))
     }
 }

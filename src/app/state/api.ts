@@ -24,6 +24,11 @@ import createErrorClass from "./createErrorClass"
 
 const API_ROOT = process.env.API_ROOT
 
+export interface PaginatedArray<T> {
+    readonly nextPageToken?: string
+    readonly items: ReadonlyArray<T>
+}
+
 export interface FetchErrorPayload {
     resp?: Response
 }
@@ -45,15 +50,23 @@ function toFetchError(err: any): any {
     }
 }
 
-function requestToArray<T>(elementConversion: (element: any) => T, request: any): T[] {
+function responseToArray<T>(elementConversion: (element: any) => T, request: any): T[] {
     return (request as any[]).map(elementConversion)
 }
 
-function requestToPublicationModel(request: any): PublicationModel {
+function responseToPaginatedArray<T>(elementConversion: (element: any) => T,
+                                    request: any): PaginatedArray<T> {
+    return {
+        nextPageToken: request.nextPageToken,
+        items: responseToArray(elementConversion, request.items),
+    }
+}
+
+function responseToPublicationModel(request: any): PublicationModel {
     return {...request as PublicationModel}
 }
 
-function requestToArticleModel(request: any): FullArticleModel {
+function responseToArticleModel(request: any): FullArticleModel {
     return {
         ...request as FullArticleModel,
         dateEdited: new Date(request.dateEdited),
@@ -61,7 +74,7 @@ function requestToArticleModel(request: any): FullArticleModel {
     }
 }
 
-function requestToArticleBriefModel(request: any): ShortArticleModel {
+function responseToShortArticleModel(request: any): ShortArticleModel {
     return {
         ...request as ShortArticleModel,
         datePublished: new Date(request.datePublished),
@@ -87,11 +100,11 @@ function articleEditModelToRequest(model: ArticleEditModel): any {
 
 export interface Api {
     publications: {
-        list(): Promise<PublicationModel[]>
+        list(pageToken: string): Promise<PaginatedArray<PublicationModel>>
     }
 
     articles: {
-        list(publicationId: string): Promise<ShortArticleModel[]>
+        list(publicationId: string, pageToken: string): Promise<PaginatedArray<ShortArticleModel>>
         get(publicationId: string, articleId: string): Promise<FullArticleModel>
         remove(publicationId: string, articleId: string): Promise<void>
         create(publicationId: string, model: ArticleCreateModel): Promise<FullArticleModel>
@@ -102,9 +115,10 @@ export interface Api {
 
 export const api: Api = {
     publications: {
-        list: async () => {
+        list: async pageToken => {
             try {
-                const resp = await fetch(`${API_ROOT}/publications`, {
+                const params = pageToken ? `?pageToken=${pageToken}` : ""
+                const resp = await fetch(`${API_ROOT}/publications${params}`, {
                     method: "GET",
                     mode: "cors",
                 })
@@ -113,7 +127,7 @@ export const api: Api = {
                     throw new FetchError("", {resp})
                 }
 
-                return requestToArray(requestToPublicationModel, await resp.json())
+                return responseToPaginatedArray(responseToPublicationModel, await resp.json())
             } catch (err) {
                 throw toFetchError(err)
             }
@@ -121,9 +135,11 @@ export const api: Api = {
     },
 
     articles: {
-        list: async publicationId => {
+        list: async (publicationId, pageToken) => {
             try {
-                const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
+                const params = pageToken ? `?pageToken=${pageToken}` : ""
+                const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles` +
+                                         `${params}`, {
                     method: "GET",
                     mode: "cors",
                 })
@@ -132,7 +148,7 @@ export const api: Api = {
                     throw new FetchError("", {resp})
                 }
 
-                return requestToArray(requestToArticleBriefModel, await resp.json())
+                return responseToPaginatedArray(responseToShortArticleModel, await resp.json())
             } catch (err) {
                 throw toFetchError(err)
             }
@@ -141,7 +157,7 @@ export const api: Api = {
         get: async (publicationId, articleId) => {
             try {
                 const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
-                                        `${articleId}`, {
+                                         `${articleId}`, {
                     method: "GET",
                     mode: "cors",
                 })
@@ -150,7 +166,7 @@ export const api: Api = {
                     throw new FetchError("", {resp})
                 }
 
-                return requestToArticleModel(await resp.json())
+                return responseToArticleModel(await resp.json())
             } catch (err) {
                 throw toFetchError(err)
             }
@@ -159,7 +175,7 @@ export const api: Api = {
         remove: async (publicationId, articleId) => {
             try {
                 const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
-                                        `${articleId}`, {
+                                         `${articleId}`, {
                     method: "DELETE",
                     mode: "cors",
                 })
@@ -184,7 +200,7 @@ export const api: Api = {
                     throw new FetchError("", {resp})
                 }
 
-                return requestToArticleModel(await resp.json())
+                return responseToArticleModel(await resp.json())
             } catch (err) {
                 throw toFetchError(err)
             }
@@ -193,7 +209,7 @@ export const api: Api = {
         edit: async (publicationId, articleId, model) => {
             try {
                 const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
-                                        `${articleId}`, {
+                                         `${articleId}`, {
                     method: "PATCH",
                     mode: "cors",
                     body: JSON.stringify(articleEditModelToRequest(model)),
@@ -203,7 +219,7 @@ export const api: Api = {
                     throw new FetchError("", {resp})
                 }
 
-                return requestToArticleModel(await resp.json())
+                return responseToArticleModel(await resp.json())
             } catch (err) {
                 throw toFetchError(err)
             }
