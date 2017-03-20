@@ -22,8 +22,10 @@ import {RouteComponentProps} from "react-router"
 import {connect} from "react-redux"
 
 import {StateModel} from "./state/models"
-import {getPublications, getArticles} from "./state/selectors"
-import {reloadArticles, deleteArticleById, AlreadyLoadingError} from "./state/actions"
+import {getPublications, getArticles,
+        getArticlesPageTokenForSelectedPublication} from "./state/selectors"
+import {reloadArticles, loadNextArticles, deleteArticleById,
+        AlreadyLoadingError} from "./state/actions"
 
 import ArticleListView, {StateProps, DispatchProps} from "./ArticleListView"
 
@@ -38,14 +40,27 @@ const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
     (state: StateModel, {params}) => ({
         articles: getArticles(state, params),
         publications: getPublications(state),
-        isLoading: state.loadingPublications.includes(params.publicationId),
         currentPublication: state.publicationsById[params.publicationId],
+        isLoading: state.loadingPublications.includes(params.publicationId),
+        articlesHaveNextPage: getArticlesPageTokenForSelectedPublication(state, params) !== "",
     }),
 
     (dispatch, {params}) => ({
         onRefresh: async () => {
             try {
                 await dispatch(reloadArticles(params.publicationId))
+            } catch (err) {
+                if (AlreadyLoadingError.isTypeOf(err)) {
+                    console.error(err.message)
+                } else {
+                    throw err
+                }
+            }
+        },
+
+        onLoadNextArticlePage: async () => {
+            try {
+                await dispatch(loadNextArticles(params.publicationId))
             } catch (err) {
                 if (AlreadyLoadingError.isTypeOf(err)) {
                     console.error(err.message)

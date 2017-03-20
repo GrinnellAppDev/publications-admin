@@ -33,16 +33,19 @@ export interface StateProps {
     publications: PublicationModel[]
     currentPublication: PublicationModel
     isLoading: boolean
+    articlesHaveNextPage: boolean
 }
 
 export interface DispatchProps {
     onRefresh: () => void
+    onLoadNextArticlePage: () => void
     onArticleDelete: (id: string) => void
 }
 
 type Props = StateProps & DispatchProps
 
 export default function ArticleListView({articles, publications, currentPublication, isLoading,
+                                         articlesHaveNextPage,
                                          ...dispatchProps}: Props): JSX.Element {
     const b = block("ArticleListView")
 
@@ -99,6 +102,12 @@ export default function ArticleListView({articles, publications, currentPublicat
                             </div>
                         )}
                     </FlipMove>
+
+                    {(!isLoading && articlesHaveNextPage) && (
+                        <button onClick={dispatchProps.onLoadNextArticlePage}>
+                            Next Page
+                        </button>
+                    )}
                 </section>
             </main>
         </div>

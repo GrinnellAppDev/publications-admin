@@ -25,6 +25,7 @@ import {StateModel} from "./models"
 const getPublicationsById = (state: StateModel) => state.publicationsById
 const getArticlesById = (state: StateModel) => state.articlesById
 const getSelectedPublicationId = (state: StateModel, {publicationId}: any) => publicationId || ""
+const getArticlesPageTokensByParentId = (state: StateModel) => state.articlesPageTokensByParentId
 
 export const getPublications = createSelector(
     getPublicationsById,
@@ -44,4 +45,10 @@ export const getArticles = createSelector(
 export const getDefaultPublicationId = createSelector(
     getPublications,
     publications => publications[0] ? publications[0].id : ""
+)
+
+export const getArticlesPageTokenForSelectedPublication = createSelector(
+    getArticlesPageTokensByParentId, getSelectedPublicationId,
+    (articlesPageTokensByParentId, selectedPublicationId) =>
+        articlesPageTokensByParentId[selectedPublicationId]
 )

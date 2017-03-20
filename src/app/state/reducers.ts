@@ -132,10 +132,10 @@ export function articleDraftsById(state: IdMapModel<ArticleCreateModel> = {},
     return state
 }
 
-export function publicationsPageToken(state: string = "", action: Action): string {
+export function publicationsPageToken(state: string = null, action: Action): string {
     if (actions.receivePublications.isTypeOf(action)) {
         const {page} = action.payload
-        return page.nextPageToken
+        return page.nextPageToken || ""
     }
 
     return state
@@ -147,7 +147,7 @@ export function articlesPageTokensByParentId(state: IdMapModel<string> = {},
         const {publicationId, page} = action.payload
         return {
             ...state,
-            [publicationId]: page.nextPageToken
+            [publicationId]: page.nextPageToken || ""
         }
     }
 

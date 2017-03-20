@@ -53,7 +53,7 @@ async function onPublicationChange({params: oldParams}: RouterState,
                                    {params}: RouterState): Promise<void> {
     const {publicationId} = params
     if (oldParams.publicationId !== publicationId) {
-        await store.dispatch(actions.loadArticles(publicationId))
+        await store.dispatch(actions.loadNextArticles(publicationId))
     }
 }
 

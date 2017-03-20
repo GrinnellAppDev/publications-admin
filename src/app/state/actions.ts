@@ -148,38 +148,45 @@ export const AlreadyLoadingError = createErrorClass<void>(
     message => `Cannot load. ${message}`,
 )
 
-export function loadPublications(): AsyncAction<void> {
+export function loadAllPublications(): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
-        if (!getState().isLoadingPublications) {
+        if (getState().isLoadingPublications) {
+            throw new AlreadyLoadingError("Already loading publications.")
+        }
+
+        const pageToken = getState().publicationsPageToken
+        if (pageToken !== "") {
             dispatch(startLoadingPublications({}))
             dispatch(receivePublications({
-                page: await api.publications.list(getState().publicationsPageToken),
+                page: await api.publications.list(pageToken),
             }))
-        } else {
-            throw new AlreadyLoadingError("Already loading publications.")
+
+            await loadAllPublications()
         }
     }
 }
 
-export function loadArticles(publicationId: string): AsyncAction<void> {
+export function loadNextArticles(publicationId: string): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
         if (getState().loadingPublications.includes(publicationId)) {
             throw new AlreadyLoadingError("Already loading articles.")
         }
 
-        dispatch(startLoadingArticles({publicationId}))
-        dispatch(receiveArticles({
-            publicationId,
-            page: await api.articles.list(publicationId,
-                                          getState().articlesPageTokensByParentId[publicationId]),
-        }))
+        const pageToken = getState().articlesPageTokensByParentId[publicationId]
+        if (pageToken !== "") {
+            dispatch(startLoadingArticles({publicationId}))
+            dispatch(receiveArticles({
+                publicationId,
+                page: await api.articles.list(publicationId, pageToken),
+            }))
+        }
     }
 }
 
 export function reloadArticles(publicationId: string): AsyncAction<void> {
     return async dispatch => {
         dispatch(clearArticles({publicationId}))
-        await dispatch(loadArticles(publicationId))
+        await dispatch(loadNextArticles(publicationId))
     }
 }
 
@@ -197,7 +204,7 @@ export function loadFullArticle(publicationId: string,
 export function maybeDoInitialLoad(publicationId: string = ""): AsyncAction<void> {
     return async (dispatch, getState) => {
         if (!getState().didInitialLoad) {
-            await dispatch(loadPublications())
+            await dispatch(loadAllPublications())
 
             if (!publicationId) {
                 const defaultPublicationId = getDefaultPublicationId(getState())
