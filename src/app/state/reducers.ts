@@ -214,8 +214,8 @@ function createInfoToast(text: string, duration: number = 4000): ToastModel {
     return {
         id: uuid(),
         timeCreated: new Date(),
-        expireAction: undefined,
-        cancelAction: undefined,
+        expireAction: null,
+        cancelAction: null,
         buttons: [],
         duration,
         text,

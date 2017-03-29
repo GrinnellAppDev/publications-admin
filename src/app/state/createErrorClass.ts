@@ -41,7 +41,7 @@ export default function createErrorClass<T>(type: string, messageFunction: Messa
 
         type: string = type
 
-        constructor(message: string = "", public payload: T = undefined) {
+        constructor(message: string = "", public payload: T = null) {
             super(messageFunction(message, payload))
         }
     }
