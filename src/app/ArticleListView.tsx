@@ -87,10 +87,6 @@ export default function ArticleListView({articles, publications, currentPublicat
                     </button>
                 )}
 
-                {(isLoading || !currentPublication) && (
-                    <span> Loading...</span>
-                )}
-
                 <section className={b("articles")}>
                     <FlipMove enterAnimation="fade" leaveAnimation="fade">
                         {articles.map(article =>
@@ -103,11 +99,14 @@ export default function ArticleListView({articles, publications, currentPublicat
                         )}
                     </FlipMove>
 
-                    {(!isLoading && articlesHaveNextPage) && (
-                        <button onClick={dispatchProps.onLoadNextArticlePage}>
-                            Next Page
-                        </button>
-                    )}
+                    <span hidden={!isLoading && !!currentPublication}>Loading...</span>
+
+                    <button
+                        hidden={isLoading || !articlesHaveNextPage}
+                        onClick={dispatchProps.onLoadNextArticlePage}
+                    >
+                        Next Page
+                    </button>
                 </section>
             </main>
         </div>

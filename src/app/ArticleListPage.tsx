@@ -42,7 +42,7 @@ const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
         publications: getPublications(state),
         currentPublication: state.publicationsById[params.publicationId],
         isLoading: state.loadingPublications.includes(params.publicationId),
-        articlesHaveNextPage: getArticlesPageTokenForSelectedPublication(state, params) !== "",
+        articlesHaveNextPage: !!getArticlesPageTokenForSelectedPublication(state, params),
     }),
 
     (dispatch, {params}) => ({
