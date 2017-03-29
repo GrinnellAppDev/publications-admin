@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {stringify as stringifyQuery} from "query-string"
+
 import {PublicationModel, FullArticleModel, ArticleCreateModel, ArticleEditModel, ShortArticleModel,
         AuthorModel} from "./models"
 import createErrorClass from "./createErrorClass"
@@ -100,10 +102,14 @@ function articleEditModelToRequest(model: ArticleEditModel): any {
 
 export default {
     publications: {
-        list: async (pageToken: string): Promise<PaginatedArray<PublicationModel>> => {
+        async list(pageToken: string): Promise<PaginatedArray<PublicationModel>> {
             try {
-                const params = pageToken ? `?pageToken=${pageToken}` : ""
-                const resp = await fetch(`${API_ROOT}/publications${params}`, {
+                const params = stringifyQuery({
+                    pageToken: pageToken || undefined,
+                    pageSize: 100,  // ask for large page to minimize the number of requests
+                })
+
+                const resp = await fetch(`${API_ROOT}/publications?${params}`, {
                     method: "GET",
                     mode: "cors",
                 })
@@ -120,12 +126,15 @@ export default {
     },
 
     articles: {
-        list: async (publicationId: string,
-                     pageToken: string): Promise<PaginatedArray<ShortArticleModel>> => {
+        async list(publicationId: string,
+                   pageToken: string): Promise<PaginatedArray<ShortArticleModel>> {
             try {
-                const params = pageToken ? `?pageToken=${pageToken}` : ""
+                const params = stringifyQuery({
+                    pageToken: pageToken || undefined,
+                })
+
                 const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles` +
-                                         `${params}`, {
+                                         `?${params}`, {
                     method: "GET",
                     mode: "cors",
                 })
@@ -140,7 +149,7 @@ export default {
             }
         },
 
-        get: async (publicationId: string, articleId: string): Promise<FullArticleModel> => {
+        async get(publicationId: string, articleId: string): Promise<FullArticleModel> {
             try {
                 const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
                                          `${articleId}`, {
@@ -158,7 +167,7 @@ export default {
             }
         },
 
-        remove: async (publicationId: string, articleId: string): Promise<void> => {
+        async remove(publicationId: string, articleId: string): Promise <void> {
             try {
                 const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
                                          `${articleId}`, {
@@ -174,8 +183,8 @@ export default {
             }
         },
 
-        create: async (publicationId: string,
-                       model: ArticleCreateModel): Promise<FullArticleModel> => {
+        async create(publicationId: string,
+                     model: ArticleCreateModel): Promise <FullArticleModel> {
             try {
                 const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
                     method: "POST",
@@ -193,8 +202,8 @@ export default {
             }
         },
 
-        edit: async (publicationId: string, articleId: string,
-                     model: ArticleEditModel): Promise<FullArticleModel> => {
+        async edit(publicationId: string, articleId: string,
+                   model: ArticleEditModel): Promise <FullArticleModel> {
             try {
                 const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
                                          `${articleId}`, {
