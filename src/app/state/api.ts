@@ -22,7 +22,7 @@ import {stringify as stringifyQuery} from "query-string"
 
 import {PublicationModel, FullArticleModel, ArticleCreateModel, ArticleEditModel, ShortArticleModel,
         AuthorModel} from "./models"
-import createErrorClass from "./createErrorClass"
+import createErrorClass, {CustomError} from "./createErrorClass"
 
 const API_ROOT = process.env.API_ROOT
 
@@ -35,6 +35,7 @@ export interface FetchErrorPayload {
     resp?: Response
 }
 
+export type FetchError = CustomError<FetchErrorPayload>
 export const FetchError = createErrorClass<FetchErrorPayload>(
     "FETCH_ERROR",
     (message, {resp}) => (resp) ? (
@@ -44,11 +45,13 @@ export const FetchError = createErrorClass<FetchErrorPayload>(
     )
 )
 
-function toFetchError(err: any): any {
-    if (err instanceof TypeError) {
+function toFetchError(err: any): FetchError {
+    if (FetchError.isTypeOf(err)) {
+        return err
+    } else if (err instanceof TypeError) {
         return new FetchError(err.message, {})
     } else {
-        return err
+        return new FetchError("", {})
     }
 }
 
@@ -57,29 +60,29 @@ function responseToArray<T>(elementConversion: (element: any) => T, request: any
 }
 
 function responseToPaginatedArray<T>(elementConversion: (element: any) => T,
-                                    request: any): PaginatedArray<T> {
+                                     response: any): PaginatedArray<T> {
     return {
-        nextPageToken: request.nextPageToken,
-        items: responseToArray(elementConversion, request.items),
+        ...response as PaginatedArray<T>,
+        items: responseToArray(elementConversion, response.items),
     }
 }
 
-function responseToPublicationModel(request: any): PublicationModel {
-    return {...request as PublicationModel}
+function responseToPublicationModel(response: any): PublicationModel {
+    return {...response as PublicationModel}
 }
 
-function responseToArticleModel(request: any): FullArticleModel {
+function responseToArticleModel(response: any): FullArticleModel {
     return {
-        ...request as FullArticleModel,
-        dateEdited: new Date(request.dateEdited),
-        datePublished: new Date(request.datePublished),
+        ...response as FullArticleModel,
+        dateEdited: new Date(response.dateEdited),
+        datePublished: new Date(response.datePublished),
     }
 }
 
-function responseToShortArticleModel(request: any): ShortArticleModel {
+function responseToShortArticleModel(response: any): ShortArticleModel {
     return {
-        ...request as ShortArticleModel,
-        datePublished: new Date(request.datePublished),
+        ...response as ShortArticleModel,
+        datePublished: new Date(response.datePublished),
     }
 }
 
