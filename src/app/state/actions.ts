@@ -20,7 +20,7 @@
 
 import {Action} from "redux"
 import {ThunkAction} from "redux-thunk"
-import {replace} from "react-router-redux"
+import {replace as replaceRoute} from "react-router-redux"
 
 import {PublicationModel, ShortArticleModel, ArticleEditModel, FullArticleModel,
         ToastActionTypeModel, StateModel} from "./models"
@@ -206,12 +206,12 @@ export function maybeDoInitialLoad(publicationId: string = ""): AsyncAction<void
         if (!getState().didInitialLoad) {
             await dispatch(loadAllPublications())
 
-            if (!publicationId) {
+            if (publicationId) {
+                await dispatch(reloadArticles(publicationId))
+            } else {
                 const defaultPublicationId = getDefaultPublicationId(getState())
-                dispatch(replace(`/publications/${defaultPublicationId}/articles`))
+                dispatch(replaceRoute(`/publications/${defaultPublicationId}/articles`))
             }
-
-            await dispatch(reloadArticles(publicationId))
         }
     }
 }
