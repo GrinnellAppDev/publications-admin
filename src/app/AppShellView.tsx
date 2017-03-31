@@ -64,6 +64,8 @@ export default function AppShellView({children, toasts}: Props): JSX.Element {
 
     return (
         <div className={b()}>
+            {children}
+
             <aside className={b("toasts")}>
                 <FlipMove
                     appearAnimation={toastEnterAnimation}
@@ -78,8 +80,6 @@ export default function AppShellView({children, toasts}: Props): JSX.Element {
                     )}
                 </FlipMove>
             </aside>
-
-            {children}
         </div>
     )
 }
