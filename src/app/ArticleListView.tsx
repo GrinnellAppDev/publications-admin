@@ -21,6 +21,7 @@
 import * as React from "react"
 import {Link} from "react-router"
 import FlipMove from "react-flip-move"
+import InfiniteScroll from "react-infinite-scroller"
 
 import {ShortArticleModel, PublicationModel} from "./state/models"
 import ArticleView from "./ArticleView"
@@ -32,7 +33,6 @@ export interface StateProps {
     articles: ShortArticleModel[]
     publications: PublicationModel[]
     currentPublication: PublicationModel
-    isLoading: boolean
     articlesHaveNextPage: boolean
 }
 
@@ -44,7 +44,7 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps
 
-export default function ArticleListView({articles, publications, currentPublication, isLoading,
+export default function ArticleListView({articles, publications, currentPublication,
                                          articlesHaveNextPage,
                                          ...dispatchProps}: Props): JSX.Element {
     const b = block("ArticleListView")
@@ -87,7 +87,13 @@ export default function ArticleListView({articles, publications, currentPublicat
                     </button>
                 )}
 
-                <section className={b("articles")}>
+                <InfiniteScroll
+                    loadMore={dispatchProps.onLoadNextArticlePage}
+                    hasMore={articlesHaveNextPage}
+                    loader={<span>Loading...</span>}
+                    element="section"
+                    className={b("articles")}
+                >
                     <FlipMove enterAnimation="fade" leaveAnimation="fade">
                         {articles.map(article =>
                             <div key={article.id}>
@@ -98,16 +104,7 @@ export default function ArticleListView({articles, publications, currentPublicat
                             </div>
                         )}
                     </FlipMove>
-
-                    <span hidden={!isLoading && !!currentPublication}>Loading...</span>
-
-                    <button
-                        hidden={isLoading || !articlesHaveNextPage}
-                        onClick={dispatchProps.onLoadNextArticlePage}
-                    >
-                        Next Page
-                    </button>
-                </section>
+                </InfiniteScroll>
             </main>
         </div>
     )
