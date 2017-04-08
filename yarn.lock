@@ -3215,17 +3215,17 @@ postcss@^5.0.10, postcss@^5.0.11, postcss@^5.0.12, postcss@^5.0.13, postcss@^5.0
     supports-color "^3.2.3"
 
 preact-compat@^3.10.0:
-  version "3.13.1"
-  resolved "https://registry.yarnpkg.com/preact-compat/-/preact-compat-3.13.1.tgz#efe46e072a8eee0774a41e362b4b253c1d66726a"
+  version "3.14.3"
+  resolved "https://registry.yarnpkg.com/preact-compat/-/preact-compat-3.14.3.tgz#88fa9c5a1dc749ab45e4c7f1fc755455ebb125b4"
   dependencies:
-    preact-render-to-string "^3.2.1"
+    preact-render-to-string "^3.6.0"
     preact-transition-group "^1.1.0"
     proptypes "^0.14.3"
     standalone-react-addons-pure-render-mixin "^0.1.1"
 
-preact-render-to-string@^3.2.1:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/preact-render-to-string/-/preact-render-to-string-3.5.0.tgz#35c741d4683e95404a94170ec7251ea5f71037b6"
+preact-render-to-string@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/preact-render-to-string/-/preact-render-to-string-3.6.0.tgz#03a49d2d755a766c3d421e8b06d6edbb33ed6bde"
   dependencies:
     pretty-format "^3.5.1"
 
