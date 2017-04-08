@@ -83,11 +83,11 @@ export default {
                 }),
             },
             {
-                test: /\.js/,
+                test: /\.js$/,
                 loader: "babel-loader",
                 include: [
-                    path.resolve('node_modules/preact-compat/src'),
-                    path.resolve('node_modules/especially'),
+                    path.resolve("node_modules/preact-compat/src"),
+                    path.resolve("node_modules/especially"),
                 ],
             },
         ],
