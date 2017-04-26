@@ -28,11 +28,11 @@ import IndexView, {StateProps, DispatchProps} from "./IndexView"
 interface OwnProps {
 }
 
-const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
+export default connect<StateProps, DispatchProps, OwnProps>(
     (state: StateModel) => ({
         isLoading: state.isLoadingPublications,
         hasPublications: !!getPublications(state).length,
     }),
+)(
+    IndexView
 )
-
-export default withReduxConnect(IndexView)

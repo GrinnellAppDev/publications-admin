@@ -24,9 +24,9 @@ import {StateModel} from "./state/models"
 
 import AppShellView, {StateProps, DispatchProps} from "./AppShellView"
 
-const withReduxConnect = connect<StateProps, DispatchProps, {}>(
+export default connect<StateProps, DispatchProps, {}>(
     ({toasts}: StateModel) => ({toasts}),
     dispatch => ({}),
+)(
+    AppShellView
 )
-
-export default withReduxConnect(AppShellView)

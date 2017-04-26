@@ -42,7 +42,10 @@ interface ComponentState {
     timeoutId: number
 }
 
-export default connect<{}, DispatchProps, OwnProps>(undefined, dispatch => ({dispatch}))(
+export default connect<{}, DispatchProps, OwnProps>(
+    undefined,
+    dispatch => ({dispatch}),
+)(
     class Toast extends React.PureComponent<Props, ComponentState> {
         private dispatch(action: ToastActionModel): void {
             const {dispatch, model} = this.props

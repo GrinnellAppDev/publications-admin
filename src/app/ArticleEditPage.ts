@@ -35,7 +35,7 @@ interface RouteParams {
 interface OwnProps extends RouteComponentProps<RouteParams, {}> {
 }
 
-const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
+export default connect<StateProps, DispatchProps, OwnProps>(
     (state: StateModel, {params}) => ({
         publicationId: params.publicationId,
         articleId: params.articleId || "",
@@ -104,6 +104,6 @@ const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
             dispatch(goBack())
         },
     })
+)(
+    ArticleEditView
 )
-
-export default withReduxConnect(ArticleEditView)

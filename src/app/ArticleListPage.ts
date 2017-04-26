@@ -36,7 +36,7 @@ export interface RouteParams {
 interface OwnProps extends RouteComponentProps<RouteParams, {}> {
 }
 
-const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
+export default connect<StateProps, DispatchProps, OwnProps>(
     (state: StateModel, {params}) => ({
         articles: getArticles(state, params),
         publications: getPublications(state),
@@ -73,6 +73,6 @@ const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
             dispatch(deleteArticleById({id}))
         },
     }),
+)(
+    ArticleListView
 )
-
-export default withReduxConnect(ArticleListView)
