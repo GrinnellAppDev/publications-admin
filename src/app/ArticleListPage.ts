@@ -1,5 +1,5 @@
 /**
- * ArticlesListPage.tsx
+ * ArticlesListPage.ts
  *
  * Created by Zander Otavka on 2/8/17.
  * Copyright (C) 2016  Grinnell AppDev.

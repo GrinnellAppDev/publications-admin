@@ -1,7 +1,7 @@
 /**
- * AppShell.tsx
+ * IndexPage.ts
  *
- * Created by Zander Otavka on 2/23/17.
+ * Created by Zander Otavka on 2/22/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,12 +21,18 @@
 import {connect} from "react-redux"
 
 import {StateModel} from "./state/models"
+import {getPublications} from "./state/selectors"
 
-import AppShellView, {StateProps, DispatchProps} from "./AppShellView"
+import IndexView, {StateProps, DispatchProps} from "./IndexView"
 
-const withReduxConnect = connect<StateProps, DispatchProps, {}>(
-    ({toasts}: StateModel) => ({toasts}),
-    dispatch => ({}),
+interface OwnProps {
+}
+
+const withReduxConnect = connect<StateProps, DispatchProps, OwnProps>(
+    (state: StateModel) => ({
+        isLoading: state.isLoadingPublications,
+        hasPublications: !!getPublications(state).length,
+    }),
 )
 
-export default withReduxConnect(AppShellView)
+export default withReduxConnect(IndexView)
