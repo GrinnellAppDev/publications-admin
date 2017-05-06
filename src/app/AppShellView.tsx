@@ -28,14 +28,13 @@ import block from "./style/bem"
 import "./AppShellView.scss"
 
 export interface StateProps {
-    children?: React.ReactNode
     toasts: ReadonlyArray<ToastModel>
 }
 
 export interface DispatchProps {
 }
 
-type Props = StateProps & DispatchProps
+type Props = StateProps & DispatchProps & React.Props<void>
 
 const toastEnterAnimation = {
     from: {
