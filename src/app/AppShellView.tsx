@@ -37,7 +37,7 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps
 
-const toastEnterAnimation: any = {
+const toastEnterAnimation = {
     from: {
         transform: "translateX(-100%)",
         opacity: "0",
@@ -48,7 +48,7 @@ const toastEnterAnimation: any = {
     },
 }
 
-const toastLeaveAnimation: any = {
+const toastLeaveAnimation = {
     from: {
         transform: "translate(0, -100%)",
         opacity: "1",
