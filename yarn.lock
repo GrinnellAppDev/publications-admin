@@ -1613,7 +1613,7 @@ faye-websocket@~0.11.0:
   dependencies:
     websocket-driver ">=0.5.1"
 
-fbjs@^0.8.1, fbjs@^0.8.4:
+fbjs@^0.8.1, fbjs@^0.8.4, fbjs@^0.8.9:
   version "0.8.9"
   resolved "https://registry.yarnpkg.com/fbjs/-/fbjs-0.8.9.tgz#180247fbd347dcc9004517b904f865400a0c8f14"
   dependencies:
@@ -2055,6 +2055,12 @@ icss-replace-symbols@^1.0.2:
 ieee754@^1.1.4:
   version "1.1.8"
   resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.1.8.tgz#be33d40ac10ef1926701f6f08a2d86fbfd1ad3e4"
+
+immutability-helper@^2.1.2:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/immutability-helper/-/immutability-helper-2.2.0.tgz#c4385ad4f68315843efaf0cff3575ee82ffa405f"
+  dependencies:
+    invariant "^2.2.0"
 
 imurmurhash@^0.1.4:
   version "0.1.4"
@@ -3214,13 +3220,14 @@ postcss@^5.0.10, postcss@^5.0.11, postcss@^5.0.12, postcss@^5.0.13, postcss@^5.0
     source-map "^0.5.6"
     supports-color "^3.2.3"
 
-preact-compat@^3.10.0:
-  version "3.14.3"
-  resolved "https://registry.yarnpkg.com/preact-compat/-/preact-compat-3.14.3.tgz#88fa9c5a1dc749ab45e4c7f1fc755455ebb125b4"
+preact-compat@^3.16.0:
+  version "3.16.0"
+  resolved "https://registry.yarnpkg.com/preact-compat/-/preact-compat-3.16.0.tgz#cf2bc1b2f8fca14900d68094f9e10b8b329cc41e"
   dependencies:
+    immutability-helper "^2.1.2"
     preact-render-to-string "^3.6.0"
     preact-transition-group "^1.1.0"
-    proptypes "^0.14.3"
+    prop-types "^15.5.8"
     standalone-react-addons-pure-render-mixin "^0.1.1"
 
 preact-render-to-string@^3.6.0:
@@ -3274,9 +3281,11 @@ promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
-proptypes@^0.14.3:
-  version "0.14.4"
-  resolved "https://registry.yarnpkg.com/proptypes/-/proptypes-0.14.4.tgz#1ead7600d44472a614aa1cf0c4cccee7d867997d"
+prop-types@^15.5.8:
+  version "15.5.8"
+  resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.5.8.tgz#6b7b2e141083be38c8595aa51fc55775c7199394"
+  dependencies:
+    fbjs "^0.8.9"
 
 proxy-addr@~1.1.3:
   version "1.1.3"
@@ -3384,9 +3393,9 @@ react-dom@^15.4.2:
     loose-envify "^1.1.0"
     object-assign "^4.1.0"
 
-react-flip-move@^2.9.1:
-  version "2.9.1"
-  resolved "https://registry.yarnpkg.com/react-flip-move/-/react-flip-move-2.9.1.tgz#075bbf7957286c13b35029f23f42cf1db0b951ec"
+react-flip-move@^2.9.7:
+  version "2.9.7"
+  resolved "https://registry.yarnpkg.com/react-flip-move/-/react-flip-move-2.9.7.tgz#d57a10fb52fd32946965c321f05dbd7beb243079"
 
 react-infinite-scroller@^1.0.7:
   version "1.0.7"
