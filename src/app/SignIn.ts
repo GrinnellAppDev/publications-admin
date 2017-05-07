@@ -61,7 +61,11 @@ export default connect<{}, DispatchProps, {}>(
 
                 newPasswordRequired: (userAttributes, requiredAttributes) => {
                     // TODO: do something better than a prompt
-                    const newPassword = prompt("Enter new password")
+                    const newPassword = prompt(
+                        "Enter new password (must be over 16 characters long and contain both " +
+                        "uppercase and lowercase letters)"
+                    )
+
                     user.completeNewPasswordChallenge(newPassword, {}, {onSuccess, onFailure})
                 },
             })
