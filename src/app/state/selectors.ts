@@ -39,7 +39,7 @@ export const getArticles = createSelector(
     (articlesById, selectedPublicationId) => Object.keys(articlesById)
         .map(id => articlesById[id])
         .filter(({publication}) => publication === selectedPublicationId)
-        .sort((a, b) => a.datePublished.valueOf() - b.datePublished.valueOf())
+        .sort((a, b) => b.datePublished.valueOf() - a.datePublished.valueOf())
 )
 
 export const getDefaultPublicationId = createSelector(
