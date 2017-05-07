@@ -20,6 +20,11 @@
 
 import {RouterState} from "react-router-redux"
 
+export interface AuthenticationModel {
+    readonly username: string
+    readonly token: string
+}
+
 export interface AuthorModel {
     readonly name: string
     readonly email: string
@@ -83,7 +88,7 @@ export interface ToastModel {
 }
 
 export interface StateModel {
-    readonly authToken: string
+    readonly auth: AuthenticationModel
 
     readonly publicationsById: IdMapModel<PublicationModel>
     readonly articlesById: IdMapModel<ShortArticleModel>

@@ -20,8 +20,8 @@
 
 import {v4 as uuid} from "uuid"
 
-import {IdMapModel, PublicationModel, ShortArticleModel, ArticleCreateModel, ToastActionTypeModel,
-        ToastModel} from "./models"
+import {AuthenticationModel, IdMapModel, PublicationModel, ShortArticleModel, ArticleCreateModel,
+        ToastActionTypeModel, ToastModel} from "./models"
 import * as actions from "./actions"
 
 export {routerReducer as routing} from "react-router-redux"
@@ -32,10 +32,10 @@ type Mutable<T> = {
     [P in keyof T]: T[P]
 }
 
-export function authToken(state: string = "", action: Action): string {
-    if (actions.saveAuthToken.isTypeOf(action)) {
-        const {token} = action.payload
-        return token
+export function auth(state: AuthenticationModel = {username: "", token: ""},
+                     action: Action): AuthenticationModel {
+    if (actions.saveAuthInfo.isTypeOf(action)) {
+        return action.payload
     }
 
     return state
@@ -236,6 +236,11 @@ export function toasts(state: ReadonlyArray<ToastModel> = [],
     if (actions.closeToast.isTypeOf(action)) {
         const {id} = action.payload
         return state.filter(toast => toast.id !== id)
+    }
+
+    if (actions.createInfoToast.isTypeOf(action)) {
+        const {text, duration} = action.payload
+        return [...state, createInfoToast(text, duration)]
     }
 
     if (actions.deleteArticle.isTypeOf(action)) {

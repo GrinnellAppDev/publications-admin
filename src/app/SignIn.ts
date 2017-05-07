@@ -22,7 +22,7 @@ import {connect} from "react-redux"
 import {AuthenticationDetails, CognitoUserPool, CognitoUser,
         CognitoUserSession} from "amazon-cognito-identity-js"
 
-import {saveAuthToken} from "./state/actions"
+import {saveAuthInfo, createInfoToast} from "./state/actions"
 import SignInView, {DispatchProps} from "./SignInView"
 
 export default connect<{}, DispatchProps, {}>(
@@ -45,13 +45,14 @@ export default connect<{}, DispatchProps, {}>(
             })
 
             function onSuccess(session: CognitoUserSession): void {
-                dispatch(saveAuthToken({
+                dispatch(saveAuthInfo({
+                    username,
                     token: session.getAccessToken().getJwtToken(),
                 }))
             }
 
-            function onFailure(err: any): void {
-                console.error("auth failed", err)
+            function onFailure(err: Error): void {
+                dispatch(createInfoToast({text: err.message}))
             }
 
             user.authenticateUser(authDetails, {

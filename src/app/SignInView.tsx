@@ -39,7 +39,7 @@ export default function SignInView({onSubmit}: Props): JSX.Element {
         >
             <input type="text" name="username" placeholder="Username"/>
             <input type="password" name="password" placeholder="Password"/>
-            <input type="submit"/>
+            <input type="submit" value="Sign In"/>
         </form>
     )
 }

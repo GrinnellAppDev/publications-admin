@@ -29,8 +29,9 @@ import block from "./style/bem"
 import "./AppShellView.scss"
 
 export interface StateProps {
+    isSignedIn: boolean
+    username: string
     toasts: ReadonlyArray<ToastModel>
-    signedIn: boolean
 }
 
 export interface DispatchProps {
@@ -60,12 +61,16 @@ const toastLeaveAnimation = {
     },
 }
 
-export default function AppShellView({children, toasts, signedIn}: Props): JSX.Element {
+export default function AppShellView({isSignedIn, username, children, toasts}: Props): JSX.Element {
     const b = block("AppShellView")
 
     return (
         <div className={b()}>
-            {signedIn || <SignIn/>}
+            {(isSignedIn) ? (
+                <div>Hello There, {username}</div>
+            ) : (
+                <SignIn/>
+            )}
 
             {children}
 

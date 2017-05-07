@@ -63,9 +63,9 @@ function createSyncActionCreator<T>(type: string): SyncActionCreator<T> {
     )
 }
 
-type SaveAuthTokenPayload = {token: string}
-export const saveAuthToken =
-    createSyncActionCreator<SaveAuthTokenPayload>("SAVE_AUTH_TOKEN")
+type SaveAuthInfoPayload = {username: string, token: string}
+export const saveAuthInfo =
+    createSyncActionCreator<SaveAuthInfoPayload>("SAVE_AUTH_INFO")
 
 type StartInitialLoadPayload = {}
 export const startInitialLoad =
@@ -141,6 +141,10 @@ export const receiveArticleSubmitError =
 type ReceiveArticleSubmitSuccessPayload = {item: FullArticleModel, isNew: boolean}
 export const receiveArticleSubmitSuccess =
     createSyncActionCreator<ReceiveArticleSubmitSuccessPayload>("RECEIVE_ARTICLE_SUBMIT_SUCCESS")
+
+type CreateInfoToastPayload = {text: string, duration?: number}
+export const createInfoToast =
+    createSyncActionCreator<CreateInfoToastPayload>("CREATE_INFO_TOAST")
 
 type CloseToastPayload = {id: string}
 export const closeToast =
