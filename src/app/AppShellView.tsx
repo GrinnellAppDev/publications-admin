@@ -67,7 +67,7 @@ export default function AppShellView({isSignedIn, username, children, toasts}: P
     return (
         <div className={b()}>
             {(isSignedIn) ? (
-                <div>Hello There, {username}</div>
+                <div>Signed in as {username}</div>
             ) : (
                 <SignIn/>
             )}
