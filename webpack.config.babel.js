@@ -34,6 +34,9 @@ const DEV_SERVER_HOST = "localhost"
 const DEV_API_ROOT = "https://g2j7qs2xs7.execute-api.us-west-2.amazonaws.com/devstable"
 const PRODUCTION_API_ROOT = "https://3iqnjzs7w1.execute-api.us-west-2.amazonaws.com/production"
 
+const COGNITO_USER_POOL_ID = "us-west-2_UIAxO7cc3"
+const COGNITO_CLIENT_ID = "2akq6q7qh6fdiv4n41iv20qvij"
+
 const paths = {
     htmlTemplate: path.resolve("src/index.html"),
     clientEntry: path.resolve("src/client"),
@@ -102,6 +105,8 @@ export default {
             "process.env": {
                 NODE_ENV: JSON.stringify(isProduction ? "production" : "dev"),
                 API_ROOT: JSON.stringify(isProduction ? PRODUCTION_API_ROOT : DEV_API_ROOT),
+                COGNITO_USER_POOL_ID: JSON.stringify(COGNITO_USER_POOL_ID),
+                COGNITO_CLIENT_ID: JSON.stringify(COGNITO_CLIENT_ID),
             },
         }),
 

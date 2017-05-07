@@ -35,8 +35,8 @@ export default connect<{}, DispatchProps, {}>(
             })
 
             const userPool = new CognitoUserPool({
-                UserPoolId: "us-west-2_UIAxO7cc3",
-                ClientId: "2akq6q7qh6fdiv4n41iv20qvij",
+                UserPoolId: process.env.COGNITO_USER_POOL_ID,
+                ClientId: process.env.COGNITO_CLIENT_ID,
             })
 
             const user = new CognitoUser({
