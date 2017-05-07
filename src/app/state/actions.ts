@@ -67,6 +67,10 @@ type SaveAuthInfoPayload = {username: string, token: string}
 export const saveAuthInfo =
     createSyncActionCreator<SaveAuthInfoPayload>("SAVE_AUTH_INFO")
 
+type ReceiveAuthErrorPayload = {}
+export const receiveAuthError =
+    createSyncActionCreator<ReceiveAuthErrorPayload>("RECEIVE_AUTH_ERROR")
+
 type StartInitialLoadPayload = {}
 export const startInitialLoad =
     createSyncActionCreator<StartInitialLoadPayload>("START_INITIAL_LOAD")
@@ -259,7 +263,13 @@ export function submitArticleDraft(publicationId: string, articleId: string): As
                 return true
             } catch (err) {
                 if (FetchError.isTypeOf(err)) {
+                    const {resp} = err.payload
                     dispatch(receiveArticleSubmitError({}))
+
+                    if (resp && resp.status === 401) {
+                        dispatch(receiveAuthError({}))
+                        dispatch(createInfoToast({text: "Sign in again."}))
+                    }
                 }
 
                 return false
