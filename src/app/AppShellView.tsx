@@ -23,12 +23,14 @@ import FlipMove from "react-flip-move"
 
 import {ToastModel} from "./state/models"
 import Toast from "./Toast"
+import SignIn from "./SignIn"
 import block from "./style/bem"
 
 import "./AppShellView.scss"
 
 export interface StateProps {
     toasts: ReadonlyArray<ToastModel>
+    signedIn: boolean
 }
 
 export interface DispatchProps {
@@ -58,11 +60,13 @@ const toastLeaveAnimation = {
     },
 }
 
-export default function AppShellView({children, toasts}: Props): JSX.Element {
+export default function AppShellView({children, toasts, signedIn}: Props): JSX.Element {
     const b = block("AppShellView")
 
     return (
         <div className={b()}>
+            {signedIn || <SignIn/>}
+
             {children}
 
             <aside className={b("toasts")}>

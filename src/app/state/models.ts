@@ -83,6 +83,8 @@ export interface ToastModel {
 }
 
 export interface StateModel {
+    readonly authToken: string
+
     readonly publicationsById: IdMapModel<PublicationModel>
     readonly articlesById: IdMapModel<ShortArticleModel>
     readonly articleDraftsById: IdMapModel<ArticleCreateModel>

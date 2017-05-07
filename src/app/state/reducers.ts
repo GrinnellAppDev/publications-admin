@@ -32,6 +32,15 @@ type Mutable<T> = {
     [P in keyof T]: T[P]
 }
 
+export function authToken(state: string = "", action: Action): string {
+    if (actions.saveAuthToken.isTypeOf(action)) {
+        const {token} = action.payload
+        return token
+    }
+
+    return state
+}
+
 export function publicationsById(state: IdMapModel<PublicationModel> = {},
                                  action: Action): IdMapModel<PublicationModel> {
     if (actions.receivePublications.isTypeOf(action)) {

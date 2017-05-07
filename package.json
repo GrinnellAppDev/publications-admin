@@ -11,6 +11,7 @@
         "deploy": "aws s3 cp build s3://publications-admin-site --recursive --region \"us-east-2\""
     },
     "dependencies": {
+        "amazon-cognito-identity-js": "^1.16.0",
         "array.prototype.includes": "^1.0.0",
         "es6-promise": "^4.0.5",
         "preact": "^7.1.0",

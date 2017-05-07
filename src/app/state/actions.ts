@@ -63,6 +63,10 @@ function createSyncActionCreator<T>(type: string): SyncActionCreator<T> {
     )
 }
 
+type SaveAuthTokenPayload = {token: string}
+export const saveAuthToken =
+    createSyncActionCreator<SaveAuthTokenPayload>("SAVE_AUTH_TOKEN")
+
 type StartInitialLoadPayload = {}
 export const startInitialLoad =
     createSyncActionCreator<StartInitialLoadPayload>("START_INITIAL_LOAD")

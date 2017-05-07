@@ -25,7 +25,10 @@ import {StateModel} from "./state/models"
 import AppShellView, {StateProps, DispatchProps} from "./AppShellView"
 
 export default connect<StateProps, DispatchProps, {}>(
-    ({toasts}: StateModel) => ({toasts}),
+    ({authToken, toasts}: StateModel) => ({
+        signedIn: !!authToken,
+        toasts,
+    }),
     dispatch => ({}),
 )(
     AppShellView
