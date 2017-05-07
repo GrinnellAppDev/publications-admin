@@ -27,7 +27,7 @@ import InlineManifestPlugin from "inline-manifest-webpack-plugin"
 import OptimizeCssAssetsPlugin from "optimize-css-assets-webpack-plugin"
 
 const isProduction = process.env.NODE_ENV === "production"
-const stage = process.env.STAGE || isProduction ? "production" : "devstable"
+const stage = process.env.STAGE || (isProduction ? "production" : "devstable")
 
 const API_ROOTS_BY_STAGE = {
     devstable: "https://g2j7qs2xs7.execute-api.us-west-2.amazonaws.com/devstable",

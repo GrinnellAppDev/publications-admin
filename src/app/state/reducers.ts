@@ -72,7 +72,7 @@ export function articlesById(state: IdMapModel<ShortArticleModel> = {},
         return newState
     }
 
-    if (actions.deleteArticle.isTypeOf(action)) {
+    if (actions.deleteLocalArticle.isTypeOf(action)) {
         const {item} = action.payload
         const {[item.id]: _, ...newState} = state
         return newState
@@ -243,7 +243,7 @@ export function toasts(state: ReadonlyArray<ToastModel> = [],
         return [...state, createInfoToast(text, duration)]
     }
 
-    if (actions.deleteArticle.isTypeOf(action)) {
+    if (actions.deleteLocalArticle.isTypeOf(action)) {
         const {item} = action.payload
         // console.assert(item.title !== undefined)  // todo: uncomment when server validates
         const title = ((item.title || "").length > 20) ? (

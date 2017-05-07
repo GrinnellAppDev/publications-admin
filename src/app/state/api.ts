@@ -170,12 +170,16 @@ export default {
             }
         },
 
-        async remove(publicationId: string, articleId: string): Promise <void> {
+        async remove(publicationId: string, articleId: string, authToken: string): Promise<void> {
             try {
+                const headers = new Headers()
+                headers.append("Authorization", authToken)
+
                 const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
                                          `${articleId}`, {
                     method: "DELETE",
                     mode: "cors",
+                    headers,
                 })
 
                 if (!resp.ok) {
@@ -186,12 +190,16 @@ export default {
             }
         },
 
-        async create(publicationId: string,
-                     model: ArticleCreateModel): Promise <FullArticleModel> {
+        async create(publicationId: string, model: ArticleCreateModel,
+                     authToken: string): Promise<FullArticleModel> {
             try {
+                const headers = new Headers()
+                headers.append("Authorization", authToken)
+
                 const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
                     method: "POST",
                     mode: "cors",
+                    headers,
                     body: JSON.stringify(articleEditModelToRequest(model)),
                 })
 
@@ -205,13 +213,17 @@ export default {
             }
         },
 
-        async edit(publicationId: string, articleId: string,
-                   model: ArticleEditModel): Promise <FullArticleModel> {
+        async edit(publicationId: string, articleId: string, model: ArticleEditModel,
+                   authToken: string): Promise<FullArticleModel> {
             try {
+                const headers = new Headers()
+                headers.append("Authorization", authToken)
+
                 const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
                                          `${articleId}`, {
                     method: "PATCH",
                     mode: "cors",
+                    headers,
                     body: JSON.stringify(articleEditModelToRequest(model)),
                 })
 

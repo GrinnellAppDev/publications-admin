@@ -24,7 +24,7 @@ import {connect} from "react-redux"
 import {StateModel} from "./state/models"
 import {getPublications, getArticles,
         getArticlesPageTokenForSelectedPublication} from "./state/selectors"
-import {reloadArticles, loadNextArticles, deleteArticleById,
+import {reloadArticles, loadNextArticles, maybeDeleteArticleById,
         AlreadyLoadingError} from "./state/actions"
 
 import ArticleListView, {StateProps, DispatchProps} from "./ArticleListView"
@@ -70,7 +70,7 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         },
 
         onArticleDelete: id => {
-            dispatch(deleteArticleById({id}))
+            dispatch(maybeDeleteArticleById({id}))
         },
     }),
 )(

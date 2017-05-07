@@ -99,13 +99,9 @@ type ClearArticlesPayload = {publicationId: string}
 export const clearArticles =
     createSyncActionCreator<ClearArticlesPayload>("CLEAR_ARTICLES")
 
-type DeleteArticlePayload = {item: ShortArticleModel}
-export const deleteArticle =
-    createSyncActionCreator<DeleteArticlePayload>("DELETE_ARTICLE")
-
-export const deleteArticleById =
-    ({id}: {id: string}): SyncThunkAction<DeleteArticlePayload> => (dispatch, getState) =>
-        dispatch(deleteArticle({item: getState().articlesById[id]}))
+type DeleteLocalArticlePayload = {item: ShortArticleModel}
+export const deleteLocalArticle =
+    createSyncActionCreator<DeleteLocalArticlePayload>("DELETE_LOCAL_ARTICLE")
 
 type ReceiveArticleDeleteErrorPayload = {}
 export const recieveArticleDeleteError =
@@ -149,6 +145,18 @@ export const createInfoToast =
 type CloseToastPayload = {id: string}
 export const closeToast =
     createSyncActionCreator<CloseToastPayload>("CLOSE_TOAST")
+
+
+type MaybeDeleteArticlePayload = DeleteLocalArticlePayload | CreateInfoToastPayload
+export const maybeDeleteArticleById =
+    ({id}: {id: string}): SyncThunkAction<MaybeDeleteArticlePayload> => (dispatch, getState) =>
+        (!getState().auth.token) ? (
+            dispatch(createInfoToast({
+                text: "You must be signed in to delete articles.",
+            }))
+        ) : (
+            dispatch(deleteLocalArticle({item: getState().articlesById[id]}))
+        )
 
 
 export const AlreadyLoadingError = createErrorClass<void>(
@@ -224,27 +232,37 @@ export function maybeDoInitialLoad(publicationId: string = ""): AsyncAction<void
     }
 }
 
-export function submitArticleDraft(publicationId: string, articleId: string): AsyncAction<void> {
+export function submitArticleDraft(publicationId: string, articleId: string): AsyncAction<boolean> {
     return async (dispatch, getState, {api}) => {
-        const draft = getState().articleDraftsById[articleId || ""]
-        dispatch(startSubmittingArticleDraft({}))
+        const {auth, articleDraftsById} = getState()
+        const draft = articleDraftsById[articleId || ""]
+        const isNew = !articleId
 
-        try {
-            const isNew = !articleId
-            dispatch(receiveArticleSubmitSuccess({
-                isNew,
-                item: (isNew) ? (
-                    await api.articles.create(publicationId, draft)
-                ) : (
-                    await api.articles.edit(publicationId, articleId, draft)
-                ),
-            }))
-        } catch (err) {
-            if (FetchError.isTypeOf(err)) {
-                dispatch(receiveArticleSubmitError({}))
-                throw err
-            } else {
-                throw err
+        if (!auth.token) {
+            const text = `You must be signed in to ${isNew ? "create" : "edit"} articles.`
+            dispatch(createInfoToast({text}))
+
+            return false
+        } else {
+            dispatch(startSubmittingArticleDraft({}))
+
+            try {
+                dispatch(receiveArticleSubmitSuccess({
+                    isNew,
+                    item: (isNew) ? (
+                        await api.articles.create(publicationId, draft, auth.token)
+                    ) : (
+                        await api.articles.edit(publicationId, articleId, draft, auth.token)
+                    ),
+                }))
+
+                return true
+            } catch (err) {
+                if (FetchError.isTypeOf(err)) {
+                    dispatch(receiveArticleSubmitError({}))
+                }
+
+                return false
             }
         }
     }
@@ -252,8 +270,10 @@ export function submitArticleDraft(publicationId: string, articleId: string): As
 
 export function deleteRemoteArticle(item: ShortArticleModel): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
+        const {auth} = getState()
+
         try {
-            await api.articles.remove(item.publication, item.id)
+            await api.articles.remove(item.publication, item.id, auth.token)
         } catch (err) {
             if (FetchError.isTypeOf(err)) {
                 dispatch(recieveArticleDeleteError({}))

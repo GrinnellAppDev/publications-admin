@@ -95,8 +95,12 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         },
 
         onSubmit: async () => {
-            await dispatch(submitArticleDraft(params.publicationId, params.articleId || ""))
-            dispatch(goBack())
+            const {publicationId, articleId} = params
+            const success = await dispatch(submitArticleDraft(publicationId, articleId || ""))
+
+            if (success) {
+                dispatch(goBack())
+            }
         },
 
         onDiscard: () => {
