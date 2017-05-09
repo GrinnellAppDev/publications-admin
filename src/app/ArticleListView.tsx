@@ -53,7 +53,7 @@ export default function ArticleListView({articles, publications, currentPublicat
         <div>
             <nav>
                 <ul>
-                    {publications.map(publication =>
+                    {publications.map((publication) =>
                         <li key={publication.id}>
                             <Link
                                 to={`/publications/${publication.id}/articles`}
@@ -95,7 +95,7 @@ export default function ArticleListView({articles, publications, currentPublicat
                     className={b("articles")}
                 >
                     <FlipMove enterAnimation="fade" leaveAnimation="fade">
-                        {articles.map(article =>
+                        {articles.map((article) =>
                             <div key={article.id}>
                                 <ArticleView
                                     model={article}

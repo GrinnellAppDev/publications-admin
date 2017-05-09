@@ -52,7 +52,7 @@ export function publicationsById(state: IdMapModel<PublicationModel> = {},
     if (actions.receivePublications.isTypeOf(action)) {
         const {page} = action.payload
         const newState = {...state} as Mutable<IdMapModel<PublicationModel>>
-        page.items.forEach(publication => {
+        page.items.forEach((publication) => {
             newState[publication.id] = publication
         })
 
@@ -67,7 +67,7 @@ export function articlesById(state: IdMapModel<ShortArticleModel> = {},
     if (actions.receiveArticles.isTypeOf(action)) {
         const {page} = action.payload
         const newState = {...state} as Mutable<IdMapModel<ShortArticleModel>>
-        page.items.forEach(article => {
+        page.items.forEach((article) => {
             newState[article.id] = (article.id in state) ? (
                 {...state[article.id], ...article}
             ) : (
@@ -95,7 +95,7 @@ export function articlesById(state: IdMapModel<ShortArticleModel> = {},
     if (actions.clearArticles.isTypeOf(action)) {
         const {publicationId} = action.payload
         const newState = {} as Mutable<IdMapModel<ShortArticleModel>>
-        Object.keys(state).forEach(articleId => {
+        Object.keys(state).forEach((articleId) => {
             if (state[articleId].publication !== publicationId) {
                 newState[articleId] = state[articleId]
             }
@@ -204,7 +204,7 @@ export function loadingPublications(state: ReadonlyArray<string> = [],
 
     if (actions.receiveArticles.isTypeOf(action)) {
         const {publicationId} = action.payload
-        return state.filter(id => id !== publicationId)
+        return state.filter((id) => id !== publicationId)
     }
 
     return state
@@ -219,7 +219,7 @@ export function loadingArticles(state: ReadonlyArray<string> = [],
 
     if (actions.recieveFullArticle.isTypeOf(action)) {
         const {item} = action.payload
-        return state.filter(id => id !== item.id)
+        return state.filter((id) => id !== item.id)
     }
 
     return state
@@ -241,7 +241,7 @@ export function toasts(state: ReadonlyArray<ToastModel> = [],
                        action: Action): ReadonlyArray<ToastModel> {
     if (actions.closeToast.isTypeOf(action)) {
         const {id} = action.payload
-        return state.filter(toast => toast.id !== id)
+        return state.filter((toast) => toast.id !== id)
     }
 
     if (actions.createInfoToast.isTypeOf(action)) {

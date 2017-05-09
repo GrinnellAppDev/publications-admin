@@ -165,7 +165,7 @@ export const maybeDeleteArticleById =
 
 export const AlreadyLoadingError = createErrorClass<void>(
     "ALREADY_LOADING_ERROR",
-    message => `Cannot load. ${message}`,
+    (message) => `Cannot load. ${message}`,
 )
 
 export function loadAllPublications(): AsyncAction<void> {
@@ -204,7 +204,7 @@ export function loadNextArticles(publicationId: string): AsyncAction<void> {
 }
 
 export function reloadArticles(publicationId: string): AsyncAction<void> {
-    return async dispatch => {
+    return async (dispatch) => {
         dispatch(clearArticles({publicationId}))
         await dispatch(loadNextArticles(publicationId))
     }

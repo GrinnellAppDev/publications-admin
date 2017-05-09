@@ -69,7 +69,7 @@ export default connect<StateProps, DispatchProps, OwnProps>(
             }
         },
 
-        onArticleDelete: id => {
+        onArticleDelete: (id) => {
             dispatch(maybeDeleteArticleById({id}))
         },
     }),

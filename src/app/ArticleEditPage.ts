@@ -47,7 +47,7 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         onAuthorAdd: () => {
             dispatch(updateArticleDraft({
                 id: params.articleId || "",
-                update: draft => ({
+                update: (draft) => ({
                     authors: [...draft.authors, {name: "", email: ""}],
                 })
             }))
@@ -56,7 +56,7 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         onAuthorChange: (newAuthorIndex, newAuthor) => {
             dispatch(updateArticleDraft({
                 id: params.articleId || "",
-                update: draft => ({
+                update: (draft) => ({
                     authors: draft.authors.map((author, index) =>
                         (index === newAuthorIndex) ? newAuthor : author
                     ),
@@ -64,33 +64,33 @@ export default connect<StateProps, DispatchProps, OwnProps>(
             }))
         },
 
-        onAuthorRemove: removeIndex => {
+        onAuthorRemove: (removeIndex) => {
             dispatch(updateArticleDraft({
                 id: params.articleId || "",
-                update: draft => ({
+                update: (draft) => ({
                     authors: draft.authors.filter((author, index) => index !== removeIndex),
                 })
             }))
         },
 
-        onContentChange: ev => {
+        onContentChange: (ev) => {
             dispatch(updateArticleDraft({
                 id: params.articleId || "",
-                update: draft => ({content: ev.target.value})
+                update: (draft) => ({content: ev.target.value})
             }))
         },
 
-        onHeaderImageChange: ev => {
+        onHeaderImageChange: (ev) => {
             dispatch(updateArticleDraft({
                 id: params.articleId || "",
-                update: draft => ({headerImage: ev.target.value})
+                update: (draft) => ({headerImage: ev.target.value})
             }))
         },
 
-        onTitleChange: ev => {
+        onTitleChange: (ev) => {
             dispatch(updateArticleDraft({
                 id: params.articleId || "",
-                update: draft => ({title: ev.target.value})
+                update: (draft) => ({title: ev.target.value})
             }))
         },
 

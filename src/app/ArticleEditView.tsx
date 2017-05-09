@@ -56,7 +56,7 @@ export default function ArticleEditView({articleId, publicationId, model, isLoad
     ) : (
         <form
             className={b()}
-            onSubmit={ev => {
+            onSubmit={(ev) => {
                 ev.preventDefault()
                 actions.onSubmit()
             }}
@@ -66,7 +66,7 @@ export default function ArticleEditView({articleId, publicationId, model, isLoad
             </Link>
 
             <button
-                onClick={ev => {
+                onClick={(ev) => {
                     ev.preventDefault()
                     actions.onDiscard()
                 }}
@@ -114,7 +114,7 @@ export default function ArticleEditView({articleId, publicationId, model, isLoad
             </div>
 
             <button
-                onClick={ev => {
+                onClick={(ev) => {
                     ev.preventDefault()
                     actions.onAuthorAdd()
                 }}

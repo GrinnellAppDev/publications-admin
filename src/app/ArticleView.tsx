@@ -39,8 +39,8 @@ export default function ArticleView({model, onDelete}: Props): JSX.Element {
     const b = block("ArticleView")
 
     const authors = model.authors
-        .map(author => author.name)
-        .filter(author => author && author.length !== 0)
+        .map((author) => author.name)
+        .filter((author) => author && author.length !== 0)
 
     return (
         <article className={b()}>

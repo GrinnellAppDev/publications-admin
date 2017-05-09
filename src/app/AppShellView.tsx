@@ -81,7 +81,7 @@ export default function AppShellView({isSignedIn, username, children, toasts}: P
                     leaveAnimation={toastLeaveAnimation}
                     typeName="ul"
                 >
-                    {toasts.map(toast =>
+                    {toasts.map((toast) =>
                         <li className={b("toast-wrapper")} key={toast.id}>
                             <Toast model={toast}/>
                         </li>

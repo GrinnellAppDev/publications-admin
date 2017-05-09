@@ -46,7 +46,7 @@ export default function AuthorInputView({model, index, onChange, onRemove, conta
                 name="authorName"
                 type="text"
                 value={model.name}
-                onChange={ev => onChange(index, {...model, name: ev.target.value})}
+                onChange={(ev) => onChange(index, {...model, name: ev.target.value})}
                 placeholder="Author Name"
                 autoComplete="off"
                 autoCapitalize="word"
@@ -57,13 +57,13 @@ export default function AuthorInputView({model, index, onChange, onRemove, conta
                 name="authorEmail"
                 type="email"
                 value={model.email}
-                onChange={ev => onChange(index, {...model, email: ev.target.value})}
+                onChange={(ev) => onChange(index, {...model, email: ev.target.value})}
                 placeholder="Author Email"
                 autoComplete="off"
             />
 
             <button
-                onClick={ev => {
+                onClick={(ev) => {
                     ev.preventDefault()
                     onRemove(index)
                 }}

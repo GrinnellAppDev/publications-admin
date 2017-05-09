@@ -44,7 +44,7 @@ interface ComponentState {
 
 export default connect<{}, DispatchProps, OwnProps>(
     undefined,
-    dispatch => ({dispatch}),
+    (dispatch) => ({dispatch}),
 )(
     class Toast extends React.PureComponent<Props, ComponentState> {
         private dispatch(action: ToastActionModel): void {
@@ -75,7 +75,7 @@ export default connect<{}, DispatchProps, OwnProps>(
                 <div className={b()}>
                     <span className={b("text")}>{model.text}</span>
 
-                    {model.buttons.map(button =>
+                    {model.buttons.map((button) =>
                         <button
                             key={button.text + button.action}
                             className={b("button")}

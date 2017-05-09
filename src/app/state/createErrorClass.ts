@@ -33,7 +33,7 @@ interface CustomErrorClass<T> {
 }
 
 export default function createErrorClass<T>(type: string, messageFunction: MessageFunction<T> =
-                                            message => message): CustomErrorClass<T> {
+                                            (message) => message): CustomErrorClass<T> {
     return class extends Error {
         static isTypeOf(err: CustomError<any>): err is CustomError<T> {
             return err.type === type

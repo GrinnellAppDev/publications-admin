@@ -87,7 +87,7 @@ function responseToShortArticleModel(response: any): ShortArticleModel {
 }
 
 function arrayToRequest<T>(elementConversion: (element: T) => any, array: T[]): any {
-    return array.map(elementConversion).filter(element => element !== undefined)
+    return array.map(elementConversion).filter((element) => element !== undefined)
 }
 
 function authorModelToRequest(model: AuthorModel): any {

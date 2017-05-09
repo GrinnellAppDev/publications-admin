@@ -30,7 +30,7 @@ export default connect<StateProps, DispatchProps, {}>(
         username: auth.username,
         toasts,
     }),
-    dispatch => ({}),
+    (dispatch) => ({}),
 )(
     AppShellView
 )

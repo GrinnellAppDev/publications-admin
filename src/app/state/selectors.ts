@@ -29,22 +29,22 @@ const getArticlesPageTokensByParentId = (state: StateModel) => state.articlesPag
 
 export const getPublications = createSelector(
     getPublicationsById,
-    publicationsById => Object.keys(publicationsById)
-        .map(id => publicationsById[id])
+    (publicationsById) => Object.keys(publicationsById)
+        .map((id) => publicationsById[id])
         .sort((a, b) => a.name.localeCompare(b.name))
 )
 
 export const getArticles = createSelector(
     getArticlesById, getSelectedPublicationId,
     (articlesById, selectedPublicationId) => Object.keys(articlesById)
-        .map(id => articlesById[id])
+        .map((id) => articlesById[id])
         .filter(({publication}) => publication === selectedPublicationId)
         .sort((a, b) => b.datePublished.valueOf() - a.datePublished.valueOf())
 )
 
 export const getDefaultPublicationId = createSelector(
     getPublications,
-    publications => publications[0] ? publications[0].id : ""
+    (publications) => publications[0] ? publications[0].id : ""
 )
 
 export const getArticlesPageTokenForSelectedPublication = createSelector(
