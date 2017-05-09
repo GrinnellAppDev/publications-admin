@@ -25,7 +25,6 @@
         "trailing-comma": [true],
         "no-trailing-whitespace": true,
         "no-unused-expression": true,
-        "no-use-before-declare": true,
         "no-var-requires": true,
         "one-line": [
             true,
@@ -72,6 +71,7 @@
             "check-type"
         ],
         "jsx-no-multiline-js": false,
-        "jsx-no-lambda": false
+        "jsx-no-lambda": false,
+        "jsx-wrap-multiline": false
     }
 }
