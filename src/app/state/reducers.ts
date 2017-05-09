@@ -212,9 +212,9 @@ export function loadingPublications(state: ReadonlyArray<string> = [],
 
 export function loadingArticles(state: ReadonlyArray<string> = [],
                                 action: Action): ReadonlyArray<string> {
-    if (actions.startLoadingFullArticle.isTypeOf(action)) {
-        const {id} = action.payload
-        return [...state, id]
+    if (actions.loadFullArticle.isTypeOf(action)) {
+        const {articleId} = action.payload
+        return [...state, articleId]
     }
 
     if (actions.recieveFullArticle.isTypeOf(action)) {

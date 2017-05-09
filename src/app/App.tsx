@@ -25,10 +25,12 @@ import {createStore, combineReducers, applyMiddleware} from "redux"
 import {syncHistoryWithStore, routerMiddleware} from "react-router-redux"
 import thunk from "redux-thunk"
 import {composeWithDevTools} from "redux-devtools-extension/developmentOnly"
+import createSagaMiddleware from "redux-saga"
 
 import {StateModel} from "./state/models"
 import * as reducers from "./state/reducers"
 import * as actions from "./state/actions"
+import saga from "./state/saga"
 import api from "./state/api"
 
 import AppShell from "./AppShell"
@@ -38,6 +40,7 @@ import IndexPage from "./IndexPage"
 import NotFoundView from "./NotFoundView"
 
 const thunkContext: actions.ThunkContext = {api}
+const sagaMiddleware = createSagaMiddleware()
 
 const store = createStore<StateModel>(
     combineReducers(reducers),
@@ -45,9 +48,12 @@ const store = createStore<StateModel>(
         applyMiddleware(
             routerMiddleware(hashHistory),
             thunk.withExtraArgument(thunkContext),
+            sagaMiddleware,
         ),
     ),
 )
+
+sagaMiddleware.run(saga)
 
 async function onPublicationChange({params: oldParams}: RouterState,
                                    {params}: RouterState): Promise<void> {
@@ -73,9 +79,7 @@ async function onArticleChange({params: oldParams}: RouterState,
     if (oldParams.publicationId !== publicationId ||
         oldParams.articleId !== articleId) {
 
-        const item = store.getState().articleDraftsById[articleId] ||
-                     await store.dispatch(actions.loadFullArticle(publicationId, articleId))
-        await store.dispatch(actions.createArticleDraft({id: articleId, item}))
+        store.dispatch(actions.loadArticleDraft({publicationId, articleId}))
     }
 }
 

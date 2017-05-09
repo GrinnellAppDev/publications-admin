@@ -52,6 +52,7 @@ export type AnyAction = SyncAction<any> | AsyncAction<any>
 interface SyncActionCreator<T> {
     (payload: T): SyncAction<T>
     isTypeOf(action: SyncAction<any>): action is SyncAction<T>
+    type: string
 }
 
 function createSyncActionCreator<T>(type: string): SyncActionCreator<T> {
@@ -59,6 +60,7 @@ function createSyncActionCreator<T>(type: string): SyncActionCreator<T> {
         (payload: T): SyncAction<T> => ({type, payload}),
         {
             isTypeOf: (action: SyncAction<any>): action is SyncAction<T> => action.type === type,
+            type,
         },
     )
 }
@@ -91,9 +93,10 @@ type ReceiveArticlesPayload = {publicationId: string, page: PaginatedArray<Short
 export const receiveArticles =
     createSyncActionCreator<ReceiveArticlesPayload>("RECIEVE_ARTICLES")
 
-type StartLoadingFullArticlePayload = {id: string}
-export const startLoadingFullArticle =
-    createSyncActionCreator<StartLoadingFullArticlePayload>("START_LOADING_FULL_ARTICLE")
+type LoadFullArticlePayload = {publicationId: string, articleId: string}
+export type LoadFullArticle = SyncAction<LoadFullArticlePayload>
+export const loadFullArticle =
+    createSyncActionCreator<LoadFullArticlePayload>("LOAD_FULL_ARTICLE")
 
 type ReceiveFullArticlePayload = {item: FullArticleModel}
 export const recieveFullArticle =
@@ -114,6 +117,11 @@ export const recieveArticleDeleteError =
 type UndeleteArticlePayload = {item: ShortArticleModel}
 export const undeleteArticle =
     createSyncActionCreator<UndeleteArticlePayload>("UNDELETE_ARTICLE")
+
+type LoadArticleDraftPayload = {publicationId: string, articleId: string}
+export type LoadArticleDraft = SyncAction<LoadArticleDraftPayload>
+export const loadArticleDraft =
+    createSyncActionCreator<LoadArticleDraftPayload>("LOAD_ARTICLE_DRAFT")
 
 type CreateArticleDraftPayload = {id: string, item: ArticleEditModel}
 export const createArticleDraft =
@@ -207,17 +215,6 @@ export function reloadArticles(publicationId: string): AsyncAction<void> {
     return async (dispatch) => {
         dispatch(clearArticles({publicationId}))
         await dispatch(loadNextArticles(publicationId))
-    }
-}
-
-export function loadFullArticle(publicationId: string,
-                                articleId: string): AsyncAction<FullArticleModel> {
-    return async (dispatch, getState, {api}) => {
-        dispatch(startLoadingFullArticle({id: articleId}))
-
-        const item = await api.articles.get(publicationId, articleId)
-        dispatch(recieveFullArticle({item}))
-        return item
     }
 }
 
