@@ -23,14 +23,32 @@ import {all, call, fork, spawn, cancel, cancelled, take, select, put,
         Effect} from "redux-saga/effects"
 import {hashHistory} from "react-router"
 import {v4 as uuid} from "uuid"
+import * as cognito from "amazon-cognito-identity-js"
 
 import {StateModel, ShortArticleModel, FullArticleModel, PublicationModel,
         ToastModel} from "./models"
 import {getDefaultPublicationId} from "./selectors"
 import * as actions from "./actions"
 import api, {FetchError, PaginatedArray} from "./api"
+import createErrorClass from "./createErrorClass"
+
+interface CognitoCallbacks {
+    onSuccess(session: cognito.CognitoUserSession): void
+    onFailure(err: Error): void
+    newPasswordRequired?(): void
+}
 
 const DEFAULT_TOAST_DURATION = 4000
+
+const NewPasswordRequiredError = createErrorClass("NEW_PASSWORD_REQUIRED_ERROR")
+const AuthError = createErrorClass<{err: Error}>(
+    "AUTH_ERROR",
+    (message, {err}) => (message ? message + " " : "") + err.message
+)
+
+function importCognito(): Promise<typeof cognito> {
+    return System.import(/* webpackChunkName: "aws-cognito" */ "amazon-cognito-identity-js")
+}
 
 function* createToast(item: ToastModel): Iterator<Effect> {
     try {
@@ -95,7 +113,41 @@ function* loadFullArticle(publicationId: string, articleId: string): Iterator<Ef
     }
 }
 
-function* initialLoad(): Iterator<Effect> {
+function* putAuthData(user: cognito.CognitoUser,
+                      authenticate: (callbacks: CognitoCallbacks) => void): Iterable<Effect> {
+    try {
+        const session: cognito.CognitoUserSession = yield call(
+            () => new Promise((resolve, reject) => {
+                authenticate({
+                    onSuccess: resolve,
+                    onFailure: (err: Error) => reject(new AuthError(
+                        "There was a problem signing in.",
+                        {err}
+                    )),
+                    newPasswordRequired: () => reject(new NewPasswordRequiredError()),
+                })
+            })
+        )
+
+        yield put(actions.saveAuthInfo({
+            username: user.getUsername(),
+            token: session.getAccessToken().getJwtToken(),
+        }))
+    } catch (err) {
+        if (NewPasswordRequiredError.isTypeOf(err)) {
+            const newPassword = prompt(
+                "Enter new password (must be over 16 characters long and contain both " +
+                "uppercase and lowercase letters)"
+            )
+
+            yield call(putAuthData, user, (callbacks: CognitoCallbacks) => {
+                user.completeNewPasswordChallenge(newPassword, {}, callbacks)
+            })
+        }
+    }
+}
+
+function* handleInitialLoad(): Iterator<Effect> {
     const selectAction: actions.SelectPublication = yield take(actions.selectPublication.type)
     const {publicationId} = selectAction.payload
 
@@ -125,6 +177,45 @@ function* initialLoad(): Iterator<Effect> {
     if (!publicationId) {
         const defaultPublicationId: string = yield select(getDefaultPublicationId)
         hashHistory.replace(`/publications/${defaultPublicationId}/articles`)
+    }
+}
+
+function* handleAuth(): Iterator<Effect | Promise<any>> {
+    while (true) {
+        const signInAction: actions.SignIn = yield take(actions.signIn.type)
+        const {username, password} = signInAction.payload
+
+        const {AuthenticationDetails, CognitoUserPool, CognitoUser}: typeof cognito =
+            yield call(importCognito)
+
+        const authDetails = new AuthenticationDetails({
+            Username: username,
+            Password: password,
+        })
+
+        const userPool = new CognitoUserPool({
+            UserPoolId: process.env.COGNITO_USER_POOL_ID,
+            ClientId: process.env.COGNITO_CLIENT_ID,
+        })
+
+        const user = new CognitoUser({
+            Username: username,
+            Pool: userPool,
+        })
+
+        try {
+            yield call(putAuthData, user, (callbacks: CognitoCallbacks) => {
+                user.authenticateUser(authDetails, callbacks)
+            })
+        } catch (err) {
+            if (AuthError.isTypeOf(err)) {
+                yield call(createInfoToast, err.message)
+                yield put(actions.receiveAuthError({}))
+                continue
+            }
+        }
+
+        yield take(actions.signOut.type)
     }
 }
 
@@ -308,7 +399,8 @@ function* handleDeleteArticle(): Iterator<Effect> {
 
 export default function* rootSaga(): Iterator<Effect> {
     yield all([
-        call(initialLoad),
+        call(handleInitialLoad),
+        call(handleAuth),
         call(handleRefreshArticles),
         call(handleLoadNextArticles),
         call(handleLoadArticleDrafts),

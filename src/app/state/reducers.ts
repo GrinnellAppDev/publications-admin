@@ -36,7 +36,9 @@ export function auth(state: AuthenticationModel = emptyAuthModel,
         return action.payload
     }
 
-    if (actions.receiveAuthError.isTypeOf(action)) {
+    if (actions.signOut.isTypeOf(action) ||
+        actions.receiveAuthError.isTypeOf(action)) {
+
         return emptyAuthModel
     }
 

@@ -45,6 +45,14 @@ function actionCreator<T>(type: string): ActionCreator<T> {
     )
 }
 
+type SignInPayload = {username: string, password: string}
+export type SignIn = Action<SignInPayload>
+export const signIn = actionCreator<SignInPayload>("SIGN_IN")
+
+type SignOutPayload = {}
+export type SignOut = Action<SignOutPayload>
+export const signOut = actionCreator<SignOutPayload>("SIGN_OUT")
+
 type SaveAuthInfoPayload = {username: string, token: string}
 export const saveAuthInfo = actionCreator<SaveAuthInfoPayload>("SAVE_AUTH_INFO")
 

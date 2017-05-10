@@ -23,7 +23,6 @@ import FlipMove from "react-flip-move"
 
 import {ToastModel} from "./state/models"
 import ToastView from "./ToastView"
-import SignIn from "./SignIn"
 import block from "./style/bem"
 
 import "./AppShellView.scss"
@@ -36,6 +35,8 @@ export interface StateProps {
 
 export interface DispatchProps {
     onToastButtonClick: (toastId: string, buttonId: string) => void
+    onSignIn: (username: string, password: string) => void
+    onSignOut: () => void
 }
 
 type Props = StateProps & DispatchProps & React.Props<void>
@@ -68,9 +69,28 @@ export default function AppShellView(props: Props): JSX.Element {
     return (
         <div className={b()}>
             {(props.isSignedIn) ? (
-                <div>Signed in as {props.username}</div>
+                <div>
+                    <span>{props.username} </span>
+                    <button onClick={props.onSignOut}>Sign Out</button>
+                </div>
             ) : (
-                <SignIn/>
+                <form
+                    onSubmit={(ev) => {
+                        ev.preventDefault()
+
+                        const form = ev.currentTarget
+                        const usernameInput = form.querySelector("[name=username]") as
+                            HTMLInputElement
+                        const passwordInput = form.querySelector("[name=password]") as
+                            HTMLInputElement
+
+                        props.onSignIn(usernameInput.value, passwordInput.value)
+                    }}
+                >
+                    <input type="text" name="username" placeholder="Username"/>
+                    <input type="password" name="password" placeholder="Password"/>
+                    <input type="submit" value="Sign In"/>
+                </form>
             )}
 
             {props.children}

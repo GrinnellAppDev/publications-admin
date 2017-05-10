@@ -1,5 +1,5 @@
 /**
- * lazy-imports.d.ts
+ * system-import.d.ts
  *
  * Created by Zander Otavka on 5/9/17.
  * Copyright (C) 2016  Grinnell AppDev.
@@ -18,12 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as cognito from "amazon-cognito-identity-js"
-
-declare global {
-    interface System {
-        import(moduleName: "amazon-cognito-identity-js"): Promise<typeof cognito>
-    }
-
-    const System: System
+declare const System: {
+    import(moduleName: any): Promise<any>
 }
