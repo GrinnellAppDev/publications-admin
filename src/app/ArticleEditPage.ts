@@ -18,9 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {RouteComponentProps} from "react-router"
+import {RouteComponentProps, hashHistory} from "react-router"
 import {connect} from "react-redux"
-import {goBack} from "react-router-redux"
 
 import {StateModel} from "./state/models"
 import {updateArticleDraft, submitArticleDraft, discardArticleDraft} from "./state/actions"
@@ -99,13 +98,13 @@ export default connect<StateProps, DispatchProps, OwnProps>(
             const success = await dispatch(submitArticleDraft(publicationId, articleId || ""))
 
             if (success) {
-                dispatch(goBack())
+                hashHistory.goBack()
             }
         },
 
         onDiscard: () => {
             dispatch(discardArticleDraft({id: params.articleId}))
-            dispatch(goBack())
+            hashHistory.goBack()
         },
     })
 )(

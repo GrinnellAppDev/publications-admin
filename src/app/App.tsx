@@ -22,7 +22,6 @@ import * as React from "react"
 import {Router, Route, IndexRoute, hashHistory, RouterState} from "react-router"
 import {Provider} from "react-redux"
 import {createStore, combineReducers, applyMiddleware} from "redux"
-import {syncHistoryWithStore, routerMiddleware} from "react-router-redux"
 import thunk from "redux-thunk"
 import {composeWithDevTools} from "redux-devtools-extension/developmentOnly"
 import createSagaMiddleware from "redux-saga"
@@ -46,7 +45,6 @@ const store = createStore<StateModel>(
     combineReducers(reducers),
     composeWithDevTools<StateModel>(
         applyMiddleware(
-            routerMiddleware(hashHistory),
             thunk.withExtraArgument(thunkContext),
             sagaMiddleware,
         ),
@@ -90,7 +88,7 @@ async function onArticleEnter(routerState: RouterState): Promise<void> {
 export default function App(): JSX.Element {
     return (
         <Provider store={store}>
-            <Router history={syncHistoryWithStore(hashHistory, store)}>
+            <Router history={hashHistory}>
                 <Route path="/" component={AppShell}>
                     <IndexRoute
                         component={IndexPage}

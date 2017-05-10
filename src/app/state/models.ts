@@ -18,8 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {RouterState} from "react-router-redux"
-
 export interface AuthenticationModel {
     readonly username: string
     readonly token: string
@@ -103,6 +101,4 @@ export interface StateModel {
     readonly loadingArticles: ReadonlyArray<string>
 
     readonly toasts: ReadonlyArray<ToastModel>
-
-    readonly routing: RouterState
 }
