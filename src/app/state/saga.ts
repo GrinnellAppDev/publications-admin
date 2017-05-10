@@ -32,12 +32,6 @@ import api, {FetchError, PaginatedArray} from "./api"
 
 const DEFAULT_TOAST_DURATION = 4000
 
-function* loadFullArticle(publicationId: string, articleId: string): Iterator<Effect> {
-    const item: FullArticleModel = yield call(api.articles.get, publicationId, articleId)
-    yield put(actions.recieveFullArticle({item}))
-    return item
-}
-
 function* createToast(item: ToastModel): Iterator<Effect> {
     try {
         yield put(actions.createToast({item}))
@@ -87,17 +81,45 @@ function* createInfoToast(text: string, duration?: number): Iterator<Effect> {
     return yield call(createTimedToast, item, duration)
 }
 
+function* loadFullArticle(publicationId: string, articleId: string): Iterator<Effect> {
+    try {
+        const item: FullArticleModel = yield call(api.articles.get, publicationId, articleId)
+        yield put(actions.recieveFullArticle({item}))
+        return item
+    } catch (err) {
+        if (FetchError.isTypeOf(err)) {
+            yield spawn(createInfoToast, "There was a problem loading the article.")
+        }
+
+        throw err
+    }
+}
+
 function* initialLoad(): Iterator<Effect> {
     const selectAction: actions.SelectPublication = yield take(actions.selectPublication.type)
     const {publicationId} = selectAction.payload
 
-    let pageToken: string | null = null
-    while (pageToken !== PaginatedArray.LAST_PAGE_TOKEN) {
-        yield put(actions.startLoadingPublications({}))
-        const page: PaginatedArray<PublicationModel> = yield call(api.publications.list, pageToken)
-        yield put(actions.receivePublications({page}))
+    try {
+        let pageToken: string | null = null
+        while (pageToken !== PaginatedArray.LAST_PAGE_TOKEN) {
+            yield put(actions.startLoadingPublications({}))
+            const page: PaginatedArray<PublicationModel> =
+                yield call(api.publications.list, pageToken)
+            yield put(actions.receivePublications({page}))
 
-        pageToken = page.nextPageToken
+            pageToken = page.nextPageToken
+        }
+    } catch (err) {
+        if (FetchError.isTypeOf(err)) {
+            yield spawn(createToast, {
+                id: uuid(),
+                text: "Could not load publications.  Check you internet connection and refresh " +
+                      "the page.",
+                buttons: [],
+            })
+        }
+
+        throw err
     }
 
     if (!publicationId) {
@@ -110,11 +132,19 @@ function* handleRefreshArticles(): Iterator<Effect> {
     while (true) {
         const refreshAction: actions.RefreshArticles = yield take(actions.refreshArticles.type)
         const {publicationId} = refreshAction.payload
-        const page: PaginatedArray<ShortArticleModel> =
-            yield call(api.articles.list, publicationId, null)
+        try {
+            const page: PaginatedArray<ShortArticleModel> =
+                yield call(api.articles.list, publicationId, null)
 
-        yield put(actions.clearArticles({publicationId}))
-        yield put(actions.receiveArticles({publicationId, page}))
+            yield put(actions.clearArticles({publicationId}))
+            yield put(actions.receiveArticles({publicationId, page}))
+        } catch (err) {
+            if (FetchError.isTypeOf(err)) {
+                yield spawn(createInfoToast, "There was a problem refreshing articles.")
+            } else {
+                throw err
+            }
+        }
     }
 }
 
@@ -125,10 +155,18 @@ function* handleLoadNextArticles(): Iterator<Effect> {
         const {articlesPageTokensByParentId}: StateModel = yield select()
         const pageToken = articlesPageTokensByParentId[publicationId]
 
-        const page: PaginatedArray<ShortArticleModel> =
-            yield call(api.articles.list, publicationId, pageToken)
+        try {
+            const page: PaginatedArray<ShortArticleModel> =
+                yield call(api.articles.list, publicationId, pageToken)
 
-        yield put(actions.receiveArticles({publicationId, page}))
+            yield put(actions.receiveArticles({publicationId, page}))
+        } catch (err) {
+            if (FetchError.isTypeOf(err)) {
+                yield spawn(createInfoToast, "There was a problem loading articles.")
+            } else {
+                throw err
+            }
+        }
     }
 }
 
@@ -140,13 +178,22 @@ function* handleLoadArticleDrafts(): Iterator<Effect> {
 
             const {articleDraftsById}: StateModel = yield select()
             const savedDraft = articleDraftsById[articleId]
-            const item: FullArticleModel = (savedDraft) ? (
-                savedDraft
-            ) : (
-                yield call(loadFullArticle, publicationId, articleId)
-            )
 
-            yield put(actions.createArticleDraft({id: articleId, item}))
+            try {
+                const item: FullArticleModel = (savedDraft) ? (
+                    savedDraft
+                ) : (
+                    yield call(loadFullArticle, publicationId, articleId)
+                )
+
+                yield put(actions.createArticleDraft({id: articleId, item}))
+            } catch (err) {
+                if (FetchError.isTypeOf(err)) {
+                    hashHistory.goBack()
+                } else {
+                    throw err
+                }
+            }
         }, action)
     }
 }
