@@ -60,14 +60,14 @@ function onPublicationEnter(routerState: RouterState): void {
     onPublicationChange({...routerState, params: {}}, routerState)
 }
 
-async function onNewArticleNavTo(): Promise<void> {
+function onNewArticleNavTo(): void {
     const id = ""
     const item = store.getState().articleDraftsById[id]
-    await store.dispatch(actions.createArticleDraft({id, item}))
+    store.dispatch(actions.createArticleDraft({id, item}))
 }
 
-async function onArticleChange({params: oldParams}: RouterState,
-                               {params}: RouterState): Promise<void> {
+function onArticleChange({params: oldParams}: RouterState,
+                               {params}: RouterState): void {
     const {publicationId, articleId} = params
     if (oldParams.publicationId !== publicationId ||
         oldParams.articleId !== articleId) {
@@ -76,8 +76,8 @@ async function onArticleChange({params: oldParams}: RouterState,
     }
 }
 
-async function onArticleEnter(routerState: RouterState): Promise<void> {
-    await onArticleChange({...routerState, params: {}}, routerState)
+function onArticleEnter(routerState: RouterState): void {
+    onArticleChange({...routerState, params: {}}, routerState)
 }
 
 export default function App(): JSX.Element {
