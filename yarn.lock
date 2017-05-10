@@ -16,6 +16,12 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-flip-move@^2.9.0":
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/@types/react-flip-move/-/react-flip-move-2.9.0.tgz#3825a58a069485dd38762b042c05ff234dfb9b6f"
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-redux@^4.4.36":
   version "4.4.40"
   resolved "https://registry.yarnpkg.com/@types/react-redux/-/react-redux-4.4.40.tgz#268d1a9b9a42e52562450e2c306630fa38db36ad"
