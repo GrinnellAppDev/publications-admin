@@ -68,30 +68,32 @@ export default function AppShellView(props: Props): JSX.Element {
 
     return (
         <div className={b()}>
-            {(props.isSignedIn) ? (
-                <div>
-                    <span>{props.username} </span>
-                    <button onClick={props.onSignOut}>Sign Out</button>
-                </div>
-            ) : (
-                <form
-                    onSubmit={(ev) => {
-                        ev.preventDefault()
+            <div className={b("auth")}>
+                {(props.isSignedIn) ? (
+                    <div>
+                        <span>{props.username} </span>
+                        <button onClick={props.onSignOut}>Sign Out</button>
+                    </div>
+                ) : (
+                    <form
+                        onSubmit={(ev) => {
+                            ev.preventDefault()
 
-                        const form = ev.currentTarget
-                        const usernameInput = form.querySelector("[name=username]") as
-                            HTMLInputElement
-                        const passwordInput = form.querySelector("[name=password]") as
-                            HTMLInputElement
+                            const form = ev.currentTarget
+                            const usernameInput = form.querySelector("[name=username]") as
+                                HTMLInputElement
+                            const passwordInput = form.querySelector("[name=password]") as
+                                HTMLInputElement
 
-                        props.onSignIn(usernameInput.value, passwordInput.value)
-                    }}
-                >
-                    <input type="text" name="username" placeholder="Username"/>
-                    <input type="password" name="password" placeholder="Password"/>
-                    <input type="submit" value="Sign In"/>
-                </form>
-            )}
+                            props.onSignIn(usernameInput.value, passwordInput.value)
+                        }}
+                    >
+                        <input type="text" name="username" placeholder="Username"/>
+                        <input type="password" name="password" placeholder="Password"/>
+                        <input type="submit" value="Sign In"/>
+                    </form>
+                )}
+            </div>
 
             {props.children}
 

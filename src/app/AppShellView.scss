@@ -21,6 +21,10 @@
 .AppShellView {
     margin: 16px 20%;
 
+    &__auth {
+        margin-bottom: 8px;
+    }
+
     &__toasts {
         position: fixed;
         right: 0;
