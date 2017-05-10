@@ -21,7 +21,7 @@
 import {all, call, take, select, put, Effect} from "redux-saga/effects"
 import {hashHistory} from "react-router"
 
-import {StateModel, FullArticleModel, PublicationModel} from "./models"
+import {StateModel, ShortArticleModel, FullArticleModel, PublicationModel} from "./models"
 import {getDefaultPublicationId} from "./selectors"
 import * as actions from "./actions"
 import api, {PaginatedArray} from "./api"
@@ -32,7 +32,26 @@ function* loadFullArticle(publicationId: string, articleId: string): Iterator<Ef
     return item
 }
 
-function* loadArticleDrafts(): Iterator<Effect> {
+function* initialLoad(): Iterator<Effect> {
+    const selectAction: actions.SelectPublication = yield take(actions.selectPublication.type)
+    const {publicationId} = selectAction.payload
+
+    let pageToken: string | null = null
+    while (pageToken !== PaginatedArray.LAST_PAGE_TOKEN) {
+        yield put(actions.startLoadingPublications({}))
+        const page: PaginatedArray<PublicationModel> = yield call(api.publications.list, pageToken)
+        yield put(actions.receivePublications({page}))
+
+        pageToken = page.nextPageToken
+    }
+
+    if (!publicationId) {
+        const defaultPublicationId: string = yield select(getDefaultPublicationId)
+        hashHistory.replace(`/publications/${defaultPublicationId}/articles`)
+    }
+}
+
+function* handleLoadArticleDrafts(): Iterator<Effect> {
     while (true) {
         const loadAction: actions.LoadArticleDraft = yield take(actions.loadArticleDraft.type)
         const {publicationId, articleId} = loadAction.payload
@@ -49,30 +68,37 @@ function* loadArticleDrafts(): Iterator<Effect> {
     }
 }
 
-function* initialLoad(): Iterator<Effect> {
-    const selectAction: actions.SelectPublication = yield take(actions.selectPublication.type)
-    const {publicationId} = selectAction.payload
+function* handleRefreshArticles(): Iterator<Effect> {
+    while (true) {
+        const refreshAction: actions.RefreshArticles = yield take(actions.refreshArticles.type)
+        const {publicationId} = refreshAction.payload
+        const page: PaginatedArray<ShortArticleModel> =
+            yield call(api.articles.list, publicationId, null)
 
-    let pageToken: string
-    do {
-        yield put(actions.startLoadingPublications({}))
-        const page: PaginatedArray<PublicationModel> = yield call(api.publications.list, pageToken)
-        yield put(actions.receivePublications({page}))
+        yield put(actions.clearArticles({publicationId}))
+        yield put(actions.receiveArticles({publicationId, page}))
+    }
+}
 
-        pageToken = page.nextPageToken
-    } while (pageToken)
+function* handleLoadNextArticles(): Iterator<Effect> {
+    while (true) {
+        const loadAction: actions.LoadNextArticles = yield take(actions.loadNextArticles.type)
+        const {publicationId} = loadAction.payload
+        const {articlesPageTokensByParentId}: StateModel = yield select()
+        const pageToken = articlesPageTokensByParentId[publicationId]
 
-    if (publicationId) {
-        // reload articles
-    } else {
-        const defaultPublicationId: string = yield select(getDefaultPublicationId)
-        hashHistory.replace(`/publications/${defaultPublicationId}/articles`)
+        const page: PaginatedArray<ShortArticleModel> =
+            yield call(api.articles.list, publicationId, pageToken)
+
+        yield put(actions.receiveArticles({publicationId, page}))
     }
 }
 
 export default function* rootSaga(): Iterator<Effect> {
     yield all([
         call(initialLoad),
-        call(loadArticleDrafts),
+        call(handleRefreshArticles),
+        call(handleLoadNextArticles),
+        call(handleLoadArticleDrafts),
     ])
 }

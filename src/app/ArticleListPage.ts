@@ -24,8 +24,8 @@ import {connect} from "react-redux"
 import {StateModel} from "./state/models"
 import {getPublications, getArticles,
         getArticlesPageTokenForSelectedPublication} from "./state/selectors"
-import {reloadArticles, loadNextArticles, maybeDeleteArticleById,
-        AlreadyLoadingError} from "./state/actions"
+import {refreshArticles, loadNextArticles, maybeDeleteArticleById} from "./state/actions"
+import {PaginatedArray} from "./state/api"
 
 import ArticleListView, {StateProps, DispatchProps} from "./ArticleListView"
 
@@ -41,32 +41,17 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         articles: getArticles(state, params),
         publications: getPublications(state),
         currentPublication: state.publicationsById[params.publicationId],
-        articlesHaveNextPage: getArticlesPageTokenForSelectedPublication(state, params) !== "",
+        articlesHaveNextPage: getArticlesPageTokenForSelectedPublication(state, params) !==
+            PaginatedArray.LAST_PAGE_TOKEN,
     }),
 
     (dispatch, {params}) => ({
-        onRefresh: async () => {
-            try {
-                await dispatch(reloadArticles(params.publicationId))
-            } catch (err) {
-                if (AlreadyLoadingError.isTypeOf(err)) {
-                    console.error(err.message)
-                } else {
-                    throw err
-                }
-            }
+        onRefresh: () => {
+            dispatch(refreshArticles({publicationId: params.publicationId}))
         },
 
-        onLoadNextArticlePage: async () => {
-            try {
-                await dispatch(loadNextArticles(params.publicationId))
-            } catch (err) {
-                if (AlreadyLoadingError.isTypeOf(err)) {
-                    console.error(err.message)
-                } else {
-                    throw err
-                }
-            }
+        onLoadNextArticlePage: () => {
+            dispatch(loadNextArticles({publicationId: params.publicationId}))
         },
 
         onArticleDelete: (id) => {

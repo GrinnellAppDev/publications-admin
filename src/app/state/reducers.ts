@@ -151,7 +151,7 @@ export function articlesPageTokensByParentId(state: IdMapModel<string> = {},
         const {publicationId, page} = action.payload
         return {
             ...state,
-            [publicationId]: page.nextPageToken || ""
+            [publicationId]: page.nextPageToken,
         }
     }
 
@@ -178,7 +178,7 @@ export function isLoadingPublications(state: boolean = false, action: Action): b
 
 export function loadingPublications(state: ReadonlyArray<string> = [],
                                     action: Action): ReadonlyArray<string> {
-    if (actions.startLoadingArticles.isTypeOf(action)) {
+    if (actions.loadNextArticles.isTypeOf(action)) {
         const {publicationId} = action.payload
         return [...state, publicationId]
     }

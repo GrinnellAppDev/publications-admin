@@ -71,10 +71,6 @@ type ReceiveAuthErrorPayload = {}
 export const receiveAuthError =
     createSyncActionCreator<ReceiveAuthErrorPayload>("RECEIVE_AUTH_ERROR")
 
-type StartInitialLoadPayload = {}
-export const startInitialLoad =
-    createSyncActionCreator<StartInitialLoadPayload>("START_INITIAL_LOAD")
-
 type SelectPublicationPayload = {publicationId: string}
 export type SelectPublication = SyncAction<SelectPublicationPayload>
 export const selectPublication =
@@ -88,13 +84,23 @@ type ReceivePublicationsPayload = {page: PaginatedArray<PublicationModel>}
 export const receivePublications =
     createSyncActionCreator<ReceivePublicationsPayload>("RECIEVE_PUBLICATIONS")
 
-type StartLoadingArticlesPayload = {publicationId: string}
-export const startLoadingArticles =
-    createSyncActionCreator<StartLoadingArticlesPayload>("START_LOADING_ARTICLES")
+type LoadNextArticlesPayload = {publicationId: string}
+export type LoadNextArticles = SyncAction<LoadNextArticlesPayload>
+export const loadNextArticles =
+    createSyncActionCreator<LoadNextArticlesPayload>("LOAD_NEXT_ARTICLES")
 
 type ReceiveArticlesPayload = {publicationId: string, page: PaginatedArray<ShortArticleModel>}
 export const receiveArticles =
     createSyncActionCreator<ReceiveArticlesPayload>("RECIEVE_ARTICLES")
+
+type ClearArticlesPayload = {publicationId: string}
+export const clearArticles =
+    createSyncActionCreator<ClearArticlesPayload>("CLEAR_ARTICLES")
+
+type RefreshArticlesPayload = {publicationId: string}
+export type RefreshArticles = SyncAction<RefreshArticlesPayload>
+export const refreshArticles =
+    createSyncActionCreator<RefreshArticlesPayload>("REFRESH_ARTICLES")
 
 type LoadFullArticlePayload = {publicationId: string, articleId: string}
 export type LoadFullArticle = SyncAction<LoadFullArticlePayload>
@@ -104,10 +110,6 @@ export const loadFullArticle =
 type ReceiveFullArticlePayload = {item: FullArticleModel}
 export const recieveFullArticle =
     createSyncActionCreator<ReceiveFullArticlePayload>("RECIEVE_FULL_ARTICLE")
-
-type ClearArticlesPayload = {publicationId: string}
-export const clearArticles =
-    createSyncActionCreator<ClearArticlesPayload>("CLEAR_ARTICLES")
 
 type DeleteLocalArticlePayload = {item: ShortArticleModel}
 export const deleteLocalArticle =
@@ -178,30 +180,6 @@ export const AlreadyLoadingError = createErrorClass<void>(
     "ALREADY_LOADING_ERROR",
     (message) => `Cannot load. ${message}`,
 )
-
-export function loadNextArticles(publicationId: string): AsyncAction<void> {
-    return async (dispatch, getState, {api}) => {
-        if (getState().loadingPublications.includes(publicationId)) {
-            throw new AlreadyLoadingError("Already loading articles.")
-        }
-
-        const pageToken = getState().articlesPageTokensByParentId[publicationId]
-        if (pageToken !== "") {
-            dispatch(startLoadingArticles({publicationId}))
-            dispatch(receiveArticles({
-                publicationId,
-                page: await api.articles.list(publicationId, pageToken),
-            }))
-        }
-    }
-}
-
-export function reloadArticles(publicationId: string): AsyncAction<void> {
-    return async (dispatch) => {
-        dispatch(clearArticles({publicationId}))
-        await dispatch(loadNextArticles(publicationId))
-    }
-}
 
 export function submitArticleDraft(publicationId: string, articleId: string): AsyncAction<boolean> {
     return async (dispatch, getState, {api}) => {

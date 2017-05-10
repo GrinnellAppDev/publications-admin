@@ -31,6 +31,10 @@ export interface PaginatedArray<T> {
     readonly items: ReadonlyArray<T>
 }
 
+export namespace PaginatedArray {
+    export const LAST_PAGE_TOKEN = ""
+}
+
 export interface FetchErrorPayload {
     resp?: Response
 }
@@ -62,8 +66,8 @@ function responseToArray<T>(elementConversion: (element: any) => T, request: any
 function responseToPaginatedArray<T>(elementConversion: (element: any) => T,
                                      response: any): PaginatedArray<T> {
     return {
-        ...response as PaginatedArray<T>,
         items: responseToArray(elementConversion, response.items),
+        nextPageToken: response.nextPageToken || PaginatedArray.LAST_PAGE_TOKEN
     }
 }
 
@@ -106,6 +110,13 @@ function articleEditModelToRequest(model: ArticleEditModel): any {
 export default {
     publications: {
         async list(pageToken: string | null): Promise<PaginatedArray<PublicationModel>> {
+            if (pageToken === PaginatedArray.LAST_PAGE_TOKEN) {
+                return {
+                    items: [],
+                    nextPageToken: PaginatedArray.LAST_PAGE_TOKEN,
+                }
+            }
+
             try {
                 const params = stringifyQuery({
                     pageToken: pageToken || undefined,
@@ -131,6 +142,13 @@ export default {
     articles: {
         async list(publicationId: string,
                    pageToken: string | null): Promise<PaginatedArray<ShortArticleModel>> {
+            if (pageToken === PaginatedArray.LAST_PAGE_TOKEN) {
+                return {
+                    items: [],
+                    nextPageToken: PaginatedArray.LAST_PAGE_TOKEN,
+                }
+            }
+
             try {
                 const params = stringifyQuery({
                     pageToken: pageToken || undefined,
