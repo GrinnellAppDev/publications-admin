@@ -19,7 +19,8 @@
  */
 
 import {delay, Task} from "redux-saga"
-import {all, call, fork, spawn, cancel, take, select, put, Effect} from "redux-saga/effects"
+import {all, call, fork, spawn, cancel, cancelled, take, select, put,
+        Effect} from "redux-saga/effects"
 import {hashHistory} from "react-router"
 import {v4 as uuid} from "uuid"
 
@@ -29,23 +30,40 @@ import {getDefaultPublicationId} from "./selectors"
 import * as actions from "./actions"
 import api, {FetchError, PaginatedArray} from "./api"
 
+const DEFAULT_TOAST_DURATION = 4000
+
 function* loadFullArticle(publicationId: string, articleId: string): Iterator<Effect> {
     const item: FullArticleModel = yield call(api.articles.get, publicationId, articleId)
     yield put(actions.recieveFullArticle({item}))
     return item
 }
 
-function* createToast(item: ToastModel, duration: number = 4000): Iterator<Effect> {
-    yield put(actions.createToast({item}))
+function* createToast(item: ToastModel): Iterator<Effect> {
+    try {
+        yield put(actions.createToast({item}))
+
+        const closeAction: actions.CloseToast = yield take((action: any) =>
+            actions.closeToast.isTypeOf(action) && action.payload.toastId === item.id
+        )
+        const {buttonId} = closeAction.payload
+
+        return buttonId
+    } finally {
+        if (yield cancelled()) {
+            yield put(actions.closeToast({toastId: item.id}))
+        }
+    }
+
+}
+
+function* createTimedToast(item: ToastModel,
+                           duration: number = DEFAULT_TOAST_DURATION): Iterator<Effect> {
     const delayTask: Task = yield fork(function* (): Iterator<Effect> {
         yield call(delay, duration)
         yield put(actions.closeToast({toastId: item.id}))
     })
 
-    const closeAction: actions.CloseToast = yield take((action: any) =>
-        actions.closeToast.isTypeOf(action) && action.payload.toastId === item.id
-    )
-    const {buttonId} = closeAction.payload
+    const buttonId: string = yield call(createToast, item)
 
     if (buttonId) {
         yield cancel(delayTask)
@@ -66,7 +84,7 @@ function* createInfoToast(text: string, duration?: number): Iterator<Effect> {
         text,
     }
 
-    return yield call(createToast, item, duration)
+    return yield call(createTimedToast, item, duration)
 }
 
 function* initialLoad(): Iterator<Effect> {
@@ -116,18 +134,77 @@ function* handleLoadNextArticles(): Iterator<Effect> {
 
 function* handleLoadArticleDrafts(): Iterator<Effect> {
     while (true) {
-        const loadAction: actions.LoadArticleDraft = yield take(actions.loadArticleDraft.type)
-        const {publicationId, articleId} = loadAction.payload
+        const action: any = yield take(actions.loadArticleDraft.type)
+        yield fork(function* (loadAction: actions.LoadArticleDraft): Iterator<Effect> {
+            const {publicationId, articleId} = loadAction.payload
 
-        const {articleDraftsById}: StateModel = yield select()
-        const savedDraft = articleDraftsById[articleId]
-        const item: FullArticleModel = (savedDraft) ? (
-            savedDraft
-        ) : (
-            yield call(loadFullArticle, publicationId, articleId)
-        )
+            const {articleDraftsById}: StateModel = yield select()
+            const savedDraft = articleDraftsById[articleId]
+            const item: FullArticleModel = (savedDraft) ? (
+                savedDraft
+            ) : (
+                yield call(loadFullArticle, publicationId, articleId)
+            )
 
-        yield put(actions.createArticleDraft({id: articleId, item}))
+            yield put(actions.createArticleDraft({id: articleId, item}))
+        }, action)
+    }
+}
+
+function* handleSubmitArticleDraft(): Iterator<Effect> {
+    while (true) {
+        const action: any = yield take(actions.submitArticleDraft.type)
+        yield fork(function* (submitAction: actions.SubmitArticleDraft): Iterator<Effect> {
+            const {publicationId, articleId} = submitAction.payload
+            const {auth, articleDraftsById}: StateModel = yield select()
+            const draft = articleDraftsById[articleId || ""]
+            const isNew = !articleId
+
+            if (!auth.token) {
+                yield spawn(createInfoToast,
+                            `You must be signed in to ${isNew ? "create" : "edit"} articles.`)
+            } else {
+                const progressToast: ToastModel = {
+                    id: uuid(),
+                    text: "Submitting...",
+                    buttons: [],
+                }
+
+                yield fork(createToast, progressToast)
+
+                try {
+                    const item: FullArticleModel = (isNew) ? (
+                        yield call(api.articles.create, publicationId, draft, auth.token)
+                    ) : (
+                        yield call(api.articles.edit, publicationId, articleId, draft, auth.token)
+                    )
+
+                    yield put(actions.receiveArticleSubmitSuccess({isNew, item}))
+                    hashHistory.goBack()
+                } catch (err) {
+                    if (FetchError.isTypeOf(err)) {
+                        const {resp} = err.payload
+
+                        if (resp && resp.status === 401) {
+                            yield spawn(createInfoToast, "Could not submit, sign in again.")
+                            yield put(actions.receiveAuthError({}))
+                        } else {
+                            yield spawn(createInfoToast,
+                                        "There was a problem submitting your article.")
+                        }
+                    }
+                } finally {
+                    yield put(actions.closeToast({toastId: progressToast.id}))
+                }
+            }
+        }, action)
+    }
+}
+
+function* handleDiscardArticleDraft(): Iterator<Effect> {
+    while (true) {
+        yield take(actions.discardArticleDraft.type)
+        hashHistory.goBack()
     }
 }
 
@@ -156,7 +233,7 @@ function* handleDeleteArticle(): Iterator<Effect> {
                     text: "Undo",
                 }
 
-                const buttonId: string = yield call(createToast, {
+                const buttonId: string = yield call(createTimedToast, {
                     id: uuid(),
                     text: `Deleting "${title}"`,
                     buttons: [undoButton, {id: uuid(), text: "Close"}]
@@ -188,6 +265,8 @@ export default function* rootSaga(): Iterator<Effect> {
         call(handleRefreshArticles),
         call(handleLoadNextArticles),
         call(handleLoadArticleDrafts),
+        call(handleSubmitArticleDraft),
+        call(handleDiscardArticleDraft),
         call(handleDeleteArticle),
     ])
 }

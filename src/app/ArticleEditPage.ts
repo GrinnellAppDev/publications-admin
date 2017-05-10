@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {RouteComponentProps, hashHistory} from "react-router"
+import {RouteComponentProps} from "react-router"
 import {connect} from "react-redux"
 
 import {StateModel} from "./state/models"
@@ -93,18 +93,13 @@ export default connect<StateProps, DispatchProps, OwnProps>(
             }))
         },
 
-        onSubmit: async () => {
+        onSubmit: () => {
             const {publicationId, articleId} = params
-            const success = await dispatch(submitArticleDraft(publicationId, articleId || ""))
-
-            if (success) {
-                hashHistory.goBack()
-            }
+            dispatch(submitArticleDraft({publicationId, articleId}))
         },
 
         onDiscard: () => {
             dispatch(discardArticleDraft({id: params.articleId}))
-            hashHistory.goBack()
         },
     })
 )(

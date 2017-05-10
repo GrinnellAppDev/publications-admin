@@ -23,7 +23,7 @@ import {ThunkAction} from "redux-thunk"
 
 import {PublicationModel, ShortArticleModel, ArticleEditModel, FullArticleModel, ToastModel,
         StateModel} from "./models"
-import api, {FetchError, PaginatedArray} from "./api"
+import api, {PaginatedArray} from "./api"
 import createErrorClass from "./createErrorClass"
 
 export interface SyncAction<T> extends Action {
@@ -144,9 +144,10 @@ type DiscardArticleDraftPayload = {id: string}
 export const discardArticleDraft =
     createSyncActionCreator<DiscardArticleDraftPayload>("DISCARD_ARTICLE_DRAFT")
 
-type StartSubmittingArticleDraftPayload = {}
-export const startSubmittingArticleDraft =
-    createSyncActionCreator<StartSubmittingArticleDraftPayload>("START_SUBMITTING_ARTICLE_DRAFT")
+type SubmitArticleDraftPayload = {publicationId: string, articleId: string}
+export type SubmitArticleDraft = SyncAction<SubmitArticleDraftPayload>
+export const submitArticleDraft =
+    createSyncActionCreator<SubmitArticleDraftPayload>("SUBMIT_ARTICLE_DRAFT")
 
 type ReceiveArticleSubmitErrorPayload = {}
 export const receiveArticleSubmitError =
@@ -170,45 +171,3 @@ export const AlreadyLoadingError = createErrorClass<void>(
     "ALREADY_LOADING_ERROR",
     (message) => `Cannot load. ${message}`,
 )
-
-export function submitArticleDraft(publicationId: string, articleId: string): AsyncAction<boolean> {
-    return async (dispatch, getState, {api}) => {
-        const {auth, articleDraftsById} = getState()
-        const draft = articleDraftsById[articleId || ""]
-        const isNew = !articleId
-
-        if (!auth.token) {
-            // const text = `You must be signed in to ${isNew ? "create" : "edit"} articles.`
-            // dispatch(createToast({text}))
-
-            return false
-        } else {
-            dispatch(startSubmittingArticleDraft({}))
-
-            try {
-                dispatch(receiveArticleSubmitSuccess({
-                    isNew,
-                    item: (isNew) ? (
-                        await api.articles.create(publicationId, draft, auth.token)
-                    ) : (
-                        await api.articles.edit(publicationId, articleId, draft, auth.token)
-                    ),
-                }))
-
-                return true
-            } catch (err) {
-                if (FetchError.isTypeOf(err)) {
-                    const {resp} = err.payload
-                    dispatch(receiveArticleSubmitError({}))
-
-                    if (resp && resp.status === 401) {
-                        dispatch(receiveAuthError({}))
-                        // dispatch(createToast({text: "Sign in again."}))
-                    }
-                }
-
-                return false
-            }
-        }
-    }
-}

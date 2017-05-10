@@ -216,14 +216,5 @@ export function toasts(state: ReadonlyArray<ToastModel> = [],
         return [...state, item]
     }
 
-
-    // if (actions.startSubmittingArticleDraft.isTypeOf(action)) {
-    //     return [...state, createInfoToast("Submitting...", 1000)]
-    // }
-
-    // if (actions.receiveArticleSubmitError.isTypeOf(action)) {
-    //     return [...state, createInfoToast("There was a problem submitting your article.")]
-    // }
-
     return state
 }
