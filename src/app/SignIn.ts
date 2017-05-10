@@ -19,8 +19,7 @@
  */
 
 import {connect} from "react-redux"
-import {AuthenticationDetails, CognitoUserPool, CognitoUser,
-        CognitoUserSession} from "amazon-cognito-identity-js"
+import {CognitoUserSession} from "amazon-cognito-identity-js"
 
 import {saveAuthInfo, createInfoToast} from "./state/actions"
 import SignInView, {DispatchProps} from "./SignInView"
@@ -28,7 +27,13 @@ import SignInView, {DispatchProps} from "./SignInView"
 export default connect<{}, DispatchProps, {}>(
     undefined,
     (dispatch) => ({
-        onSubmit: (username, password) => {
+        onSubmit: async (username, password) => {
+            const {AuthenticationDetails, CognitoUserPool, CognitoUser} =
+                await System.import(
+                    /* webpackChunkName: "aws-cognito" */
+                    "amazon-cognito-identity-js"
+                )
+
             const authDetails = new AuthenticationDetails({
                 Username: username,
                 Password: password,
