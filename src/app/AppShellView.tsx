@@ -81,6 +81,7 @@ export default function AppShellView(props: Props): JSX.Element {
                     enterAnimation={toastEnterAnimation}
                     leaveAnimation={toastLeaveAnimation}
                     typeName="ul"
+                    duration={150}
                 >
                     {props.toasts.map((toast) =>
                         <li className={b("toast-wrapper")} key={toast.id}>
