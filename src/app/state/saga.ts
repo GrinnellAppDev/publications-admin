@@ -18,18 +18,55 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {all, call, take, select, put, Effect} from "redux-saga/effects"
+import {delay, Task} from "redux-saga"
+import {all, call, fork, spawn, cancel, take, select, put, Effect} from "redux-saga/effects"
 import {hashHistory} from "react-router"
+import {v4 as uuid} from "uuid"
 
-import {StateModel, ShortArticleModel, FullArticleModel, PublicationModel} from "./models"
+import {StateModel, ShortArticleModel, FullArticleModel, PublicationModel,
+        ToastModel} from "./models"
 import {getDefaultPublicationId} from "./selectors"
 import * as actions from "./actions"
-import api, {PaginatedArray} from "./api"
+import api, {FetchError, PaginatedArray} from "./api"
 
 function* loadFullArticle(publicationId: string, articleId: string): Iterator<Effect> {
     const item: FullArticleModel = yield call(api.articles.get, publicationId, articleId)
     yield put(actions.recieveFullArticle({item}))
     return item
+}
+
+function* createToast(item: ToastModel, duration: number = 4000): Iterator<Effect> {
+    yield put(actions.createToast({item}))
+    const delayTask: Task = yield fork(function* (): Iterator<Effect> {
+        yield call(delay, duration)
+        yield put(actions.closeToast({toastId: item.id}))
+    })
+
+    const closeAction: actions.CloseToast = yield take((action: any) =>
+        actions.closeToast.isTypeOf(action) && action.payload.toastId === item.id
+    )
+    const {buttonId} = closeAction.payload
+
+    if (buttonId) {
+        yield cancel(delayTask)
+    }
+
+    return buttonId
+}
+
+function* createInfoToast(text: string, duration?: number): Iterator<Effect> {
+    const item: ToastModel = {
+        id: uuid(),
+        buttons: [
+            {
+                id: uuid(),
+                text: "Close",
+            }
+        ],
+        text,
+    }
+
+    return yield call(createToast, item, duration)
 }
 
 function* initialLoad(): Iterator<Effect> {
@@ -48,23 +85,6 @@ function* initialLoad(): Iterator<Effect> {
     if (!publicationId) {
         const defaultPublicationId: string = yield select(getDefaultPublicationId)
         hashHistory.replace(`/publications/${defaultPublicationId}/articles`)
-    }
-}
-
-function* handleLoadArticleDrafts(): Iterator<Effect> {
-    while (true) {
-        const loadAction: actions.LoadArticleDraft = yield take(actions.loadArticleDraft.type)
-        const {publicationId, articleId} = loadAction.payload
-
-        const {articleDraftsById}: StateModel = yield select()
-        const savedDraft = articleDraftsById[articleId]
-        const item: FullArticleModel = (savedDraft) ? (
-            savedDraft
-        ) : (
-            yield call(loadFullArticle, publicationId, articleId)
-        )
-
-        yield put(actions.createArticleDraft({id: articleId, item}))
     }
 }
 
@@ -94,11 +114,80 @@ function* handleLoadNextArticles(): Iterator<Effect> {
     }
 }
 
+function* handleLoadArticleDrafts(): Iterator<Effect> {
+    while (true) {
+        const loadAction: actions.LoadArticleDraft = yield take(actions.loadArticleDraft.type)
+        const {publicationId, articleId} = loadAction.payload
+
+        const {articleDraftsById}: StateModel = yield select()
+        const savedDraft = articleDraftsById[articleId]
+        const item: FullArticleModel = (savedDraft) ? (
+            savedDraft
+        ) : (
+            yield call(loadFullArticle, publicationId, articleId)
+        )
+
+        yield put(actions.createArticleDraft({id: articleId, item}))
+    }
+}
+
+function* handleDeleteArticle(): Iterator<Effect> {
+    while (true) {
+        const action: any = yield take(actions.deleteArticle.type)
+        yield fork(function* (deleteAction: actions.DeleteArticle): Iterator<Effect> {
+            const {auth, articlesById}: StateModel = yield select()
+
+            if (!auth.token) {
+                yield spawn(createInfoToast, "You must be signed in to delete articles.")
+            } else {
+                const {id} = deleteAction.payload
+                yield put(actions.deleteLocalArticle({id}))
+
+                const article = articlesById[id]
+                const title = ((article.title || "").length > 20) ? (
+                    article.title.substring(0, 15).trim() + "..." +
+                    article.title.substring(article.title.length - 5).trim()
+                ) : (
+                    article.title || "Untitled"
+                )
+
+                const undoButton = {
+                    id: uuid(),
+                    text: "Undo",
+                }
+
+                const buttonId: string = yield call(createToast, {
+                    id: uuid(),
+                    text: `Deleting "${title}"`,
+                    buttons: [undoButton, {id: uuid(), text: "Close"}]
+                })
+
+                if (buttonId === undoButton.id) {
+                    yield put(actions.undeleteArticle({item: article}))
+                } else {
+                    try {
+                        yield call(api.articles.remove, article.publication, article.id, auth.token)
+                    } catch (err) {
+                        if (FetchError.isTypeOf(err)) {
+                            yield spawn(createInfoToast,
+                                        "There was a problem deleting the article.")
+                            yield put(actions.undeleteArticle({item: article}))
+                        } else {
+                            throw err
+                        }
+                    }
+                }
+            }
+        }, action)
+    }
+}
+
 export default function* rootSaga(): Iterator<Effect> {
     yield all([
         call(initialLoad),
         call(handleRefreshArticles),
         call(handleLoadNextArticles),
         call(handleLoadArticleDrafts),
+        call(handleDeleteArticle),
     ])
 }

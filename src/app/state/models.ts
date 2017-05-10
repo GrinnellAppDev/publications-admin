@@ -71,17 +71,13 @@ export interface ToastActionModel {
 }
 
 export interface ToastButtonModel {
+    readonly id: string
     readonly text: string
-    readonly action: ToastActionModel
 }
 
 export interface ToastModel {
     readonly id: string
-    readonly timeCreated: Date
-    readonly duration: number
     readonly text: string
-    readonly expireAction: ToastActionModel
-    readonly cancelAction: ToastActionModel
     readonly buttons: ReadonlyArray<ToastButtonModel>
 }
 

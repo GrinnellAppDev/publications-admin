@@ -22,7 +22,7 @@ import * as React from "react"
 import FlipMove from "react-flip-move"
 
 import {ToastModel} from "./state/models"
-import Toast from "./Toast"
+import ToastView from "./ToastView"
 import SignIn from "./SignIn"
 import block from "./style/bem"
 
@@ -35,6 +35,7 @@ export interface StateProps {
 }
 
 export interface DispatchProps {
+    onToastButtonClick: (toastId: string, buttonId: string) => void
 }
 
 type Props = StateProps & DispatchProps & React.Props<void>
@@ -61,18 +62,18 @@ const toastLeaveAnimation = {
     },
 }
 
-export default function AppShellView({isSignedIn, username, children, toasts}: Props): JSX.Element {
+export default function AppShellView(props: Props): JSX.Element {
     const b = block("AppShellView")
 
     return (
         <div className={b()}>
-            {(isSignedIn) ? (
-                <div>Signed in as {username}</div>
+            {(props.isSignedIn) ? (
+                <div>Signed in as {props.username}</div>
             ) : (
                 <SignIn/>
             )}
 
-            {children}
+            {props.children}
 
             <aside className={b("toasts")}>
                 <FlipMove
@@ -81,9 +82,9 @@ export default function AppShellView({isSignedIn, username, children, toasts}: P
                     leaveAnimation={toastLeaveAnimation}
                     typeName="ul"
                 >
-                    {toasts.map((toast) =>
+                    {props.toasts.map((toast) =>
                         <li className={b("toast-wrapper")} key={toast.id}>
-                            <Toast model={toast}/>
+                            <ToastView model={toast} onButtonClick={props.onToastButtonClick}/>
                         </li>
                     )}
                 </FlipMove>

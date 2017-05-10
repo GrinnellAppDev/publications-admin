@@ -21,8 +21,8 @@
 import {Action} from "redux"
 import {ThunkAction} from "redux-thunk"
 
-import {PublicationModel, ShortArticleModel, ArticleEditModel, FullArticleModel,
-        ToastActionTypeModel, StateModel} from "./models"
+import {PublicationModel, ShortArticleModel, ArticleEditModel, FullArticleModel, ToastModel,
+        StateModel} from "./models"
 import api, {FetchError, PaginatedArray} from "./api"
 import createErrorClass from "./createErrorClass"
 
@@ -57,7 +57,7 @@ function createSyncActionCreator<T>(type: string): SyncActionCreator<T> {
     return Object.assign(
         (payload: T): SyncAction<T> => ({type, payload}),
         {
-            isTypeOf: (action: SyncAction<any>): action is SyncAction<T> => action.type === type,
+            isTypeOf: (action: any): action is SyncAction<T> => action.type === type,
             type,
         },
     )
@@ -111,13 +111,14 @@ type ReceiveFullArticlePayload = {item: FullArticleModel}
 export const recieveFullArticle =
     createSyncActionCreator<ReceiveFullArticlePayload>("RECIEVE_FULL_ARTICLE")
 
-type DeleteLocalArticlePayload = {item: ShortArticleModel}
+type DeleteArticlePayload = {id: string}
+export type DeleteArticle = SyncAction<DeleteArticlePayload>
+export const deleteArticle =
+    createSyncActionCreator<DeleteArticlePayload>("DELETE_ARTICLE")
+
+type DeleteLocalArticlePayload = {id: string}
 export const deleteLocalArticle =
     createSyncActionCreator<DeleteLocalArticlePayload>("DELETE_LOCAL_ARTICLE")
-
-type ReceiveArticleDeleteErrorPayload = {}
-export const recieveArticleDeleteError =
-    createSyncActionCreator<ReceiveArticleDeleteErrorPayload>("RECEIVE_ARTICLE_DELETE_ERROR")
 
 type UndeleteArticlePayload = {item: ShortArticleModel}
 export const undeleteArticle =
@@ -155,25 +156,14 @@ type ReceiveArticleSubmitSuccessPayload = {item: FullArticleModel, isNew: boolea
 export const receiveArticleSubmitSuccess =
     createSyncActionCreator<ReceiveArticleSubmitSuccessPayload>("RECEIVE_ARTICLE_SUBMIT_SUCCESS")
 
-type CreateInfoToastPayload = {text: string, duration?: number}
-export const createInfoToast =
-    createSyncActionCreator<CreateInfoToastPayload>("CREATE_INFO_TOAST")
+type CreateToastPayload = {item: ToastModel}
+export const createToast =
+    createSyncActionCreator<CreateToastPayload>("CREATE_TOAST")
 
-type CloseToastPayload = {id: string}
+type CloseToastPayload = {toastId: string, buttonId?: string}
+export type CloseToast = SyncAction<CloseToastPayload>
 export const closeToast =
     createSyncActionCreator<CloseToastPayload>("CLOSE_TOAST")
-
-
-type MaybeDeleteArticlePayload = DeleteLocalArticlePayload | CreateInfoToastPayload
-export const maybeDeleteArticleById =
-    ({id}: {id: string}): SyncThunkAction<MaybeDeleteArticlePayload> => (dispatch, getState) =>
-        (!getState().auth.token) ? (
-            dispatch(createInfoToast({
-                text: "You must be signed in to delete articles.",
-            }))
-        ) : (
-            dispatch(deleteLocalArticle({item: getState().articlesById[id]}))
-        )
 
 
 export const AlreadyLoadingError = createErrorClass<void>(
@@ -188,8 +178,8 @@ export function submitArticleDraft(publicationId: string, articleId: string): As
         const isNew = !articleId
 
         if (!auth.token) {
-            const text = `You must be signed in to ${isNew ? "create" : "edit"} articles.`
-            dispatch(createInfoToast({text}))
+            // const text = `You must be signed in to ${isNew ? "create" : "edit"} articles.`
+            // dispatch(createToast({text}))
 
             return false
         } else {
@@ -213,7 +203,7 @@ export function submitArticleDraft(publicationId: string, articleId: string): As
 
                     if (resp && resp.status === 401) {
                         dispatch(receiveAuthError({}))
-                        dispatch(createInfoToast({text: "Sign in again."}))
+                        // dispatch(createToast({text: "Sign in again."}))
                     }
                 }
 
@@ -221,26 +211,4 @@ export function submitArticleDraft(publicationId: string, articleId: string): As
             }
         }
     }
-}
-
-export function deleteRemoteArticle(item: ShortArticleModel): AsyncAction<void> {
-    return async (dispatch, getState, {api}) => {
-        const {auth} = getState()
-
-        try {
-            await api.articles.remove(item.publication, item.id, auth.token)
-        } catch (err) {
-            if (FetchError.isTypeOf(err)) {
-                dispatch(recieveArticleDeleteError({}))
-                dispatch(undeleteArticle({item}))
-            } else {
-                throw err
-            }
-        }
-    }
-}
-
-export const toastActions: {[action: number]: (...args: any[]) => AnyAction} = {
-    [ToastActionTypeModel.DELETE_REMOTE_ARTICLE]: deleteRemoteArticle,
-    [ToastActionTypeModel.UNDELETE_ARTICLE]: undeleteArticle,
 }

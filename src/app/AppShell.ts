@@ -21,6 +21,7 @@
 import {connect} from "react-redux"
 
 import {StateModel} from "./state/models"
+import {closeToast} from "./state/actions"
 
 import AppShellView, {StateProps, DispatchProps} from "./AppShellView"
 
@@ -30,7 +31,12 @@ export default connect<StateProps, DispatchProps, {}>(
         username: auth.username,
         toasts,
     }),
-    (dispatch) => ({}),
+
+    (dispatch) => ({
+        onToastButtonClick: (toastId, buttonId) => {
+            dispatch(closeToast({toastId, buttonId}))
+        }
+    }),
 )(
     AppShellView
 )

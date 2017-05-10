@@ -21,7 +21,7 @@
 import {connect} from "react-redux"
 import {CognitoUserSession} from "amazon-cognito-identity-js"
 
-import {saveAuthInfo, createInfoToast} from "./state/actions"
+import {saveAuthInfo} from "./state/actions"
 import SignInView, {DispatchProps} from "./SignInView"
 
 export default connect<{}, DispatchProps, {}>(
@@ -57,7 +57,7 @@ export default connect<{}, DispatchProps, {}>(
             }
 
             function onFailure(err: Error): void {
-                dispatch(createInfoToast({text: err.message}))
+                // dispatch(createToast({text: err.message}))
             }
 
             user.authenticateUser(authDetails, {

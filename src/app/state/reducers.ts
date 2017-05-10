@@ -18,10 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {v4 as uuid} from "uuid"
-
 import {AuthenticationModel, IdMapModel, PublicationModel, ShortArticleModel, ArticleCreateModel,
-        ToastActionTypeModel, ToastModel} from "./models"
+        ToastModel} from "./models"
 import * as actions from "./actions"
 
 type Action = actions.SyncAction<any>
@@ -77,8 +75,8 @@ export function articlesById(state: IdMapModel<ShortArticleModel> = {},
     }
 
     if (actions.deleteLocalArticle.isTypeOf(action)) {
-        const {item} = action.payload
-        const {[item.id]: _, ...newState} = state
+        const {id} = action.payload
+        const {[id]: _, ...newState} = state
         return newState
     }
 
@@ -206,73 +204,26 @@ export function loadingArticles(state: ReadonlyArray<string> = [],
     return state
 }
 
-function createInfoToast(text: string, duration: number = 4000): ToastModel {
-    return {
-        id: uuid(),
-        timeCreated: new Date(),
-        expireAction: null,
-        cancelAction: null,
-        buttons: [],
-        duration,
-        text,
-    }
-}
-
 export function toasts(state: ReadonlyArray<ToastModel> = [],
                        action: Action): ReadonlyArray<ToastModel> {
     if (actions.closeToast.isTypeOf(action)) {
-        const {id} = action.payload
-        return state.filter((toast) => toast.id !== id)
+        const {toastId} = action.payload
+        return state.filter((toast) => toast.id !== toastId)
     }
 
-    if (actions.createInfoToast.isTypeOf(action)) {
-        const {text, duration} = action.payload
-        return [...state, createInfoToast(text, duration)]
-    }
-
-    if (actions.deleteLocalArticle.isTypeOf(action)) {
+    if (actions.createToast.isTypeOf(action)) {
         const {item} = action.payload
-        // console.assert(item.title !== undefined)  // todo: uncomment when server validates
-        const title = ((item.title || "").length > 20) ? (
-            item.title.substring(0, 15) + "..." + item.title.substring(item.title.length - 5)
-        ) : (
-            item.title || "Untitled"
-        )
-
-        return [...state, {
-            id: uuid(),
-            timeCreated: new Date(),
-            duration: 4000,
-            text: `Deleting "${title}"`,
-            expireAction: {
-                type: ToastActionTypeModel.DELETE_REMOTE_ARTICLE,
-                args: [item],
-            },
-            cancelAction: {
-                type: ToastActionTypeModel.DELETE_REMOTE_ARTICLE,
-                args: [item],
-            },
-            buttons: [{
-                text: "Undo",
-                action: {
-                    type: ToastActionTypeModel.UNDELETE_ARTICLE,
-                    args: [{item}],
-                },
-            }],
-        }]
+        return [...state, item]
     }
 
-    if (actions.recieveArticleDeleteError.isTypeOf(action)) {
-        return [...state, createInfoToast("There was a problem deleting the article.")]
-    }
 
-    if (actions.startSubmittingArticleDraft.isTypeOf(action)) {
-        return [...state, createInfoToast("Submitting...", 1000)]
-    }
+    // if (actions.startSubmittingArticleDraft.isTypeOf(action)) {
+    //     return [...state, createInfoToast("Submitting...", 1000)]
+    // }
 
-    if (actions.receiveArticleSubmitError.isTypeOf(action)) {
-        return [...state, createInfoToast("There was a problem submitting your article.")]
-    }
+    // if (actions.receiveArticleSubmitError.isTypeOf(action)) {
+    //     return [...state, createInfoToast("There was a problem submitting your article.")]
+    // }
 
     return state
 }
