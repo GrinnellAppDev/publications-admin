@@ -22,7 +22,6 @@ import * as React from "react"
 import {Router, Route, IndexRoute, hashHistory, RouterState} from "react-router"
 import {Provider} from "react-redux"
 import {createStore, combineReducers, applyMiddleware} from "redux"
-import thunk from "redux-thunk"
 import {composeWithDevTools} from "redux-devtools-extension/developmentOnly"
 import createSagaMiddleware from "redux-saga"
 
@@ -30,7 +29,6 @@ import {StateModel} from "./state/models"
 import * as reducers from "./state/reducers"
 import * as actions from "./state/actions"
 import saga from "./state/saga"
-import api from "./state/api"
 
 import AppShell from "./AppShell"
 import ArticleListPage from "./ArticleListPage"
@@ -38,14 +36,12 @@ import ArticleEditPage from "./ArticleEditPage"
 import IndexPage from "./IndexPage"
 import NotFoundView from "./NotFoundView"
 
-const thunkContext: actions.ThunkContext = {api}
 const sagaMiddleware = createSagaMiddleware()
 
 const store = createStore<StateModel>(
     combineReducers(reducers),
     composeWithDevTools<StateModel>(
         applyMiddleware(
-            thunk.withExtraArgument(thunkContext),
             sagaMiddleware,
         ),
     ),

@@ -22,7 +22,7 @@ import {AuthenticationModel, IdMapModel, PublicationModel, ShortArticleModel, Ar
         ToastModel} from "./models"
 import * as actions from "./actions"
 
-type Action = actions.SyncAction<any>
+type Action = actions.Action<any>
 
 type Mutable<T> = {
     [P in keyof T]: T[P]
