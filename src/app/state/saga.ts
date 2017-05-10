@@ -19,10 +19,12 @@
  */
 
 import {all, call, take, select, put, Effect} from "redux-saga/effects"
+import {hashHistory} from "react-router"
 
-import {StateModel, FullArticleModel} from "./models"
+import {StateModel, FullArticleModel, PublicationModel} from "./models"
+import {getDefaultPublicationId} from "./selectors"
 import * as actions from "./actions"
-import api from "./api"
+import api, {PaginatedArray} from "./api"
 
 function* loadFullArticle(publicationId: string, articleId: string): Iterator<Effect> {
     const item: FullArticleModel = yield call(api.articles.get, publicationId, articleId)
@@ -47,8 +49,30 @@ function* loadArticleDrafts(): Iterator<Effect> {
     }
 }
 
+function* initialLoad(): Iterator<Effect> {
+    const selectAction: actions.SelectPublication = yield take(actions.selectPublication.type)
+    const {publicationId} = selectAction.payload
+
+    let pageToken: string
+    do {
+        yield put(actions.startLoadingPublications({}))
+        const page: PaginatedArray<PublicationModel> = yield call(api.publications.list, pageToken)
+        yield put(actions.receivePublications({page}))
+
+        pageToken = page.nextPageToken
+    } while (pageToken)
+
+    if (publicationId) {
+        // reload articles
+    } else {
+        const defaultPublicationId: string = yield select(getDefaultPublicationId)
+        hashHistory.replace(`/publications/${defaultPublicationId}/articles`)
+    }
+}
+
 export default function* rootSaga(): Iterator<Effect> {
     yield all([
+        call(initialLoad),
         call(loadArticleDrafts),
     ])
 }

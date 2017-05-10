@@ -41,7 +41,7 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         articles: getArticles(state, params),
         publications: getPublications(state),
         currentPublication: state.publicationsById[params.publicationId],
-        articlesHaveNextPage: !!getArticlesPageTokenForSelectedPublication(state, params),
+        articlesHaveNextPage: getArticlesPageTokenForSelectedPublication(state, params) !== "",
     }),
 
     (dispatch, {params}) => ({

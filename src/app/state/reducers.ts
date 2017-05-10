@@ -145,15 +145,6 @@ export function articleDraftsById(state: IdMapModel<ArticleCreateModel> = {},
     return state
 }
 
-export function publicationsPageToken(state: string = null, action: Action): string {
-    if (actions.receivePublications.isTypeOf(action)) {
-        const {page} = action.payload
-        return page.nextPageToken || ""
-    }
-
-    return state
-}
-
 export function articlesPageTokensByParentId(state: IdMapModel<string> = {},
                                              action: Action): IdMapModel<string> {
     if (actions.receiveArticles.isTypeOf(action)) {
@@ -168,14 +159,6 @@ export function articlesPageTokensByParentId(state: IdMapModel<string> = {},
         const {publicationId} = action.payload
         const {[publicationId]: _, ...newState} = state
         return newState
-    }
-
-    return state
-}
-
-export function didInitialLoad(state: boolean = false, action: Action): boolean {
-    if (actions.startInitialLoad.isTypeOf(action)) {
-        return true
     }
 
     return state

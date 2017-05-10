@@ -20,13 +20,11 @@
 
 import {Action} from "redux"
 import {ThunkAction} from "redux-thunk"
-import {hashHistory} from "react-router"
 
 import {PublicationModel, ShortArticleModel, ArticleEditModel, FullArticleModel,
         ToastActionTypeModel, StateModel} from "./models"
 import api, {FetchError, PaginatedArray} from "./api"
 import createErrorClass from "./createErrorClass"
-import {getDefaultPublicationId} from "./selectors"
 
 export interface SyncAction<T> extends Action {
     readonly type: string
@@ -76,6 +74,11 @@ export const receiveAuthError =
 type StartInitialLoadPayload = {}
 export const startInitialLoad =
     createSyncActionCreator<StartInitialLoadPayload>("START_INITIAL_LOAD")
+
+type SelectPublicationPayload = {publicationId: string}
+export type SelectPublication = SyncAction<SelectPublicationPayload>
+export const selectPublication =
+    createSyncActionCreator<SelectPublicationPayload>("SELECT_PUBLICATION")
 
 type StartLoadingPublicationsPayload = {}
 export const startLoadingPublications =
@@ -176,24 +179,6 @@ export const AlreadyLoadingError = createErrorClass<void>(
     (message) => `Cannot load. ${message}`,
 )
 
-export function loadAllPublications(): AsyncAction<void> {
-    return async (dispatch, getState, {api}) => {
-        if (getState().isLoadingPublications) {
-            throw new AlreadyLoadingError("Already loading publications.")
-        }
-
-        const pageToken = getState().publicationsPageToken
-        if (pageToken !== "") {
-            dispatch(startLoadingPublications({}))
-            dispatch(receivePublications({
-                page: await api.publications.list(pageToken),
-            }))
-
-            await loadAllPublications()
-        }
-    }
-}
-
 export function loadNextArticles(publicationId: string): AsyncAction<void> {
     return async (dispatch, getState, {api}) => {
         if (getState().loadingPublications.includes(publicationId)) {
@@ -215,21 +200,6 @@ export function reloadArticles(publicationId: string): AsyncAction<void> {
     return async (dispatch) => {
         dispatch(clearArticles({publicationId}))
         await dispatch(loadNextArticles(publicationId))
-    }
-}
-
-export function maybeDoInitialLoad(publicationId: string = ""): AsyncAction<void> {
-    return async (dispatch, getState) => {
-        if (!getState().didInitialLoad) {
-            await dispatch(loadAllPublications())
-
-            if (publicationId) {
-                await dispatch(reloadArticles(publicationId))
-            } else {
-                const defaultPublicationId = getDefaultPublicationId(getState())
-                hashHistory.replace(`/publications/${defaultPublicationId}/articles`)
-            }
-        }
     }
 }
 

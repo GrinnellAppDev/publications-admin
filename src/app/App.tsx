@@ -53,16 +53,15 @@ const store = createStore<StateModel>(
 
 sagaMiddleware.run(saga)
 
-async function onPublicationChange({params: oldParams}: RouterState,
-                                   {params}: RouterState): Promise<void> {
+function onPublicationChange({params: oldParams}: RouterState, {params}: RouterState): void {
     const {publicationId} = params
     if (oldParams.publicationId !== publicationId) {
-        await store.dispatch(actions.loadNextArticles(publicationId))
+        store.dispatch(actions.selectPublication({publicationId}))
     }
 }
 
-async function onPublicationEnter({params}: RouterState): Promise<void> {
-    await store.dispatch(actions.maybeDoInitialLoad(params.publicationId))
+function onPublicationEnter(routerState: RouterState): void {
+    onPublicationChange({...routerState, params: {}}, routerState)
 }
 
 async function onNewArticleNavTo(): Promise<void> {

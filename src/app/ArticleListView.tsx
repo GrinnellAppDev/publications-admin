@@ -21,7 +21,7 @@
 import * as React from "react"
 import {Link} from "react-router"
 import FlipMove from "react-flip-move"
-import InfiniteScroll from "react-infinite-scroller"
+import InfiniteScroller from "react-infinite-scroller"
 
 import {ShortArticleModel, PublicationModel} from "./state/models"
 import ArticleView from "./ArticleView"
@@ -87,7 +87,7 @@ export default function ArticleListView({articles, publications, currentPublicat
                     </button>
                 )}
 
-                <InfiniteScroll
+                <InfiniteScroller
                     loadMore={dispatchProps.onLoadNextArticlePage}
                     hasMore={articlesHaveNextPage}
                     loader={<span>Loading...</span>}
@@ -104,7 +104,7 @@ export default function ArticleListView({articles, publications, currentPublicat
                             </div>
                         )}
                     </FlipMove>
-                </InfiniteScroll>
+                </InfiniteScroller>
             </main>
         </div>
     )

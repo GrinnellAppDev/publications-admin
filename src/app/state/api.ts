@@ -105,7 +105,7 @@ function articleEditModelToRequest(model: ArticleEditModel): any {
 
 export default {
     publications: {
-        async list(pageToken: string): Promise<PaginatedArray<PublicationModel>> {
+        async list(pageToken: string | null): Promise<PaginatedArray<PublicationModel>> {
             try {
                 const params = stringifyQuery({
                     pageToken: pageToken || undefined,
@@ -130,7 +130,7 @@ export default {
 
     articles: {
         async list(publicationId: string,
-                   pageToken: string): Promise<PaginatedArray<ShortArticleModel>> {
+                   pageToken: string | null): Promise<PaginatedArray<ShortArticleModel>> {
             try {
                 const params = stringifyQuery({
                     pageToken: pageToken || undefined,
