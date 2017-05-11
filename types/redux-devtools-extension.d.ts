@@ -20,7 +20,7 @@
  */
 
 declare module "redux-devtools-extension/developmentOnly" {
-    import {StoreEnhancer, GenericStoreEnhancer} from "redux";
+    import {StoreEnhancer, GenericStoreEnhancer} from "redux"
 
     export function composeWithDevTools<TState>(
         ...args: StoreEnhancer<TState>[]): StoreEnhancer<TState>
