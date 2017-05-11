@@ -22,7 +22,7 @@ import * as React from "react"
 import {Router, Route, IndexRoute, hashHistory, RouterState} from "react-router"
 import {Provider} from "react-redux"
 import {createStore, combineReducers, applyMiddleware} from "redux"
-import {composeWithDevTools} from "redux-devtools-extension/developmentOnly"
+import {composeWithDevTools} from "redux-devtools-extension"
 import createSagaMiddleware from "redux-saga"
 
 import {StateModel} from "./state/models"
@@ -40,7 +40,7 @@ const sagaMiddleware = createSagaMiddleware()
 
 const store = createStore<StateModel>(
     combineReducers(reducers),
-    composeWithDevTools<StateModel>(
+    composeWithDevTools(
         applyMiddleware(
             sagaMiddleware,
         ),
