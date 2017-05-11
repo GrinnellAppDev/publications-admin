@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as React from "react"
+import React from "react"
 import {Router, Route, IndexRoute, hashHistory, RouterState} from "react-router"
 import {Provider} from "react-redux"
 import {createStore, combineReducers, applyMiddleware} from "redux"

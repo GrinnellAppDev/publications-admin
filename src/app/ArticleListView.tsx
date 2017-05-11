@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as React from "react"
+import React from "react"
 import {Link} from "react-router"
 import FlipMove from "react-flip-move"
 import InfiniteScroller from "react-infinite-scroller"
