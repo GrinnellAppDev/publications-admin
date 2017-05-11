@@ -56,8 +56,8 @@ function onPublicationChange({params: oldParams}: RouterState, {params}: RouterS
     }
 }
 
-function onPublicationEnter(routerState: RouterState): void {
-    onPublicationChange({...routerState, params: {}}, routerState)
+function onPublicationEnter({params}: RouterState): void {
+    store.dispatch(actions.selectPublication({publicationId: params.publicationId}))
 }
 
 function onNewArticleNavTo(): void {
@@ -67,7 +67,7 @@ function onNewArticleNavTo(): void {
 }
 
 function onArticleChange({params: oldParams}: RouterState,
-                               {params}: RouterState): void {
+                         {params}: RouterState): void {
     const {publicationId, articleId} = params
     if (oldParams.publicationId !== publicationId ||
         oldParams.articleId !== articleId) {
