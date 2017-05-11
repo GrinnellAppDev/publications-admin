@@ -24,6 +24,8 @@ import {Provider} from "react-redux"
 import {createStore, combineReducers, applyMiddleware} from "redux"
 import {composeWithDevTools} from "redux-devtools-extension/developmentOnly"
 import createSagaMiddleware from "redux-saga"
+import * as storage from "redux-storage"
+import createStorageEngine from "redux-storage-engine-indexed-db"
 
 import {StateModel} from "./state/models"
 import * as reducers from "./state/reducers"
@@ -36,17 +38,23 @@ import ArticleEditPage from "./ArticleEditPage"
 import IndexPage from "./IndexPage"
 import NotFoundView from "./NotFoundView"
 
+const storageEngine = createStorageEngine()
+const loadFromStorage = storage.createLoader(storageEngine)
+
+const storageMiddleware = storage.createMiddleware(storageEngine)
 const sagaMiddleware = createSagaMiddleware()
 
 const store = createStore<StateModel>(
-    combineReducers(reducers),
+    storage.reducer(combineReducers(reducers)),
     composeWithDevTools<StateModel>(
         applyMiddleware(
             sagaMiddleware,
+            storageMiddleware,
         ),
     ),
 )
 
+loadFromStorage(store)
 sagaMiddleware.run(saga)
 
 function onPublicationChange({params: oldParams}: RouterState, {params}: RouterState): void {
@@ -57,7 +65,7 @@ function onPublicationChange({params: oldParams}: RouterState, {params}: RouterS
 }
 
 function onPublicationEnter(routerState: RouterState): void {
-    onPublicationChange({...routerState, params: {}}, routerState)
+    store.dispatch(actions.selectPublication({publicationId: ""}))
 }
 
 function onNewArticleNavTo(): void {

@@ -47,7 +47,7 @@ const AuthError = createErrorClass<{err: Error}>(
 )
 
 function importCognito(): Promise<typeof cognito> {
-    return System.import(/* webpackChunkName: "aws-cognito" */ "amazon-cognito-identity-js")
+    return System.import("amazon-cognito-identity-js")
 }
 
 function* createToast(item: ToastModel): Iterator<Effect> {

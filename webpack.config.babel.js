@@ -100,6 +100,7 @@ export default {
                 include: [
                     path.resolve("node_modules/preact-compat/src"),
                     path.resolve("node_modules/especially"),
+                    path.resolve("node_modules/redux-storage-engine-indexed-db"),
                 ],
             },
         ],
