@@ -32,7 +32,7 @@ const emptyAuthModel = {username: "", token: ""}
 
 export function auth(state: AuthenticationModel = emptyAuthModel,
                      action: Action): AuthenticationModel {
-    if (actions.saveAuthInfo.isTypeOf(action)) {
+    if (actions.receiveAuthInfo.isTypeOf(action)) {
         return action.payload
     }
 

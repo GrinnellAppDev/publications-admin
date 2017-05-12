@@ -39,6 +39,7 @@ interface CognitoCallbacks {
 }
 
 const DEFAULT_TOAST_DURATION = 4000
+const LOCAL_STORAGE_HAS_USER_KEY = "CognitoHasUser"
 
 const NewPasswordRequiredError = createErrorClass("NEW_PASSWORD_REQUIRED_ERROR")
 const AuthError = createErrorClass<{err: Error}>(
@@ -48,6 +49,43 @@ const AuthError = createErrorClass<{err: Error}>(
 
 function importCognito(): Promise<typeof cognito> {
     return System.import(/* webpackChunkName: "aws-cognito" */ "amazon-cognito-identity-js")
+}
+
+function getSessionFromAuthenticator(
+    authenticate: (callbacks: CognitoCallbacks) => void
+): Promise<cognito.CognitoUserSession> {
+    return new Promise<cognito.CognitoUserSession>((resolve, reject) => {
+        authenticate({
+            onSuccess: resolve,
+            onFailure: (err: Error) => reject(new AuthError(
+                "There was a problem signing in.",
+                {err}
+            )),
+            newPasswordRequired: () => reject(new NewPasswordRequiredError()),
+        })
+    })
+}
+
+function localStorageHasUser(): boolean {
+    return window.localStorage && !!window.localStorage.getItem(LOCAL_STORAGE_HAS_USER_KEY)
+}
+
+function setLocalStorageHasUser(hasUser: boolean): void {
+    if (window.localStorage) {
+        if (hasUser) {
+            window.localStorage.setItem(LOCAL_STORAGE_HAS_USER_KEY, "true")
+        } else {
+            window.localStorage.removeItem(LOCAL_STORAGE_HAS_USER_KEY)
+        }
+    }
+}
+
+function signOut(user: cognito.CognitoUser): void {
+    user.signOut()
+}
+
+function getCurrentUser(userPool: cognito.CognitoUserPool): cognito.CognitoUser {
+    return userPool.getCurrentUser()
 }
 
 function* createToast(item: ToastModel): Iterator<Effect> {
@@ -116,20 +154,10 @@ function* loadFullArticle(publicationId: string, articleId: string): Iterator<Ef
 function* putAuthData(user: cognito.CognitoUser,
                       authenticate: (callbacks: CognitoCallbacks) => void): Iterable<Effect> {
     try {
-        const session: cognito.CognitoUserSession = yield call(
-            () => new Promise((resolve, reject) => {
-                authenticate({
-                    onSuccess: resolve,
-                    onFailure: (err: Error) => reject(new AuthError(
-                        "There was a problem signing in.",
-                        {err}
-                    )),
-                    newPasswordRequired: () => reject(new NewPasswordRequiredError()),
-                })
-            })
-        )
+        const session: cognito.CognitoUserSession =
+            yield call(getSessionFromAuthenticator, authenticate)
 
-        yield put(actions.saveAuthInfo({
+        yield put(actions.receiveAuthInfo({
             username: user.getUsername(),
             token: session.getAccessToken().getJwtToken(),
         }))
@@ -150,6 +178,10 @@ function* putAuthData(user: cognito.CognitoUser,
 function* handleInitialLoad(): Iterator<Effect> {
     const selectAction: actions.SelectPublication = yield take(actions.selectPublication.type)
     const {publicationId} = selectAction.payload
+
+    if (yield call(localStorageHasUser)) {
+        yield put(actions.loadAuthInfo({}))
+    }
 
     try {
         let pageToken: string | null = null
@@ -182,31 +214,53 @@ function* handleInitialLoad(): Iterator<Effect> {
 
 function* handleAuth(): Iterator<Effect | Promise<any>> {
     while (true) {
-        const signInAction: actions.SignIn = yield take(actions.signIn.type)
-        const {username, password} = signInAction.payload
+        const signInAction: actions.SignIn | actions.LoadAuthInfo =
+            yield take([actions.signIn.type, actions.loadAuthInfo.type])
 
         const {AuthenticationDetails, CognitoUserPool, CognitoUser}: typeof cognito =
             yield call(importCognito)
-
-        const authDetails = new AuthenticationDetails({
-            Username: username,
-            Password: password,
-        })
 
         const userPool = new CognitoUserPool({
             UserPoolId: process.env.COGNITO_USER_POOL_ID,
             ClientId: process.env.COGNITO_CLIENT_ID,
         })
 
-        const user = new CognitoUser({
-            Username: username,
-            Pool: userPool,
-        })
+        let user: cognito.CognitoUser
+        let authenticator: (callbacks: CognitoCallbacks) => void
+
+        if (actions.signIn.isTypeOf(signInAction)) {
+            const {username, password} = signInAction.payload
+
+            const authDetails = new AuthenticationDetails({
+                Username: username,
+                Password: password,
+            })
+
+            user = new CognitoUser({
+                Username: username,
+                Pool: userPool,
+            })
+
+            authenticator = (callbacks: CognitoCallbacks) => {
+                user.authenticateUser(authDetails, callbacks)
+            }
+        } else {
+            user = yield call(getCurrentUser, userPool)
+
+            authenticator = (callbacks: CognitoCallbacks) => {
+                user.getSession((err: Error, session: cognito.CognitoUserSession) => {
+                    if (err) {
+                        callbacks.onFailure(err)
+                    } else {
+                        callbacks.onSuccess(session)
+                    }
+                })
+            }
+        }
 
         try {
-            yield call(putAuthData, user, (callbacks: CognitoCallbacks) => {
-                user.authenticateUser(authDetails, callbacks)
-            })
+            yield call(putAuthData, user, authenticator)
+            yield call(setLocalStorageHasUser, true)
         } catch (err) {
             if (AuthError.isTypeOf(err)) {
                 yield call(createInfoToast, err.message)
@@ -216,6 +270,8 @@ function* handleAuth(): Iterator<Effect | Promise<any>> {
         }
 
         yield take(actions.signOut.type)
+        yield call(signOut, user)
+        yield call(setLocalStorageHasUser, false)
     }
 }
 

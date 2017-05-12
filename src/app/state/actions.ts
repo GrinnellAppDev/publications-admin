@@ -49,12 +49,16 @@ type SignInPayload = {username: string, password: string}
 export type SignIn = Action<SignInPayload>
 export const signIn = actionCreator<SignInPayload>("SIGN_IN")
 
+type LoadAuthInfoPayload = {}
+export type LoadAuthInfo = Action<LoadAuthInfoPayload>
+export const loadAuthInfo = actionCreator<LoadAuthInfoPayload>("LOAD_AUTH_INFO")
+
 type SignOutPayload = {}
 export type SignOut = Action<SignOutPayload>
 export const signOut = actionCreator<SignOutPayload>("SIGN_OUT")
 
-type SaveAuthInfoPayload = {username: string, token: string}
-export const saveAuthInfo = actionCreator<SaveAuthInfoPayload>("SAVE_AUTH_INFO")
+type ReceiveAuthInfoPayload = {username: string, token: string}
+export const receiveAuthInfo = actionCreator<ReceiveAuthInfoPayload>("RECEIVE_AUTH_INFO")
 
 type ReceiveAuthErrorPayload = {}
 export const receiveAuthError = actionCreator<ReceiveAuthErrorPayload>("RECEIVE_AUTH_ERROR")
