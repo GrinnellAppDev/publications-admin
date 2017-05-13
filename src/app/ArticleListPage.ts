@@ -35,6 +35,7 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         currentPublication: state.publicationsById[params.publicationId],
         articlesHaveNextPage: getArticlesPageTokenForSelectedPublication(state, params) !==
             PaginatedArray.LAST_PAGE_TOKEN,
+        isLoading: state.loadingPublications.includes(params.publicationId),
     }),
 
     (dispatch, {params}) => ({

@@ -34,6 +34,7 @@ export interface StateProps {
     publications: PublicationModel[]
     currentPublication: PublicationModel
     articlesHaveNextPage: boolean
+    isLoading: boolean
 }
 
 export interface DispatchProps {
@@ -91,6 +92,8 @@ export default function ArticleListView({currentPublication, ...props}: Props): 
                         Refresh
                     </button>
                 )}
+
+                <span hidden={!props.isLoading}>Loading...</span>
 
                 <InfiniteScroller
                     loadMore={props.onLoadNextArticlePage}

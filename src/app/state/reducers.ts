@@ -189,7 +189,9 @@ export function isLoadingPublications(state: boolean = false, action: Action): b
 
 export function loadingPublications(state: ReadonlyArray<string> = [],
                                     action: Action): ReadonlyArray<string> {
-    if (actions.loadNextArticles.isTypeOf(action)) {
+    if (actions.refreshArticles.isTypeOf(action) ||
+        actions.loadNextArticles.isTypeOf(action)) {
+
         const {publicationId} = action.payload
         return [...state, publicationId]
     }
