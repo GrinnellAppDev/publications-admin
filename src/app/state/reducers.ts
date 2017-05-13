@@ -28,7 +28,12 @@ type Mutable<T> = {
     [P in keyof T]: T[P]
 }
 
-const emptyAuthModel = {username: "", token: "", isLoading: false}
+const emptyAuthModel: AuthenticationModel = {
+    username: "",
+    token: "",
+    expiration: 0,
+    isLoading: false,
+}
 
 export function auth(state: AuthenticationModel = emptyAuthModel,
                      action: Action): AuthenticationModel {
@@ -39,8 +44,7 @@ export function auth(state: AuthenticationModel = emptyAuthModel,
     }
 
     if (actions.receiveAuthInfo.isTypeOf(action)) {
-        const {username, token} = action.payload
-        return {username, token, isLoading: false}
+        return {...action.payload, isLoading: false}
     }
 
     if (actions.signOut.isTypeOf(action) ||

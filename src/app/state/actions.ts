@@ -57,10 +57,11 @@ type SignOutPayload = {}
 export type SignOut = Action<SignOutPayload>
 export const signOut = actionCreator<SignOutPayload>("SIGN_OUT")
 
-type ReceiveAuthInfoPayload = {username: string, token: string}
+type ReceiveAuthInfoPayload = {username: string, token: string, expiration: number}
 export const receiveAuthInfo = actionCreator<ReceiveAuthInfoPayload>("RECEIVE_AUTH_INFO")
 
 type ReceiveAuthErrorPayload = {}
+export type ReceiveAuthError = Action<ReceiveAuthErrorPayload>
 export const receiveAuthError = actionCreator<ReceiveAuthErrorPayload>("RECEIVE_AUTH_ERROR")
 
 type SelectPublicationPayload = {publicationId: string}

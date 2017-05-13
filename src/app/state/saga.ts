@@ -30,7 +30,7 @@ import {StateModel, ShortArticleModel, FullArticleModel, PublicationModel,
 import {getDefaultPublicationId} from "./selectors"
 import * as actions from "./actions"
 import api, {FetchError, PaginatedArray} from "./api"
-import createErrorClass from "./createErrorClass"
+import createErrorClass, {CustomError} from "./createErrorClass"
 
 interface CognitoCallbacks {
     onSuccess(session: cognito.CognitoUserSession): void
@@ -38,11 +38,18 @@ interface CognitoCallbacks {
     newPasswordRequired?(): void
 }
 
+interface Authenticator {
+    (callbacks: CognitoCallbacks): void
+}
+
 const DEFAULT_TOAST_DURATION = 4000
 const LOCAL_STORAGE_HAS_USER_KEY = "CognitoHasUser"
 
 const NewPasswordRequiredError = createErrorClass("NEW_PASSWORD_REQUIRED_ERROR")
-const AuthError = createErrorClass<{err: Error}>(
+
+type AuthErrorPayload = {err: Error}
+type AuthError = CustomError<AuthErrorPayload>
+const AuthError = createErrorClass<AuthErrorPayload>(
     "AUTH_ERROR",
     (message, {err}) => (message ? message + " " : "") + err.message
 )
@@ -51,8 +58,34 @@ function importCognito(): Promise<typeof cognito> {
     return System.import(/* webpackChunkName: "aws-cognito" */ "amazon-cognito-identity-js")
 }
 
+function loadUserPool(): Promise<cognito.CognitoUserPool> {
+    return importCognito()
+        .then(({CognitoUserPool}) => new CognitoUserPool({
+            UserPoolId: process.env.COGNITO_USER_POOL_ID,
+            ClientId: process.env.COGNITO_CLIENT_ID,
+        }))
+}
+
+function isExpired(date: number): boolean {
+    return date < Date.now()
+}
+
+function getAuthenticator(
+    func: (cb: (err: Error, session: cognito.CognitoUserSession) => void) => void
+): Authenticator {
+    return (callbacks) => {
+        func((err: Error, session: cognito.CognitoUserSession) => {
+            if (err) {
+                callbacks.onFailure(err)
+            } else {
+                callbacks.onSuccess(session)
+            }
+        })
+    }
+}
+
 function getSessionFromAuthenticator(
-    authenticate: (callbacks: CognitoCallbacks) => void
+    authenticate: Authenticator
 ): Promise<cognito.CognitoUserSession> {
     return new Promise<cognito.CognitoUserSession>((resolve, reject) => {
         authenticate({
@@ -151,8 +184,7 @@ function* loadFullArticle(publicationId: string, articleId: string): Iterator<Ef
     }
 }
 
-function* putAuthData(user: cognito.CognitoUser,
-                      authenticate: (callbacks: CognitoCallbacks) => void): Iterable<Effect> {
+function* putAuthData(user: cognito.CognitoUser, authenticate: Authenticator): Iterable<Effect> {
     try {
         const session: cognito.CognitoUserSession =
             yield call(getSessionFromAuthenticator, authenticate)
@@ -160,6 +192,7 @@ function* putAuthData(user: cognito.CognitoUser,
         yield put(actions.receiveAuthInfo({
             username: user.getUsername(),
             token: session.getAccessToken().getJwtToken(),
+            expiration: session.getAccessToken().getExpiration(),
         }))
     } catch (err) {
         if (NewPasswordRequiredError.isTypeOf(err)) {
@@ -171,7 +204,25 @@ function* putAuthData(user: cognito.CognitoUser,
             yield call(putAuthData, user, (callbacks: CognitoCallbacks) => {
                 user.completeNewPasswordChallenge(newPassword, {}, callbacks)
             })
+        } else {
+            throw err
         }
+    }
+}
+
+function* handleAuthError(err: AuthError): Iterable<Effect> {
+    yield spawn(createInfoToast, err.message)
+    yield put(actions.receiveAuthError({}))
+    yield call(setLocalStorageHasUser, false)
+}
+
+function* refreshAuth(userPool: cognito.CognitoUserPool | null = null): Iterator<Effect> {
+    if (yield call(localStorageHasUser)) {
+        const loadedUserPool = (userPool) ? userPool : yield call(loadUserPool)
+        const user: cognito.CognitoUser = yield call(getCurrentUser, loadedUserPool)
+        yield call(putAuthData, user, getAuthenticator((callback) => user.getSession(callback)))
+    } else {
+        throw new AuthError("", {err: new Error("Please sign in.")})
     }
 }
 
@@ -217,16 +268,10 @@ function* handleAuth(): Iterator<Effect | Promise<any>> {
         const signInAction: actions.SignIn | actions.LoadAuthInfo =
             yield take([actions.signIn.type, actions.loadAuthInfo.type])
 
-        const {AuthenticationDetails, CognitoUserPool, CognitoUser}: typeof cognito =
+        const {AuthenticationDetails, CognitoUser}: typeof cognito =
             yield call(importCognito)
 
-        const userPool = new CognitoUserPool({
-            UserPoolId: process.env.COGNITO_USER_POOL_ID,
-            ClientId: process.env.COGNITO_CLIENT_ID,
-        })
-
-        let user: cognito.CognitoUser
-        let authenticator: (callbacks: CognitoCallbacks) => void
+        const userPool: cognito.CognitoUserPool = yield call(loadUserPool)
 
         if (actions.signIn.isTypeOf(signInAction)) {
             const {username, password} = signInAction.payload
@@ -236,41 +281,38 @@ function* handleAuth(): Iterator<Effect | Promise<any>> {
                 Password: password,
             })
 
-            user = new CognitoUser({
+            const user = new CognitoUser({
                 Username: username,
                 Pool: userPool,
             })
 
-            authenticator = (callbacks: CognitoCallbacks) => {
+            const authenticator = (callbacks: CognitoCallbacks) => {
                 user.authenticateUser(authDetails, callbacks)
             }
-        } else {
-            user = yield call(getCurrentUser, userPool)
 
-            authenticator = (callbacks: CognitoCallbacks) => {
-                user.getSession((err: Error, session: cognito.CognitoUserSession) => {
-                    if (err) {
-                        callbacks.onFailure(err)
-                    } else {
-                        callbacks.onSuccess(session)
-                    }
-                })
-            }
+            yield call(putAuthData, user, authenticator)
+        } else {
+            yield call(refreshAuth, userPool)
         }
 
         try {
-            yield call(putAuthData, user, authenticator)
             yield call(setLocalStorageHasUser, true)
         } catch (err) {
             if (AuthError.isTypeOf(err)) {
-                yield call(createInfoToast, err.message)
-                yield put(actions.receiveAuthError({}))
-                continue
+                yield call(handleAuthError, err)
+            } else {
+                throw err
             }
         }
 
-        yield take(actions.signOut.type)
-        yield call(signOut, user)
+        const signOutAction: actions.SignOut | actions.ReceiveAuthError =
+            yield take([actions.signOut.type, actions.receiveAuthError.type])
+
+        if (actions.signOut.isTypeOf(signOutAction)) {
+            const user: cognito.CognitoUser = yield call(getCurrentUser, userPool)
+            yield call(signOut, user)
+        }
+
         yield call(setLocalStorageHasUser, false)
     }
 }
@@ -359,27 +401,27 @@ function* handleSubmitArticleDraft(): Iterator<Effect> {
                             `You must be signed in to ${isNew ? "create" : "edit"} articles.`)
             } else {
                 try {
+                    if (isExpired(auth.expiration)) {
+                        yield call(refreshAuth)
+                    }
+
+                    const {auth: newAuth}: StateModel = yield select()
+
                     const item: FullArticleModel = (isNew) ? (
-                        yield call(api.articles.create, publicationId, draft, auth.token)
+                        yield call(api.articles.create, publicationId, draft, newAuth.token)
                     ) : (
-                        yield call(api.articles.edit, publicationId, articleId, draft, auth.token)
+                        yield call(api.articles.edit, publicationId, articleId, draft,
+                                   newAuth.token)
                     )
 
                     yield put(actions.receiveArticleSubmitSuccess({id: item.id, item, isNew}))
                     hashHistory.goBack()
                 } catch (err) {
                     if (FetchError.isTypeOf(err)) {
-                        const {resp} = err.payload
-
-                        if (resp && resp.status === 401) {
-                            yield spawn(createInfoToast, "Could not submit, sign in again.")
-                            yield put(actions.receiveAuthError({}))
-                        } else {
-                            yield spawn(createInfoToast,
-                                        "There was a problem submitting your article.")
-                        }
-
+                        yield spawn(createInfoToast, "There was a problem submitting your article.")
                         yield put(actions.receiveArticleSubmitError({id: articleId}))
+                    } else if (AuthError.isTypeOf(err)) {
+                        yield call(handleAuthError, err)
                     } else {
                         throw err
                     }
@@ -431,12 +473,20 @@ function* handleDeleteArticle(): Iterator<Effect> {
                     yield put(actions.undeleteArticle({item: article}))
                 } else {
                     try {
-                        yield call(api.articles.remove, article.publication, article.id, auth.token)
+                        if (isExpired(auth.expiration)) {
+                            yield call(refreshAuth)
+                        }
+
+                        const {auth: newAuth}: StateModel = yield select()
+                        yield call(api.articles.remove, article.publication, article.id,
+                                   newAuth.token)
                     } catch (err) {
                         if (FetchError.isTypeOf(err)) {
                             yield spawn(createInfoToast,
                                         "There was a problem deleting the article.")
                             yield put(actions.undeleteArticle({item: article}))
+                        } else if (AuthError.isTypeOf(err)) {
+                            yield call(handleAuthError, err)
                         } else {
                             throw err
                         }
