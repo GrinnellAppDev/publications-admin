@@ -32,6 +32,7 @@ export interface StateProps {
     publicationId: string
     model: ArticleEditModel
     isLoading: boolean
+    isSubmitting: boolean
 }
 
 export interface DispatchProps {
@@ -47,7 +48,7 @@ export interface DispatchProps {
 
 type Props = StateProps & DispatchProps
 
-export default function ArticleEditView({articleId, publicationId, model, isLoading,
+export default function ArticleEditView({articleId, publicationId, model, isLoading, isSubmitting,
                                          ...actions}: Props): JSX.Element {
     const b = block("ArticleEditView")
 
@@ -130,7 +131,13 @@ export default function ArticleEditView({articleId, publicationId, model, isLoad
                 required={true}
             />
 
-            <input type="submit" value={(articleId ? "Update" : "Create") + " Article"}/>
+            <input
+                type="submit"
+                value={(articleId ? "Update" : "Create") + " Article"}
+                hidden={isSubmitting}
+            />
+
+            <div hidden={!isSubmitting}>{(articleId ? "Updating" : "Creating")} Article...</div>
         </form >
     )
 }

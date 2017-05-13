@@ -126,11 +126,11 @@ type SubmitArticleDraftPayload = {publicationId: string, articleId: string}
 export type SubmitArticleDraft = Action<SubmitArticleDraftPayload>
 export const submitArticleDraft = actionCreator<SubmitArticleDraftPayload>("SUBMIT_ARTICLE_DRAFT")
 
-type ReceiveArticleSubmitErrorPayload = {}
+type ReceiveArticleSubmitErrorPayload = {id: string}
 export const receiveArticleSubmitError =
     actionCreator<ReceiveArticleSubmitErrorPayload>("RECEIVE_ARTICLE_SUBMIT_ERROR")
 
-type ReceiveArticleSubmitSuccessPayload = {item: FullArticleModel, isNew: boolean}
+type ReceiveArticleSubmitSuccessPayload = {id: string, item: FullArticleModel, isNew: boolean}
 export const receiveArticleSubmitSuccess =
     actionCreator<ReceiveArticleSubmitSuccessPayload>("RECEIVE_ARTICLE_SUBMIT_SUCCESS")
 

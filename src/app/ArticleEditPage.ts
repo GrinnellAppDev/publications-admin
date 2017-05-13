@@ -40,6 +40,7 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         articleId: params.articleId || "",
         model: state.articleDraftsById[params.articleId || ""],
         isLoading: state.loadingArticles.includes(params.articleId),
+        isSubmitting: state.submittingDrafts.includes(params.articleId),
     }),
 
     (dispatch, {params}) => ({

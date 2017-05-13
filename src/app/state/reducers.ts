@@ -213,6 +213,23 @@ export function loadingArticles(state: ReadonlyArray<string> = [],
     return state
 }
 
+export function submittingDrafts(state: ReadonlyArray<string> = [],
+                                 action: Action): ReadonlyArray<string> {
+    if (actions.submitArticleDraft.isTypeOf(action)) {
+        const {articleId} = action.payload
+        return [...state, articleId]
+    }
+
+    if (actions.receiveArticleSubmitSuccess.isTypeOf(action) ||
+        actions.receiveArticleSubmitError.isTypeOf(action)) {
+
+        const {id} = action.payload
+        return state.filter((draftId) => draftId !== id)
+    }
+
+    return state
+}
+
 export function toasts(state: ReadonlyArray<ToastModel> = [],
                        action: Action): ReadonlyArray<ToastModel> {
     if (actions.closeToast.isTypeOf(action)) {

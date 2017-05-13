@@ -94,6 +94,7 @@ export interface StateModel {
     readonly isLoadingPublications: boolean
     readonly loadingPublications: ReadonlyArray<string>
     readonly loadingArticles: ReadonlyArray<string>
+    readonly submittingDrafts: ReadonlyArray<string>
 
     readonly toasts: ReadonlyArray<ToastModel>
 }

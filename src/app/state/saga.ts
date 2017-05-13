@@ -358,14 +358,6 @@ function* handleSubmitArticleDraft(): Iterator<Effect> {
                 yield spawn(createInfoToast,
                             `You must be signed in to ${isNew ? "create" : "edit"} articles.`)
             } else {
-                const progressToast: ToastModel = {
-                    id: uuid(),
-                    text: "Submitting...",
-                    buttons: [],
-                }
-
-                yield fork(createToast, progressToast)
-
                 try {
                     const item: FullArticleModel = (isNew) ? (
                         yield call(api.articles.create, publicationId, draft, auth.token)
@@ -373,7 +365,7 @@ function* handleSubmitArticleDraft(): Iterator<Effect> {
                         yield call(api.articles.edit, publicationId, articleId, draft, auth.token)
                     )
 
-                    yield put(actions.receiveArticleSubmitSuccess({isNew, item}))
+                    yield put(actions.receiveArticleSubmitSuccess({id: item.id, item, isNew}))
                     hashHistory.goBack()
                 } catch (err) {
                     if (FetchError.isTypeOf(err)) {
@@ -386,9 +378,11 @@ function* handleSubmitArticleDraft(): Iterator<Effect> {
                             yield spawn(createInfoToast,
                                         "There was a problem submitting your article.")
                         }
+
+                        yield put(actions.receiveArticleSubmitError({id: articleId}))
+                    } else {
+                        throw err
                     }
-                } finally {
-                    yield put(actions.closeToast({toastId: progressToast.id}))
                 }
             }
         }, action)
