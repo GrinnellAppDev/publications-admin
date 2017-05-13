@@ -23,10 +23,7 @@ import {connect} from "react-redux"
 import {StateModel} from "./state/models"
 import {getPublications} from "./state/selectors"
 
-import IndexView, {StateProps, DispatchProps} from "./IndexView"
-
-interface OwnProps {
-}
+import IndexView, {StateProps, DispatchProps, OwnProps} from "./IndexView"
 
 export default connect<StateProps, DispatchProps, OwnProps>(
     (state: StateModel) => ({

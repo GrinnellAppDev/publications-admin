@@ -19,7 +19,7 @@
  */
 
 import React from "react"
-import {Link} from "react-router"
+import {Link, RouteComponentProps} from "react-router"
 
 import {AuthorModel, ArticleEditModel} from "./state/models"
 import AuthorInputView from "./AuthorInputView"
@@ -46,30 +46,38 @@ export interface DispatchProps {
     onContentChange: (ev: React.ChangeEvent<HTMLTextAreaElement>) => void
 }
 
-type Props = StateProps & DispatchProps
+interface RouteParams {
+    publicationId: string
+    articleId?: string
+}
 
-export default function ArticleEditView({articleId, publicationId, model, isLoading, isSubmitting,
-                                         ...actions}: Props): JSX.Element {
+export interface OwnProps extends RouteComponentProps<RouteParams, {}> {
+}
+
+type Props = StateProps & DispatchProps & OwnProps
+
+export default function ArticleEditView({articleId, model, isSubmitting,
+                                         ...props}: Props): JSX.Element {
     const b = block("ArticleEditView")
 
-    return (isLoading || !model) ? (
+    return (props.isLoading || !model) ? (
         <div className={b("", "loading")}>Loading...</div>
     ) : (
         <form
             className={b()}
             onSubmit={(ev) => {
                 ev.preventDefault()
-                actions.onSubmit()
+                props.onSubmit()
             }}
         >
-            <Link to={`/publications/${publicationId}/articles`}>
+            <Link to={`/publications/${props.publicationId}/articles`}>
                 <button>Back</button>
             </Link>
 
             <button
                 onClick={(ev) => {
                     ev.preventDefault()
-                    actions.onDiscard()
+                    props.onDiscard()
                 }}
             >
                 Discard Draft
@@ -83,7 +91,7 @@ export default function ArticleEditView({articleId, publicationId, model, isLoad
                 className={b("input", "block title")}
                 name="title"
                 type="text"
-                onChange={actions.onTitleChange}
+                onChange={props.onTitleChange}
                 value={model.title}
                 placeholder="Title"
                 autoComplete="off"
@@ -95,21 +103,22 @@ export default function ArticleEditView({articleId, publicationId, model, isLoad
                 name="headerImage"
                 type="url"
                 value={model.headerImage}
-                onChange={actions.onHeaderImageChange}
+                onChange={props.onHeaderImageChange}
                 placeholder="Header Image URL"
                 autoComplete="off"
             />
 
             <div className={b("authors")}>
-                {model.authors.map((model, index) =>
+                {model.authors.map((model, i) =>
                     <AuthorInputView
-                        {...{model, index}}
-                        key={index}
+                        model={model}
+                        index={i}
+                        key={i}
                         containerClass={b("author")}
                         nameClass={b("input")}
                         emailClass={b("input")}
-                        onChange={actions.onAuthorChange}
-                        onRemove={actions.onAuthorRemove}
+                        onChange={props.onAuthorChange}
+                        onRemove={props.onAuthorRemove}
                     />
                 )}
             </div>
@@ -117,7 +126,7 @@ export default function ArticleEditView({articleId, publicationId, model, isLoad
             <button
                 onClick={(ev) => {
                     ev.preventDefault()
-                    actions.onAuthorAdd()
+                    props.onAuthorAdd()
                 }}
             >
                 Add Author
@@ -126,7 +135,7 @@ export default function ArticleEditView({articleId, publicationId, model, isLoad
             <textarea
                 className={b("input", "block content")}
                 name="content"
-                onChange={actions.onContentChange}
+                onChange={props.onContentChange}
                 value={model.content}
                 required={true}
             />
@@ -138,6 +147,6 @@ export default function ArticleEditView({articleId, publicationId, model, isLoad
             />
 
             <div hidden={!isSubmitting}>{(articleId ? "Updating" : "Creating")} Article...</div>
-        </form >
+        </form>
     )
 }

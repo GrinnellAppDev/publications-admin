@@ -26,15 +26,18 @@ import block from "./style/bem"
 
 import "./ToastView.scss"
 
-interface DispatchProps {
+export interface StateProps {
+}
+
+export interface DispatchProps {
     onButtonClick: (toastId: string, buttonId: string) => void
 }
 
-interface OwnProps {
+export interface OwnProps {
     model: ToastModel
 }
 
-type Props = OwnProps & DispatchProps
+type Props = StateProps & DispatchProps & OwnProps
 
 export default function ToastView({model, onButtonClick}: Props): JSX.Element {
     const b = block("ToastView")

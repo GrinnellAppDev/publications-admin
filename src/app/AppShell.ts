@@ -23,9 +23,9 @@ import {connect} from "react-redux"
 import {StateModel} from "./state/models"
 import {signIn, signOut, closeToast} from "./state/actions"
 
-import AppShellView, {StateProps, DispatchProps} from "./AppShellView"
+import AppShellView, {StateProps, DispatchProps, OwnProps} from "./AppShellView"
 
-export default connect<StateProps, DispatchProps, {}>(
+export default connect<StateProps, DispatchProps, OwnProps>(
     ({auth, toasts}: StateModel) => ({
         isSignedIn: !!auth.token,
         isAuthLoading: auth.isLoading,

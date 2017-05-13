@@ -19,7 +19,7 @@
  */
 
 import React from "react"
-import {Link} from "react-router"
+import {Link, RouteComponentProps} from "react-router"
 import FlipMove from "react-flip-move"
 import InfiniteScroller from "react-infinite-scroller"
 
@@ -42,18 +42,23 @@ export interface DispatchProps {
     onArticleDelete: (id: string) => void
 }
 
-type Props = StateProps & DispatchProps
+export interface RouteParams {
+    publicationId?: string
+}
 
-export default function ArticleListView({articles, publications, currentPublication,
-                                         articlesHaveNextPage,
-                                         ...dispatchProps}: Props): JSX.Element {
+export interface OwnProps extends RouteComponentProps<RouteParams, {}> {
+}
+
+type Props = StateProps & DispatchProps & OwnProps
+
+export default function ArticleListView({currentPublication, ...props}: Props): JSX.Element {
     const b = block("ArticleListView")
 
     return (
         <div>
             <nav>
                 <ul>
-                    {publications.map((publication) =>
+                    {props.publications.map((publication) =>
                         <li key={publication.id}>
                             <Link
                                 to={`/publications/${publication.id}/articles`}
@@ -82,24 +87,24 @@ export default function ArticleListView({articles, publications, currentPublicat
                 )}
 
                 {(currentPublication) && (
-                    <button onClick={dispatchProps.onRefresh}>
+                    <button onClick={props.onRefresh}>
                         Refresh
                     </button>
                 )}
 
                 <InfiniteScroller
-                    loadMore={dispatchProps.onLoadNextArticlePage}
-                    hasMore={articlesHaveNextPage}
+                    loadMore={props.onLoadNextArticlePage}
+                    hasMore={props.articlesHaveNextPage}
                     loader={<span>Loading...</span>}
                     element="section"
                     className={b("articles")}
                 >
                     <FlipMove enterAnimation="fade" leaveAnimation="fade" duration={150}>
-                        {articles.map((article) =>
+                        {props.articles.map((article) =>
                             <div key={article.id}>
                                 <ArticleView
                                     model={article}
-                                    onDelete={dispatchProps.onArticleDelete}
+                                    onDelete={props.onArticleDelete}
                                 />
                             </div>
                         )}

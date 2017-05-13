@@ -40,7 +40,10 @@ export interface DispatchProps {
     onSignOut: () => void
 }
 
-type Props = StateProps & DispatchProps & React.Props<void>
+export interface OwnProps extends React.Props<void> {
+}
+
+type Props = StateProps & DispatchProps & OwnProps
 
 const toastEnterAnimation = {
     from: {

@@ -23,11 +23,6 @@ import React from "react"
 import {AuthorModel} from "./state/models"
 
 export interface StateProps {
-    index: number
-    model: AuthorModel
-    containerClass: string
-    nameClass: string
-    emailClass: string
 }
 
 export interface DispatchProps {
@@ -35,14 +30,21 @@ export interface DispatchProps {
     onRemove: (index: number) => void
 }
 
-type Props = StateProps & DispatchProps
+export interface OwnProps {
+    index: number
+    model: AuthorModel
+    containerClass: string
+    nameClass: string
+    emailClass: string
+}
 
-export default function AuthorInputView({model, index, onChange, onRemove, containerClass,
-                                         nameClass, emailClass}: Props): JSX.Element {
+type Props = StateProps & DispatchProps & OwnProps
+
+export default function AuthorInputView({model, index, onChange, ...props}: Props): JSX.Element {
     return (
-        <div className={containerClass}>
+        <div className={props.containerClass}>
             <input
-                className={nameClass}
+                className={props.nameClass}
                 name="authorName"
                 type="text"
                 value={model.name}
@@ -53,7 +55,7 @@ export default function AuthorInputView({model, index, onChange, onRemove, conta
             />
 
             <input
-                className={emailClass}
+                className={props.emailClass}
                 name="authorEmail"
                 type="email"
                 value={model.email}
@@ -65,7 +67,7 @@ export default function AuthorInputView({model, index, onChange, onRemove, conta
             <button
                 onClick={(ev) => {
                     ev.preventDefault()
-                    onRemove(index)
+                    props.onRemove(index)
                 }}
             >
                 Remove

@@ -28,10 +28,13 @@ export interface StateProps {
 export interface DispatchProps {
 }
 
-type Props = StateProps & DispatchProps
+export interface OwnProps {
+}
 
-export default function IndexPage({isLoading, hasPublications}: Props): JSX.Element {
-    return (isLoading || hasPublications) ? (
+type Props = StateProps & DispatchProps & OwnProps
+
+export default function IndexView(props: Props): JSX.Element {
+    return (props.isLoading || props.hasPublications) ? (
         <div>Loading...</div>
     ) : (
         <div>

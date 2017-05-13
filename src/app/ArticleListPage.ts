@@ -18,7 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {RouteComponentProps} from "react-router"
 import {connect} from "react-redux"
 
 import {StateModel} from "./state/models"
@@ -27,14 +26,7 @@ import {getPublications, getArticles,
 import {refreshArticles, loadNextArticles, deleteArticle} from "./state/actions"
 import {PaginatedArray} from "./state/api"
 
-import ArticleListView, {StateProps, DispatchProps} from "./ArticleListView"
-
-export interface RouteParams {
-    publicationId?: string
-}
-
-interface OwnProps extends RouteComponentProps<RouteParams, {}> {
-}
+import ArticleListView, {StateProps, DispatchProps, OwnProps} from "./ArticleListView"
 
 export default connect<StateProps, DispatchProps, OwnProps>(
     (state: StateModel, {params}) => ({
