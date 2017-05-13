@@ -83,6 +83,8 @@ export default function ArticleEditView({articleId, model, isSubmitting,
                 Discard Draft
             </button>
 
+            <span> Draft <b>not</b> saved.  Will be discarded on page refresh.</span>
+
             <h1>
                 {articleId ? "Edit" : "Create"} Article
             </h1>
