@@ -21,6 +21,7 @@
 export interface AuthenticationModel {
     readonly username: string
     readonly token: string
+    readonly isLoading: boolean
 }
 
 export interface AuthorModel {

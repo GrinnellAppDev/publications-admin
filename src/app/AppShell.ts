@@ -28,6 +28,7 @@ import AppShellView, {StateProps, DispatchProps} from "./AppShellView"
 export default connect<StateProps, DispatchProps, {}>(
     ({auth, toasts}: StateModel) => ({
         isSignedIn: !!auth.token,
+        isAuthLoading: auth.isLoading,
         username: auth.username,
         toasts,
     }),

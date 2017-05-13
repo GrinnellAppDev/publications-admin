@@ -29,6 +29,7 @@ import "./AppShellView.scss"
 
 export interface StateProps {
     isSignedIn: boolean
+    isAuthLoading: boolean
     username: string
     toasts: ReadonlyArray<ToastModel>
 }
@@ -69,7 +70,9 @@ export default function AppShellView(props: Props): JSX.Element {
     return (
         <div className={b()}>
             <div className={b("auth")}>
-                {(props.isSignedIn) ? (
+                {(props.isAuthLoading) ? (
+                    <div>Signing In...</div>
+                ) : (props.isSignedIn) ? (
                     <div>
                         <span>{props.username} </span>
                         <button onClick={props.onSignOut}>Sign Out</button>
