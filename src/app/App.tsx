@@ -91,13 +91,13 @@ export default function App(): JSX.Element {
                     />
 
                     <Route
-                        path="publications/:publicationId/articles"
+                        path=":publicationId"
                         onEnter={onPublicationEnter}
                         onChange={onPublicationChange}
                     >
                         <IndexRoute component={ArticleListPage}/>
                         <Route
-                            path="new"
+                            path="new-article"
                             component={ArticleEditPage}
                             onEnter={onNewArticleNavTo}
                             onChange={onNewArticleNavTo}

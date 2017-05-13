@@ -53,7 +53,7 @@ export default function ArticleView({model, onDelete}: Props): JSX.Element {
                 <h2 className={b("title")}>{model.title}</h2>
 
                 <div>
-                    <Link to={`/publications/${model.publication}/articles/${model.id}/edit`}>
+                    <Link to={`/${model.publication}/${model.id}/edit`}>
                         <button>Edit</button>
                     </Link>
                     <button onClick={() => onDelete(model.id)}>Delete</button>

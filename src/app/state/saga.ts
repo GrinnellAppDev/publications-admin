@@ -259,7 +259,7 @@ function* handleInitialLoad(): Iterator<Effect> {
 
     if (!publicationId) {
         const defaultPublicationId: string = yield select(getDefaultPublicationId)
-        hashHistory.replace(`/publications/${defaultPublicationId}/articles`)
+        hashHistory.replace(`/${defaultPublicationId}`)
     }
 }
 

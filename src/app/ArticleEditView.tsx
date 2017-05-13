@@ -70,7 +70,7 @@ export default function ArticleEditView({articleId, model, isSubmitting,
                 props.onSubmit()
             }}
         >
-            <Link to={`/publications/${props.publicationId}/articles`}>
+            <Link to={`/${props.publicationId}`}>
                 <button>Back</button>
             </Link>
 

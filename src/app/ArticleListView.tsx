@@ -61,7 +61,7 @@ export default function ArticleListView({currentPublication, ...props}: Props): 
                     {props.publications.map((publication) =>
                         <li key={publication.id}>
                             <Link
-                                to={`/publications/${publication.id}/articles`}
+                                to={`/${publication.id}`}
                                 className={b("publication-link")}
                                 activeClassName={b("publication-link", "active")}
                             >
@@ -81,7 +81,7 @@ export default function ArticleListView({currentPublication, ...props}: Props): 
 
             <main>
                 {(currentPublication) && (
-                    <Link to={`/publications/${currentPublication.id}/articles/new`}>
+                    <Link to={`/${currentPublication.id}/new-article`}>
                         <button>New Article</button>
                     </Link>
                 )}
