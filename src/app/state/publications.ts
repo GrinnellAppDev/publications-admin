@@ -22,9 +22,10 @@ import {combineReducers} from "redux"
 import {call, spawn, take, select, put, Effect} from "redux-saga/effects"
 import {hashHistory} from "react-router"
 import {v4 as uuid} from "uuid"
+import {stringify as stringifyQuery} from "query-string"
 
-import {Mutable, IdMapModel, actionCreator, Action} from "./util"
-import api, {PaginatedArray, FetchError} from "./api"
+import {Mutable, IdMapModel, actionCreator, Action, PaginatedArray, FetchError,
+        API_ROOT, responseToPaginatedArray, toFetchError} from "./util"
 import {getDefaultPublicationId} from "./selectors"
 import {createToast} from "./toasts"
 
@@ -90,6 +91,43 @@ export const publicationsReducer = combineReducers<PublicationsStateModel>({
     isLoadingPublications: isLoadingPublicationsReducer,
 })
 
+// Saga Helpers
+
+function responseToPublicationModel(response: any): PublicationModel {
+    return response as PublicationModel
+}
+
+async function listPublicatons(
+    pageToken: string | null
+): Promise<PaginatedArray<PublicationModel>> {
+    if (pageToken === PaginatedArray.LAST_PAGE_TOKEN) {
+        return {
+            items: [],
+            nextPageToken: PaginatedArray.LAST_PAGE_TOKEN,
+        }
+    }
+
+    try {
+        const params = stringifyQuery({
+            pageToken: pageToken || undefined,
+            pageSize: 100,  // ask for large page to minimize the number of requests
+        })
+
+        const resp = await fetch(`${API_ROOT}/publications?${params}`, {
+            method: "GET",
+            mode: "cors",
+        })
+
+        if (!resp.ok) {
+            throw new FetchError("", {resp})
+        }
+
+        return responseToPaginatedArray(responseToPublicationModel, await resp.json())
+    } catch (err) {
+        throw toFetchError(err)
+    }
+}
+
 // Saga
 
 export function* loadPublicationsSaga(): Iterator<Effect> {
@@ -102,7 +140,7 @@ export function* loadPublicationsSaga(): Iterator<Effect> {
         while (pageToken !== PaginatedArray.LAST_PAGE_TOKEN) {
             yield put(publicationsActions.startLoadingPublications({}))
             const page: PaginatedArray<PublicationModel> =
-                yield call(api.publications.list, pageToken)
+                yield call(listPublicatons, pageToken)
             yield put(publicationsActions.receivePublications({page}))
 
             pageToken = page.nextPageToken

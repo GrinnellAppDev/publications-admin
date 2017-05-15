@@ -21,10 +21,11 @@
 import {combineReducers} from "redux"
 import {all, call, fork, spawn, take, select, put, Effect} from "redux-saga/effects"
 import {v4 as uuid} from "uuid"
+import {stringify as stringifyQuery} from "query-string"
 
 import {getArticles, getAuthToken} from "./selectors"
-import {Mutable, IdMapModel, actionCreator, Action} from "./util"
-import api, {FetchError, PaginatedArray} from "./api"
+import {Mutable, IdMapModel, actionCreator, Action, PaginatedArray, FetchError,
+        API_ROOT, responseToPaginatedArray, toFetchError} from "./util"
 import {createInfoToast, createTimedToast} from "./toasts"
 import {refreshAuth, handleAuthError, AuthError} from "./auth"
 import {draftsActions} from "./drafts"
@@ -208,11 +209,97 @@ export const articlesReducer = combineReducers<ArticlesStateModel>({
     loadingArticles: loadingArticlesReducer,
 })
 
+// Saga Helpers
+
+export function responseToArticleModel(response: any): FullArticleModel {
+    return {
+        ...response as FullArticleModel,
+        dateEdited: new Date(response.dateEdited),
+        datePublished: new Date(response.datePublished),
+    }
+}
+
+function responseToShortArticleModel(response: any): ShortArticleModel {
+    return {
+        ...response as ShortArticleModel,
+        datePublished: new Date(response.datePublished),
+    }
+}
+
+async function listArticles(publicationId: string,
+            pageToken: string | null): Promise<PaginatedArray<ShortArticleModel>> {
+    if (pageToken === PaginatedArray.LAST_PAGE_TOKEN) {
+        return {
+            items: [],
+            nextPageToken: PaginatedArray.LAST_PAGE_TOKEN,
+        }
+    }
+
+    try {
+        const params = stringifyQuery({
+            pageToken: pageToken || undefined,
+        })
+
+        const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles` +
+                                    `?${params}`, {
+            method: "GET",
+            mode: "cors",
+        })
+
+        if (!resp.ok) {
+            throw new FetchError("", {resp})
+        }
+
+        return responseToPaginatedArray(responseToShortArticleModel, await resp.json())
+    } catch (err) {
+        throw toFetchError(err)
+    }
+}
+
+async function getArticle(publicationId: string, articleId: string): Promise<FullArticleModel> {
+    try {
+        const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
+                                    `${articleId}`, {
+            method: "GET",
+            mode: "cors",
+        })
+
+        if (!resp.ok) {
+            throw new FetchError("", {resp})
+        }
+
+        return responseToArticleModel(await resp.json())
+    } catch (err) {
+        throw toFetchError(err)
+    }
+}
+
+async function deleteArticle(publicationId: string, articleId: string,
+                             authToken: string): Promise<void> {
+    try {
+        const headers = new Headers()
+        headers.append("Authorization", authToken)
+
+        const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
+                                    `${articleId}`, {
+            method: "DELETE",
+            mode: "cors",
+            headers,
+        })
+
+        if (!resp.ok) {
+            throw new FetchError("", {resp})
+        }
+    } catch (err) {
+        throw toFetchError(err)
+    }
+}
+
 // Saga
 
 export function* loadFullArticle(publicationId: string, articleId: string): Iterator<Effect> {
     try {
-        const item: FullArticleModel = yield call(api.articles.get, publicationId, articleId)
+        const item: FullArticleModel = yield call(getArticle, publicationId, articleId)
         yield put(articlesActions.recieveFullArticle({item}))
         return item
     } catch (err) {
@@ -232,7 +319,7 @@ function* refreshArticlesSaga(): Iterator<Effect> {
         const {publicationId} = refreshAction.payload
         try {
             const page: PaginatedArray<ShortArticleModel> =
-                yield call(api.articles.list, publicationId, null)
+                yield call(listArticles, publicationId, null)
 
             yield put(articlesActions.clearArticles({publicationId}))
             yield put(articlesActions.receiveArticles({publicationId, page}))
@@ -257,7 +344,7 @@ function* loadNextArticlesSaga(): Iterator<Effect> {
 
         try {
             const page: PaginatedArray<ShortArticleModel> =
-                yield call(api.articles.list, publicationId, pageToken)
+                yield call(listArticles, publicationId, pageToken)
 
             yield put(articlesActions.receiveArticles({publicationId, page}))
         } catch (err) {
@@ -308,7 +395,7 @@ function* deleteArticleSaga(): Iterator<Effect> {
                     try {
                         yield call(refreshAuth)
                         const token: string = yield select(getAuthToken)
-                        yield call(api.articles.remove, article.publication, article.id, token)
+                        yield call(deleteArticle, article.publication, article.id, token)
                     } catch (err) {
                         if (FetchError.isTypeOf(err)) {
                             yield spawn(createInfoToast,

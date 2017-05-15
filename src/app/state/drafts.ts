@@ -22,10 +22,11 @@ import {combineReducers} from "redux"
 import {all, call, fork, spawn, take, select, put, Effect} from "redux-saga/effects"
 import {hashHistory} from "react-router"
 
-import {IdMapModel, actionCreator, Action} from "./util"
+import {IdMapModel, actionCreator, Action, FetchError, API_ROOT, toFetchError,
+        arrayToRequest} from "./util"
 import {getDrafts, getAuthToken} from "./selectors"
-import api, {FetchError} from "./api"
-import {FullArticleModel, ArticleCreateModel, ArticleEditModel, loadFullArticle} from "./articles"
+import {FullArticleModel, AuthorModel, ArticleCreateModel, ArticleEditModel,
+        loadFullArticle, responseToArticleModel} from "./articles"
 import {AuthError, handleAuthError, refreshAuth} from "./auth"
 import {createInfoToast} from "./toasts"
 
@@ -136,6 +137,75 @@ export const draftsReducer = combineReducers<DraftsStateModel>({
     submittingDrafts: submittingDraftsReducer,
 })
 
+// Saga Helpers
+
+function authorModelToRequest(model: AuthorModel): any {
+    const {name, email} = model
+    return {name, email}
+}
+
+function articleEditModelToRequest(model: ArticleEditModel): any {
+    const {content, title, authors, headerImage} = model
+    return {
+        authors: arrayToRequest(authorModelToRequest, authors),
+        content, title, headerImage,
+    }
+}
+
+async function createArticle(
+    publicationId: string,
+    model: ArticleCreateModel,
+    authToken: string
+): Promise<FullArticleModel> {
+    try {
+        const headers = new Headers()
+        headers.append("Authorization", authToken)
+
+        const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles`, {
+            method: "POST",
+            mode: "cors",
+            headers,
+            body: JSON.stringify(articleEditModelToRequest(model)),
+        })
+
+        if (!resp.ok) {
+            throw new FetchError("", {resp})
+        }
+
+        return responseToArticleModel(await resp.json())
+    } catch (err) {
+        throw toFetchError(err)
+    }
+}
+
+async function editArticle(
+    publicationId: string,
+    articleId: string,
+    model: ArticleEditModel,
+    authToken: string
+): Promise<FullArticleModel> {
+    try {
+        const headers = new Headers()
+        headers.append("Authorization", authToken)
+
+        const resp = await fetch(`${API_ROOT}/publications/${publicationId}/articles/` +
+                                    `${articleId}`, {
+            method: "PATCH",
+            mode: "cors",
+            headers,
+            body: JSON.stringify(articleEditModelToRequest(model)),
+        })
+
+        if (!resp.ok) {
+            throw new FetchError("", {resp})
+        }
+
+        return responseToArticleModel(await resp.json())
+    } catch (err) {
+        throw toFetchError(err)
+    }
+}
+
 // Sagas
 
 function* loadArticleDraftsSaga(): Iterator<Effect> {
@@ -185,9 +255,9 @@ function* submitArticleDraftSaga(): Iterator<Effect> {
                     const token: string = yield select(getAuthToken)
 
                     const item: FullArticleModel = (isNew) ? (
-                        yield call(api.articles.create, publicationId, draft, token)
+                        yield call(createArticle, publicationId, draft, token)
                     ) : (
-                        yield call(api.articles.edit, publicationId, articleId, draft, token)
+                        yield call(editArticle, publicationId, articleId, draft, token)
                     )
 
                     yield put(draftsActions.receiveArticleSubmitSuccess({id: item.id, item, isNew}))

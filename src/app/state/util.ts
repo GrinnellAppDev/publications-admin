@@ -89,3 +89,56 @@ export function createErrorClass<T>(type: string, messageFunction: MessageFuncti
         }
     }
 }
+
+// Api
+
+export const API_ROOT = process.env.API_ROOT
+
+export interface PaginatedArray<T> {
+    readonly nextPageToken?: string
+    readonly items: ReadonlyArray<T>
+}
+
+export namespace PaginatedArray {
+    export const LAST_PAGE_TOKEN = ""
+}
+
+export interface FetchErrorPayload {
+    resp?: Response
+}
+
+export type FetchError = CustomError<FetchErrorPayload>
+export const FetchError = createErrorClass<FetchErrorPayload>(
+    "FETCH_ERROR",
+    (message, {resp}) => (resp) ? (
+        `Fetch errored with code: ${resp.status} - ${resp.statusText}. ${message}`
+    ) : (
+        `Fetch errored. ${message}`
+    )
+)
+
+export function toFetchError(err: any): FetchError {
+    if (FetchError.isTypeOf(err)) {
+        return err
+    } else if (err instanceof TypeError) {
+        return new FetchError(err.message, {})
+    } else {
+        return new FetchError("", {})
+    }
+}
+
+export function responseToArray<T>(elementConversion: (element: any) => T, request: any): T[] {
+    return (request as any[]).map(elementConversion)
+}
+
+export function responseToPaginatedArray<T>(elementConversion: (element: any) => T,
+                                     response: any): PaginatedArray<T> {
+    return {
+        items: responseToArray(elementConversion, response.items),
+        nextPageToken: response.nextPageToken || PaginatedArray.LAST_PAGE_TOKEN
+    }
+}
+
+export function arrayToRequest<T>(elementConversion: (element: T) => any, array: T[]): any {
+    return array.map(elementConversion).filter((element) => element !== undefined)
+}

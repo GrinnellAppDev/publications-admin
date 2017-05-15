@@ -24,7 +24,7 @@ import {StateModel} from "./state/store"
 import {getPublicationsList, getArticlesList,
         getArticlesPageTokenForSelectedPublication} from "./state/selectors"
 import {articlesActions} from "./state/articles"
-import {PaginatedArray} from "./state/api"
+import {PaginatedArray} from "./state/util"
 
 import ArticleListView, {StateProps, DispatchProps, OwnProps} from "./ArticleListView"
 
