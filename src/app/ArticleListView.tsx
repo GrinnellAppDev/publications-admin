@@ -23,7 +23,8 @@ import {Link, RouteComponentProps} from "react-router"
 import FlipMove from "react-flip-move"
 import InfiniteScroller from "react-infinite-scroller"
 
-import {ShortArticleModel, PublicationModel} from "./state/models"
+import {PublicationModel} from "./state/publications"
+import {ShortArticleModel} from "./state/articles"
 import ArticleView from "./ArticleView"
 import block from "./style/bem"
 

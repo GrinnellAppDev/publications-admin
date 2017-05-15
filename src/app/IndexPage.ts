@@ -20,15 +20,15 @@
 
 import {connect} from "react-redux"
 
-import {StateModel} from "./state/models"
-import {getPublications} from "./state/selectors"
+import {StateModel} from "./state/store"
+import {getPublicationsList} from "./state/selectors"
 
 import IndexView, {StateProps, DispatchProps, OwnProps} from "./IndexView"
 
 export default connect<StateProps, DispatchProps, OwnProps>(
     (state: StateModel) => ({
-        isLoading: state.isLoadingPublications,
-        hasPublications: !!getPublications(state).length,
+        isLoading: state.publications.isLoadingPublications,
+        hasPublications: !!getPublicationsList(state).length,
     }),
 )(
     IndexView

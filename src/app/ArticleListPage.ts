@@ -20,35 +20,35 @@
 
 import {connect} from "react-redux"
 
-import {StateModel} from "./state/models"
-import {getPublications, getArticles,
+import {StateModel} from "./state/store"
+import {getPublicationsList, getArticlesList,
         getArticlesPageTokenForSelectedPublication} from "./state/selectors"
-import {refreshArticles, loadNextArticles, deleteArticle} from "./state/actions"
+import {articlesActions} from "./state/articles"
 import {PaginatedArray} from "./state/api"
 
 import ArticleListView, {StateProps, DispatchProps, OwnProps} from "./ArticleListView"
 
 export default connect<StateProps, DispatchProps, OwnProps>(
     (state: StateModel, {params}) => ({
-        articles: getArticles(state, params),
-        publications: getPublications(state),
-        currentPublication: state.publicationsById[params.publicationId],
+        articles: getArticlesList(state, params),
+        publications: getPublicationsList(state),
+        currentPublication: state.publications.publicationsById[params.publicationId],
         articlesHaveNextPage: getArticlesPageTokenForSelectedPublication(state, params) !==
             PaginatedArray.LAST_PAGE_TOKEN,
-        isLoading: state.loadingPublications.includes(params.publicationId),
+        isLoading: state.articles.loadingPublications.includes(params.publicationId),
     }),
 
     (dispatch, {params}) => ({
         onRefresh: () => {
-            dispatch(refreshArticles({publicationId: params.publicationId}))
+            dispatch(articlesActions.refreshArticles({publicationId: params.publicationId}))
         },
 
         onLoadNextArticlePage: () => {
-            dispatch(loadNextArticles({publicationId: params.publicationId}))
+            dispatch(articlesActions.loadNextArticles({publicationId: params.publicationId}))
         },
 
         onArticleDelete: (id) => {
-            dispatch(deleteArticle({id}))
+            dispatch(articlesActions.deleteArticle({id}))
         },
     }),
 )(

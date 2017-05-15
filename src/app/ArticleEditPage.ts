@@ -20,23 +20,23 @@
 
 import {connect} from "react-redux"
 
-import {StateModel} from "./state/models"
-import {updateArticleDraft, submitArticleDraft, discardArticleDraft} from "./state/actions"
+import {StateModel} from "./state/store"
+import {draftsActions} from "./state/drafts"
 
 import ArticleEditView, {StateProps, DispatchProps, OwnProps} from "./ArticleEditView"
 
 export default connect<StateProps, DispatchProps, OwnProps>(
-    (state: StateModel, {params}) => ({
+    ({drafts, articles}: StateModel, {params}) => ({
         publicationId: params.publicationId,
         articleId: params.articleId || "",
-        model: state.articleDraftsById[params.articleId || ""],
-        isLoading: state.loadingArticles.includes(params.articleId),
-        isSubmitting: state.submittingDrafts.includes(params.articleId),
+        model: drafts.articleDraftsById[params.articleId || ""],
+        isLoading: articles.loadingArticles.includes(params.articleId),
+        isSubmitting: drafts.submittingDrafts.includes(params.articleId),
     }),
 
     (dispatch, {params}) => ({
         onAuthorAdd: () => {
-            dispatch(updateArticleDraft({
+            dispatch(draftsActions.updateArticleDraft({
                 id: params.articleId || "",
                 update: (draft) => ({
                     authors: [...draft.authors, {name: "", email: ""}],
@@ -45,7 +45,7 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         },
 
         onAuthorChange: (newAuthorIndex, newAuthor) => {
-            dispatch(updateArticleDraft({
+            dispatch(draftsActions.updateArticleDraft({
                 id: params.articleId || "",
                 update: (draft) => ({
                     authors: draft.authors.map((author, index) =>
@@ -56,7 +56,7 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         },
 
         onAuthorRemove: (removeIndex) => {
-            dispatch(updateArticleDraft({
+            dispatch(draftsActions.updateArticleDraft({
                 id: params.articleId || "",
                 update: (draft) => ({
                     authors: draft.authors.filter((author, index) => index !== removeIndex),
@@ -65,21 +65,21 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         },
 
         onContentChange: (ev) => {
-            dispatch(updateArticleDraft({
+            dispatch(draftsActions.updateArticleDraft({
                 id: params.articleId || "",
                 update: (draft) => ({content: ev.target.value})
             }))
         },
 
         onHeaderImageChange: (ev) => {
-            dispatch(updateArticleDraft({
+            dispatch(draftsActions.updateArticleDraft({
                 id: params.articleId || "",
                 update: (draft) => ({headerImage: ev.target.value})
             }))
         },
 
         onTitleChange: (ev) => {
-            dispatch(updateArticleDraft({
+            dispatch(draftsActions.updateArticleDraft({
                 id: params.articleId || "",
                 update: (draft) => ({title: ev.target.value})
             }))
@@ -87,11 +87,11 @@ export default connect<StateProps, DispatchProps, OwnProps>(
 
         onSubmit: () => {
             const {publicationId, articleId} = params
-            dispatch(submitArticleDraft({publicationId, articleId}))
+            dispatch(draftsActions.submitArticleDraft({publicationId, articleId}))
         },
 
         onDiscard: () => {
-            dispatch(discardArticleDraft({id: params.articleId}))
+            dispatch(draftsActions.discardArticleDraft({id: params.articleId}))
         },
     })
 )(

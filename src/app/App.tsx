@@ -21,14 +21,10 @@
 import React from "react"
 import {Router, Route, IndexRoute, hashHistory, RouterState} from "react-router"
 import {Provider} from "react-redux"
-import {createStore, combineReducers, applyMiddleware} from "redux"
-import {composeWithDevTools} from "redux-devtools-extension"
-import createSagaMiddleware from "redux-saga"
 
-import {StateModel} from "./state/models"
-import * as reducers from "./state/reducers"
-import * as actions from "./state/actions"
-import saga from "./state/saga"
+import createStore, {runSaga} from "./state/store"
+import {publicationsActions} from "./state/publications"
+import {draftsActions} from "./state/drafts"
 
 import AppShell from "./AppShell"
 import ArticleListPage from "./ArticleListPage"
@@ -36,34 +32,24 @@ import ArticleEditPage from "./ArticleEditPage"
 import IndexPage from "./IndexPage"
 import NotFoundView from "./NotFoundView"
 
-const sagaMiddleware = createSagaMiddleware()
-
-const store = createStore<StateModel>(
-    combineReducers(reducers),
-    composeWithDevTools(
-        applyMiddleware(
-            sagaMiddleware,
-        ),
-    ),
-)
-
-sagaMiddleware.run(saga)
+const store = createStore()
+runSaga()
 
 function onPublicationChange({params: oldParams}: RouterState, {params}: RouterState): void {
     const {publicationId} = params
     if (oldParams.publicationId !== publicationId) {
-        store.dispatch(actions.selectPublication({publicationId}))
+        store.dispatch(publicationsActions.selectPublication({publicationId}))
     }
 }
 
 function onPublicationEnter({params}: RouterState): void {
-    store.dispatch(actions.selectPublication({publicationId: params.publicationId}))
+    store.dispatch(publicationsActions.selectPublication({publicationId: params.publicationId}))
 }
 
 function onNewArticleNavTo(): void {
     const id = ""
-    const item = store.getState().articleDraftsById[id]
-    store.dispatch(actions.createArticleDraft({id, item}))
+    const item = store.getState().drafts.articleDraftsById[id]
+    store.dispatch(draftsActions.createArticleDraft({id, item}))
 }
 
 function onArticleChange({params: oldParams}: RouterState,
@@ -72,7 +58,7 @@ function onArticleChange({params: oldParams}: RouterState,
     if (oldParams.publicationId !== publicationId ||
         oldParams.articleId !== articleId) {
 
-        store.dispatch(actions.loadArticleDraft({publicationId, articleId}))
+        store.dispatch(draftsActions.loadArticleDraft({publicationId, articleId}))
     }
 }
 

@@ -20,7 +20,7 @@
 
 import React from "react"
 
-import {ToastModel} from "./state/models"
+import {ToastModel} from "./state/toasts"
 
 import block from "./style/bem"
 

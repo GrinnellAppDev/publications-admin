@@ -21,7 +21,7 @@
 import React from "react"
 import FlipMove from "react-flip-move"
 
-import {ToastModel} from "./state/models"
+import {ToastModel} from "./state/toasts"
 import ToastView from "./ToastView"
 import block from "./style/bem"
 

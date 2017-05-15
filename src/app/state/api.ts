@@ -20,9 +20,10 @@
 
 import {stringify as stringifyQuery} from "query-string"
 
-import {PublicationModel, FullArticleModel, ArticleCreateModel, ArticleEditModel, ShortArticleModel,
-        AuthorModel} from "./models"
-import createErrorClass, {CustomError} from "./createErrorClass"
+import {PublicationModel} from "./publications"
+import {FullArticleModel, ShortArticleModel, AuthorModel, ArticleCreateModel,
+        ArticleEditModel} from "./articles"
+import {createErrorClass, CustomError} from "./util"
 
 const API_ROOT = process.env.API_ROOT
 

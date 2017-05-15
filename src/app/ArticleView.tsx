@@ -21,7 +21,7 @@
 import React from "react"
 import {Link} from "react-router"
 
-import {ShortArticleModel} from "./state/models"
+import {ShortArticleModel} from "./state/articles"
 
 import block from "./style/bem"
 

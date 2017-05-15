@@ -20,7 +20,7 @@
 
 import React from "react"
 
-import {AuthorModel} from "./state/models"
+import {AuthorModel} from "./state/articles"
 
 export interface StateProps {
 }

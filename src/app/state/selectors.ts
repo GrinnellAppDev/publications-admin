@@ -20,21 +20,30 @@
 
 import {createSelector} from "reselect"
 
-import {StateModel} from "./models"
+import {StateModel} from "./store"
 
-const getPublicationsById = (state: StateModel) => state.publicationsById
-const getArticlesById = (state: StateModel) => state.articlesById
+export const getAuth = (state: StateModel) => state.auth
+export const getToasts = (state: StateModel) => state.toasts
+export const getPublications = (state: StateModel) => state.publications
+export const getArticles = (state: StateModel) => state.articles
+export const getDrafts = (state: StateModel) => state.drafts
+
+export const getAuthToken = (state: StateModel) => state.auth.token
+
+const getPublicationsById = (state: StateModel) => state.publications.publicationsById
+const getArticlesById = (state: StateModel) => state.articles.articlesById
 const getSelectedPublicationId = (state: StateModel, {publicationId}: any) => publicationId || ""
-const getArticlesPageTokensByParentId = (state: StateModel) => state.articlesPageTokensByParentId
+const getArticlesPageTokensByParentId = (state: StateModel) =>
+    state.articles.articlesPageTokensByParentId
 
-export const getPublications = createSelector(
+export const getPublicationsList = createSelector(
     getPublicationsById,
     (publicationsById) => Object.keys(publicationsById)
         .map((id) => publicationsById[id])
         .sort((a, b) => a.name.localeCompare(b.name))
 )
 
-export const getArticles = createSelector(
+export const getArticlesList = createSelector(
     getArticlesById, getSelectedPublicationId,
     (articlesById, selectedPublicationId) => Object.keys(articlesById)
         .map((id) => articlesById[id])
@@ -43,7 +52,7 @@ export const getArticles = createSelector(
 )
 
 export const getDefaultPublicationId = createSelector(
-    getPublications,
+    getPublicationsList,
     (publications) => publications[0] ? publications[0].id : ""
 )
 

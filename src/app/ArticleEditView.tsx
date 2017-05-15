@@ -21,7 +21,7 @@
 import React from "react"
 import {Link, RouteComponentProps} from "react-router"
 
-import {AuthorModel, ArticleEditModel} from "./state/models"
+import {AuthorModel, ArticleEditModel} from "./state/articles"
 import AuthorInputView from "./AuthorInputView"
 import block from "./style/bem"
 
