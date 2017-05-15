@@ -1,7 +1,7 @@
 /**
- * NotFoundView.tsx
+ * Toast.tsx
  *
- * Created by Zander Otavka on 2/22/17.
+ * Created by Zander Otavka on 2/23/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,12 +20,29 @@
 
 import React from "react"
 
-export default function NotFoundView(): JSX.Element {
-    return (
-        <div>
-            <h1>404 Not Found</h1>
-            <a href="#">Home</a>
-        </div>
-    )
+import {ToastModel} from "./state/toasts"
+
+import block from "./style/bem"
+import "./Toast.scss"
+
+interface Props {
+    model: ToastModel
+    onButtonClick: (toastId: string, buttonId: string) => void
 }
 
+const b = block("Toast")
+
+export default ({model, onButtonClick}: Props) =>
+    <div className={b()}>
+        <span className={b("text")}>{model.text}</span>
+
+        {model.buttons.map((button) =>
+            <button
+                key={button.id}
+                className={b("button")}
+                onClick={() => onButtonClick(model.id, button.id)}
+            >
+                {button.text}
+            </button>
+        )}
+    </div>

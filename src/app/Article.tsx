@@ -1,5 +1,5 @@
 /**
- * ArticleView.tsx
+ * Article.tsx
  *
  * Created by Zander Otavka on 2/8/16.
  * Copyright (C) 2016  Grinnell AppDev.
@@ -25,7 +25,7 @@ import {ShortArticleModel} from "./state/articles"
 
 import block from "./style/bem"
 
-import "./ArticleView.scss"
+import "./Article.scss"
 
 interface Props {
     model: ShortArticleModel
@@ -35,9 +35,9 @@ interface Props {
 const SHORT_MONTHS = ["Jan", "Feb", "Mar", "April", "May", "June", "July", "Aug", "Sep", "Oct",
                       "Nov", "Dec"]
 
-export default function ArticleView({model, onDelete}: Props): JSX.Element {
-    const b = block("ArticleView")
+const b = block("Article")
 
+export default ({model, onDelete}: Props) => {
     const authors = model.authors
         .map((author) => author.name)
         .filter((author) => author && author.length !== 0)

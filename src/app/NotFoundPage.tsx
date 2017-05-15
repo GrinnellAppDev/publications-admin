@@ -1,5 +1,5 @@
 /**
- * IndexPage.ts
+ * NotFoundPage.tsx
  *
  * Created by Zander Otavka on 2/22/17.
  * Copyright (C) 2016  Grinnell AppDev.
@@ -18,18 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {connect} from "react-redux"
+import React from "react"
 
-import {StateModel} from "./state/store"
-import {getPublicationsList} from "./state/selectors"
-
-import IndexView, {StateProps, DispatchProps, OwnProps} from "./IndexView"
-
-export default connect<StateProps, DispatchProps, OwnProps>(
-    (state: StateModel) => ({
-        isLoading: state.publications.isLoadingPublications,
-        hasPublications: !!getPublicationsList(state).length,
-    }),
-)(
-    IndexView
-)
+export default () =>
+    <div>
+        <h1>404 Not Found</h1>
+        <a href="#">Home</a>
+    </div>

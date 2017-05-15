@@ -1,5 +1,5 @@
 /**
- * ArticleListView.scss
+ * Article.scss
  *
  * Created by Zander Otavka on 2/11/17.
  * Copyright (C) 2016  Grinnell AppDev.
@@ -18,19 +18,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.ArticleListView {
-    &__publication-link {
-        &--active {
-            font-weight: bold;
-            cursor: text;
+.Article {
+    display: flex;
+    flex-direction: row;
 
-            &:hover {
-                text-decoration: none;
-            }
-        }
+    &__title {
+        margin: 0;
     }
 
-    &__articles {
-        margin-top: 20px;
+    &__header-image-wrapper {
+        width: 20%;
+        flex: 1;
+    }
+
+    &__header-image-container {
+        position: relative;
+        width: 100%;
+        padding-bottom: 100%;
+    }
+
+    &__header-image {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        background-color: #ddd;
+    }
+
+    &__detail-wrapper {
+        width: 20%;
+        flex: 4;
+        padding-left: 10px;
+    }
+
+    &__date {
+        font-style: italic;
     }
 }

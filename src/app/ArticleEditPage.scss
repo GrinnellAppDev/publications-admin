@@ -1,7 +1,7 @@
 /**
- * AppShellView.scss
+ * ArticleEditPage.scss
  *
- * Created by Zander Otavka on 1/16/17.
+ * Created by Zander Otavka on 2/11/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,35 +18,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.AppShellView {
-    margin: 16px 20%;
+.ArticleEditPage {
+    &__input {
+        font-size: 0.9rem;
 
-    &__auth {
-        margin-bottom: 8px;
+        &--block {
+            display: block;
+            width: 100%;
+        }
+
+        &--title {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        &--content {
+            height: 50vh;
+            margin-top: 4px;
+        }
     }
 
-    &__toasts {
-        position: fixed;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 999;
-        margin: 8px;
-        pointer-events: none;
-    }
-
-    &__toasts > ul {
-        pointer-events: none;
-        width: 100%;
-        padding: 0;
+    &__author {
         display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        align-items: flex-start;
-    }
+        flex-direction: row;
 
-    &__toast-wrapper {
-        pointer-events: all;
-        display: inline-block;
+        input {
+            flex: 1;
+        }
     }
 }

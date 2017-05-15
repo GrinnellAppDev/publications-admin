@@ -1,7 +1,7 @@
 /**
- * IndexView.tsx
+ * IndexPage.tsx
  *
- * Created by Zander Otavka on 2/23/17.
+ * Created by Zander Otavka on 2/22/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,22 +19,29 @@
  */
 
 import React from "react"
+import {connect} from "react-redux"
 
-export interface StateProps {
+import {StateModel} from "./state/store"
+import {getPublicationsList} from "./state/selectors"
+
+interface StateProps {
     isLoading: boolean
     hasPublications: boolean
 }
 
-export interface DispatchProps {
+interface DispatchProps {
 }
 
-export interface OwnProps {
+interface OwnProps {
 }
 
-type Props = StateProps & DispatchProps & OwnProps
-
-export default function IndexView(props: Props): JSX.Element {
-    return (props.isLoading || props.hasPublications) ? (
+export default connect<StateProps, DispatchProps, OwnProps>(
+    (state: StateModel) => ({
+        isLoading: state.publications.isLoadingPublications,
+        hasPublications: !!getPublicationsList(state).length,
+    }),
+)((props) =>
+    (props.isLoading || props.hasPublications) ? (
         <div>Loading...</div>
     ) : (
         <div>
@@ -42,4 +49,4 @@ export default function IndexView(props: Props): JSX.Element {
             <p>Couldn't find any publications.</p>
         </div>
     )
-}
+)

@@ -1,7 +1,7 @@
 /**
- * ArticleEditView.tsx
+ * ArticleEditPage.tsx
  *
- * Created by Zander Otavka on 2/17/17.
+ * Created by Zander Otavka on 2/8/17.
  * Copyright (C) 2016  Grinnell AppDev.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,14 +20,18 @@
 
 import React from "react"
 import {Link, RouteComponentProps} from "react-router"
+import {connect} from "react-redux"
 
+import {StateModel} from "./state/store"
+import {draftsActions} from "./state/drafts"
 import {AuthorModel, ArticleEditModel} from "./state/articles"
-import AuthorInputView from "./AuthorInputView"
+
+import AuthorInput from "./AuthorInput"
+
 import block from "./style/bem"
+import "./ArticleEditPage.scss"
 
-import "./ArticleEditView.scss"
-
-export interface StateProps {
+interface StateProps {
     articleId: string
     publicationId: string
     model: ArticleEditModel
@@ -35,14 +39,14 @@ export interface StateProps {
     isSubmitting: boolean
 }
 
-export interface DispatchProps {
-    onSubmit: () => void
-    onDiscard: () => void
+interface DispatchProps {
+    onSubmit: (ev: React.FormEvent<HTMLFormElement>) => void
+    onDiscard: (ev: React.MouseEvent<HTMLButtonElement>) => void
     onTitleChange: (ev: React.ChangeEvent<HTMLInputElement>) => void
     onHeaderImageChange: (ev: React.ChangeEvent<HTMLInputElement>) => void
     onAuthorChange: (index: number, newModel: AuthorModel) => void
     onAuthorRemove: (index: number) => void
-    onAuthorAdd: () => void
+    onAuthorAdd: (ev: React.MouseEvent<HTMLButtonElement>) => void
     onContentChange: (ev: React.ChangeEvent<HTMLTextAreaElement>) => void
 }
 
@@ -51,35 +55,94 @@ interface RouteParams {
     articleId?: string
 }
 
-export interface OwnProps extends RouteComponentProps<RouteParams, {}> {
+interface OwnProps extends RouteComponentProps<RouteParams, {}> {
 }
 
-type Props = StateProps & DispatchProps & OwnProps
+const b = block("ArticleEditPage")
 
-export default function ArticleEditView({articleId, model, isSubmitting,
-                                         ...props}: Props): JSX.Element {
-    const b = block("ArticleEditView")
+export default connect<StateProps, DispatchProps, OwnProps>(
+    ({drafts, articles}: StateModel, {params}: OwnProps) => ({
+        publicationId: params.publicationId,
+        articleId: params.articleId || "",
+        model: drafts.articleDraftsById[params.articleId || ""],
+        isLoading: articles.loadingArticles.includes(params.articleId),
+        isSubmitting: drafts.submittingDrafts.includes(params.articleId),
+    }),
 
-    return (props.isLoading || !model) ? (
+    (dispatch, {params}) => ({
+        onAuthorAdd: (ev) => {
+            ev.preventDefault()
+            dispatch(draftsActions.updateArticleDraft({
+                id: params.articleId || "",
+                update: (draft) => ({
+                    authors: [...draft.authors, {name: "", email: ""}],
+                })
+            }))
+        },
+
+        onAuthorChange: (newAuthorIndex, newAuthor) => {
+            dispatch(draftsActions.updateArticleDraft({
+                id: params.articleId || "",
+                update: (draft) => ({
+                    authors: draft.authors.map((author, index) =>
+                        (index === newAuthorIndex) ? newAuthor : author
+                    ),
+                })
+            }))
+        },
+
+        onAuthorRemove: (removeIndex) => {
+            dispatch(draftsActions.updateArticleDraft({
+                id: params.articleId || "",
+                update: (draft) => ({
+                    authors: draft.authors.filter((author, index) => index !== removeIndex),
+                })
+            }))
+        },
+
+        onContentChange: (ev) => {
+            dispatch(draftsActions.updateArticleDraft({
+                id: params.articleId || "",
+                update: (draft) => ({content: ev.target.value})
+            }))
+        },
+
+        onHeaderImageChange: (ev) => {
+            dispatch(draftsActions.updateArticleDraft({
+                id: params.articleId || "",
+                update: (draft) => ({headerImage: ev.target.value})
+            }))
+        },
+
+        onTitleChange: (ev) => {
+            dispatch(draftsActions.updateArticleDraft({
+                id: params.articleId || "",
+                update: (draft) => ({title: ev.target.value})
+            }))
+        },
+
+        onSubmit: (ev) => {
+            const {publicationId, articleId} = params
+            ev.preventDefault()
+            dispatch(draftsActions.submitArticleDraft({publicationId, articleId}))
+        },
+
+        onDiscard: (ev) => {
+            ev.preventDefault()
+            dispatch(draftsActions.discardArticleDraft({id: params.articleId}))
+        },
+    }),
+
+)(({articleId, model, isSubmitting, ...props}) =>
+    (props.isLoading || !model) ? (
         <div className={b("", "loading")}>Loading...</div>
     ) : (
-        <form
-            className={b()}
-            onSubmit={(ev) => {
-                ev.preventDefault()
-                props.onSubmit()
-            }}
-        >
+        <form className={b()} onSubmit={props.onSubmit}>
             <Link to={`/${props.publicationId}`}>
                 <button>Back</button>
             </Link>
 
-            <button
-                onClick={(ev) => {
-                    ev.preventDefault()
-                    props.onDiscard()
-                }}
-            >
+            <button onClick={props.onDiscard}>
                 Discard Draft
             </button>
 
@@ -112,7 +175,7 @@ export default function ArticleEditView({articleId, model, isSubmitting,
 
             <div className={b("authors")}>
                 {model.authors.map((model, i) =>
-                    <AuthorInputView
+                    <AuthorInput
                         model={model}
                         index={i}
                         key={i}
@@ -125,12 +188,7 @@ export default function ArticleEditView({articleId, model, isSubmitting,
                 )}
             </div>
 
-            <button
-                onClick={(ev) => {
-                    ev.preventDefault()
-                    props.onAuthorAdd()
-                }}
-            >
+            <button onClick={props.onAuthorAdd}>
                 Add Author
             </button>
 
@@ -151,4 +209,4 @@ export default function ArticleEditView({articleId, model, isSubmitting,
             <div hidden={!isSubmitting}>{(articleId ? "Updating" : "Creating")} Article...</div>
         </form>
     )
-}
+)

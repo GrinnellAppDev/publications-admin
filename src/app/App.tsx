@@ -30,7 +30,7 @@ import AppShell from "./AppShell"
 import ArticleListPage from "./ArticleListPage"
 import ArticleEditPage from "./ArticleEditPage"
 import IndexPage from "./IndexPage"
-import NotFoundView from "./NotFoundView"
+import NotFoundPage from "./NotFoundPage"
 
 const store = createStore()
 runSaga()
@@ -96,7 +96,7 @@ export default function App(): JSX.Element {
                         />
                     </Route>
 
-                    <Route path="*" component={NotFoundView}/>
+                    <Route path="*" component={NotFoundPage}/>
                 </Route>
             </Router>
         </Provider>
