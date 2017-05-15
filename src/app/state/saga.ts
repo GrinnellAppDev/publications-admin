@@ -226,7 +226,7 @@ function* refreshAuth(userPool: cognito.CognitoUserPool | null = null): Iterator
     }
 }
 
-function* handleInitialLoad(): Iterator<Effect> {
+function* initialLoadSaga(): Iterator<Effect> {
     const selectAction: actions.SelectPublication = yield take(actions.selectPublication.type)
     const {publicationId} = selectAction.payload
 
@@ -263,7 +263,7 @@ function* handleInitialLoad(): Iterator<Effect> {
     }
 }
 
-function* handleAuth(): Iterator<Effect | Promise<any>> {
+function* authSaga(): Iterator<Effect | Promise<any>> {
     while (true) {
         const signInAction: actions.SignIn | actions.LoadAuthInfo =
             yield take([actions.signIn.type, actions.loadAuthInfo.type])
@@ -317,7 +317,7 @@ function* handleAuth(): Iterator<Effect | Promise<any>> {
     }
 }
 
-function* handleRefreshArticles(): Iterator<Effect> {
+function* refreshArticlesSaga(): Iterator<Effect> {
     while (true) {
         const refreshAction: actions.RefreshArticles = yield take(actions.refreshArticles.type)
         const {publicationId} = refreshAction.payload
@@ -337,7 +337,7 @@ function* handleRefreshArticles(): Iterator<Effect> {
     }
 }
 
-function* handleLoadNextArticles(): Iterator<Effect> {
+function* loadNextArticlesSaga(): Iterator<Effect> {
     while (true) {
         const loadAction: actions.LoadNextArticles = yield take(actions.loadNextArticles.type)
         const {publicationId} = loadAction.payload
@@ -359,7 +359,7 @@ function* handleLoadNextArticles(): Iterator<Effect> {
     }
 }
 
-function* handleLoadArticleDrafts(): Iterator<Effect> {
+function* loadArticleDraftsSaga(): Iterator<Effect> {
     while (true) {
         const action: any = yield take(actions.loadArticleDraft.type)
         yield fork(function* (loadAction: actions.LoadArticleDraft): Iterator<Effect> {
@@ -387,7 +387,7 @@ function* handleLoadArticleDrafts(): Iterator<Effect> {
     }
 }
 
-function* handleSubmitArticleDraft(): Iterator<Effect> {
+function* submitArticleDraftSaga(): Iterator<Effect> {
     while (true) {
         const action: any = yield take(actions.submitArticleDraft.type)
         yield fork(function* (submitAction: actions.SubmitArticleDraft): Iterator<Effect> {
@@ -431,14 +431,14 @@ function* handleSubmitArticleDraft(): Iterator<Effect> {
     }
 }
 
-function* handleDiscardArticleDraft(): Iterator<Effect> {
+function* discardArticleDraftSaga(): Iterator<Effect> {
     while (true) {
         yield take(actions.discardArticleDraft.type)
         hashHistory.goBack()
     }
 }
 
-function* handleDeleteArticle(): Iterator<Effect> {
+function* deleteArticleSaga(): Iterator<Effect> {
     while (true) {
         const action: any = yield take(actions.deleteArticle.type)
         yield fork(function* (deleteAction: actions.DeleteArticle): Iterator<Effect> {
@@ -499,13 +499,13 @@ function* handleDeleteArticle(): Iterator<Effect> {
 
 export default function* rootSaga(): Iterator<Effect> {
     yield all([
-        call(handleInitialLoad),
-        call(handleAuth),
-        call(handleRefreshArticles),
-        call(handleLoadNextArticles),
-        call(handleLoadArticleDrafts),
-        call(handleSubmitArticleDraft),
-        call(handleDiscardArticleDraft),
-        call(handleDeleteArticle),
+        call(initialLoadSaga),
+        call(authSaga),
+        call(refreshArticlesSaga),
+        call(loadNextArticlesSaga),
+        call(loadArticleDraftsSaga),
+        call(submitArticleDraftSaga),
+        call(discardArticleDraftSaga),
+        call(deleteArticleSaga),
     ])
 }
