@@ -1,0 +1,62 @@
+/**
+ * Toast.scss
+ *
+ * Created by Zander Otavka on 2/23/17.
+ * Copyright (C) 2016  Grinnell AppDev.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.Toast
+    display: inline-block
+    margin: 8px
+    padding: 8px
+    background: #333
+    border-radius: 2px
+
+    &__text
+        color: white
+        font-size: 1rem
+        margin: 0 8px
+
+    &__button
+        position: relative
+        margin-left: 8px
+        padding: 8px
+        text-transform: uppercase
+        color: white
+        background: none
+        border: none
+        outline: none
+
+        &::after
+            content: ""
+            position: absolute
+            display: block
+            top: 0
+            right: 0
+            left: 0
+            bottom: 0
+            pointer-events: none
+            background: rgba(255, 255, 255, 0.3)
+            border-radius: 2px
+            opacity: 0
+            transition: opacity 400ms
+
+        &:hover::after,
+        &:focus::after
+            opacity: 0.5
+
+        &:active::after
+            opacity: 1

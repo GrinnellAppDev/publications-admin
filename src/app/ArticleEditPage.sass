@@ -1,5 +1,5 @@
 /**
- * ArticleListPage.scss
+ * ArticleEditPage.scss
  *
  * Created by Zander Otavka on 2/11/17.
  * Copyright (C) 2016  Grinnell AppDev.
@@ -10,7 +10,7 @@
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -18,19 +18,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.ArticleListPage {
-    &__publication-link {
-        &--active {
-            font-weight: bold;
-            cursor: text;
+.ArticleEditPage
+    &__input
+        font-size: 0.9rem
 
-            &:hover {
-                text-decoration: none;
-            }
-        }
-    }
+        &--block
+            display: block
+            width: 100%
 
-    &__articles {
-        margin-top: 20px;
-    }
-}
+        &--title
+            font-size: 1.3rem
+            font-weight: bold
+
+        &--content
+            height: 50vh
+            margin-top: 4px
+
+    &__author
+        display: flex
+        flex-direction: row
+
+        input
+            flex: 1

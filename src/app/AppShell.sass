@@ -1,5 +1,5 @@
 /**
- * AppShell.scss
+ * AppShell.sass
  *
  * Created by Zander Otavka on 1/16/17.
  * Copyright (C) 2016  Grinnell AppDev.
@@ -10,7 +10,7 @@
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -18,35 +18,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.AppShell {
-    margin: 16px 20%;
+.AppShell
+    margin: 16px 20%
 
-    &__auth {
-        margin-bottom: 8px;
-    }
+    &__auth
+        margin-bottom: 8px
 
-    &__toasts {
-        position: fixed;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 999;
-        margin: 8px;
-        pointer-events: none;
-    }
+    &__toasts
+        position: fixed
+        right: 0
+        bottom: 0
+        left: 0
+        z-index: 999
+        margin: 8px
+        pointer-events: none
 
-    &__toasts > ul {
-        pointer-events: none;
-        width: 100%;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        align-items: flex-start;
-    }
+    &__toasts > ul
+        pointer-events: none
+        width: 100%
+        padding: 0
+        display: flex
+        flex-direction: column
+        justify-content: flex-end
+        align-items: flex-start
 
-    &__toast-wrapper {
-        pointer-events: all;
-        display: inline-block;
-    }
-}
+    &__toast-wrapper
+        pointer-events: all
+        display: inline-block
