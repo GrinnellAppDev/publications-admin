@@ -80,7 +80,7 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         },
 
         onArticleDelete: (id) => {
-            dispatch(articlesActions.delete({id}))
+            dispatch(articlesActions.deleteArticle({id}))
         },
     }),
 )
