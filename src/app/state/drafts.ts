@@ -49,7 +49,7 @@ export namespace draftsActions {
 
     type UpdatePayload = {
         id: string,
-        update: (draft: ArticleEditModel) => Partial<ArticleEditModel>
+        update: (draft: ArticleEditModel) => Partial<ArticleEditModel>,
     }
     export const update = actionCreator<UpdatePayload>("UPDATE_ARTICLE_DRAFT")
 
@@ -151,7 +151,7 @@ function articleEditModelToRequest(model: ArticleEditModel): any {
 async function createArticle(
     publicationId: string,
     model: ArticleCreateModel,
-    authToken: string
+    authToken: string,
 ): Promise<FullArticleModel> {
     try {
         const headers = new Headers()
@@ -178,7 +178,7 @@ async function editArticle(
     publicationId: string,
     articleId: string,
     model: ArticleEditModel,
-    authToken: string
+    authToken: string,
 ): Promise<FullArticleModel> {
     try {
         const headers = new Headers()

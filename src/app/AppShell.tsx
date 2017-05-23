@@ -103,8 +103,8 @@ export default connect<StateProps, DispatchProps, OwnProps>(
             dispatch(toastsActions.close({toastId, buttonId}))
         },
     }),
-
-)(function AppShell(props) {
+)
+(function AppShell(props) {
     return (
         <div className={b()}>
             <div className={b("auth")}>
