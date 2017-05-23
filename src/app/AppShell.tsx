@@ -31,7 +31,7 @@ import {toastsActions} from "./state/toasts"
 import Toast from "./Toast"
 
 import block from "./style/bem"
-import "./AppShell.scss"
+import "./AppShell.sass"
 
 interface StateProps {
     isSignedIn: boolean

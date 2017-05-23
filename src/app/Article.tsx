@@ -25,7 +25,7 @@ import {ShortArticleModel} from "./state/articles"
 
 import block from "./style/bem"
 
-import "./Article.scss"
+import "./Article.sass"
 
 interface Props {
     model: ShortArticleModel

@@ -18,8 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+@import "style/dimens"
+
 .AppShell
     margin: 16px 20%
+
+    @media (max-width: $breakpoint-mobile-large)
+        margin: 16px
 
     &__auth
         margin-bottom: 8px

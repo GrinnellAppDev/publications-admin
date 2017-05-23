@@ -35,7 +35,7 @@ import {ShortArticleModel} from "./state/articles"
 import Article from "./Article"
 
 import block from "./style/bem"
-import "./ArticleListPage.scss"
+import "./ArticleListPage.sass"
 
 interface StateProps {
     articles: ShortArticleModel[]

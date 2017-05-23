@@ -18,12 +18,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+@import "style/dimens"
+
 .Article
     display: flex
     flex-direction: row
 
     &__title
         margin: 0
+
+        @media (max-width: $breakpoint-mobile-large)
+            font-size: 1.2rem
 
     &__header-image-wrapper
         width: 20%

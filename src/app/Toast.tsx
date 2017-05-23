@@ -23,7 +23,7 @@ import React from "react"
 import {ToastModel} from "./state/toasts"
 
 import block from "./style/bem"
-import "./Toast.scss"
+import "./Toast.sass"
 
 interface Props {
     model: ToastModel

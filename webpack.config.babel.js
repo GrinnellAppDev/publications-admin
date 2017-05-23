@@ -89,9 +89,16 @@ export default {
                 loader: "ts-loader",
             },
             {
-                test: /\.scss$/,
+                test: /\.sass$/,
                 use: ExtractTextPlugin.extract({
-                    use: ["css-loader", "sass-loader"],
+                    use: [{
+                        loader: "css-loader",
+                    }, {
+                        loader: "sass-loader",
+                        options: {
+                            indentedSyntax: true,
+                        },
+                    }],
                 }),
             },
             {

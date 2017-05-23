@@ -27,7 +27,7 @@ import {draftsActions} from "./state/drafts"
 import {AuthorModel, ArticleEditModel} from "./state/articles"
 
 import block from "./style/bem"
-import "./ArticleEditPage.scss"
+import "./ArticleEditPage.sass"
 
 interface AuthorInputProps {
     index: number

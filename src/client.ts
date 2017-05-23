@@ -27,6 +27,6 @@ import {render} from "react-dom"
 
 import App from "./app/App"
 
-import "./index.scss"
+import "./index.sass"
 
 render(createElement(App), document.getElementById("root"))
