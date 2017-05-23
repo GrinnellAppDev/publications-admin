@@ -42,7 +42,7 @@ interface StateProps {
 
 interface DispatchProps {
     onToastButtonClick: (toastId: string, buttonId: string) => void
-    onSignIn: (username: string, password: string) => void
+    onSignIn: (ev: React.FormEvent<HTMLFormElement>) => void
     onSignOut: () => void
 }
 
@@ -82,8 +82,17 @@ export default connect<StateProps, DispatchProps, OwnProps>(
     }),
 
     (dispatch) => ({
-        onSignIn: (username, password) => {
-            dispatch(authActions.signIn({username, password}))
+        onSignIn: (ev) => {
+            ev.preventDefault()
+
+            const form = ev.currentTarget
+            const usernameInput = form.querySelector("[name=username]") as HTMLInputElement
+            const passwordInput = form.querySelector("[name=password]") as HTMLInputElement
+
+            dispatch(authActions.signIn({
+                username: usernameInput.value,
+                password: passwordInput.value,
+            }))
         },
 
         onSignOut: () => {
@@ -95,53 +104,43 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         },
     }),
 
-)((props) =>
-    <div className={b()}>
-        <div className={b("auth")}>
-            {(props.isAuthLoading) ? (
-                <div>Signing In...</div>
-            ) : (props.isSignedIn) ? (
-                <div>
-                    <span>{props.username} </span>
-                    <button onClick={props.onSignOut}>Sign Out</button>
-                </div>
-            ) : (
-                <form
-                    onSubmit={(ev) => {
-                        ev.preventDefault()
-
-                        const form = ev.currentTarget
-                        const usernameInput = form.querySelector("[name=username]") as
-                            HTMLInputElement
-                        const passwordInput = form.querySelector("[name=password]") as
-                            HTMLInputElement
-
-                        props.onSignIn(usernameInput.value, passwordInput.value)
-                    }}
-                >
-                    <input type="text" name="username" placeholder="Username"/>
-                    <input type="password" name="password" placeholder="Password"/>
-                    <input type="submit" value="Sign In"/>
-                </form>
-            )}
-        </div>
-
-        {props.children}
-
-        <aside className={b("toasts")}>
-            <FlipMove
-                appearAnimation={toastEnterAnimation}
-                enterAnimation={toastEnterAnimation}
-                leaveAnimation={toastLeaveAnimation}
-                typeName="ul"
-                duration={150}
-            >
-                {props.toasts.map((toast) =>
-                    <li className={b("toast-wrapper")} key={toast.id}>
-                        <Toast model={toast} onButtonClick={props.onToastButtonClick}/>
-                    </li>
+)(function AppShell(props) {
+    return (
+        <div className={b()}>
+            <div className={b("auth")}>
+                {(props.isAuthLoading) ? (
+                    <div>Signing In...</div>
+                ) : (props.isSignedIn) ? (
+                    <div>
+                        <span>{props.username} </span>
+                        <button onClick={props.onSignOut}>Sign Out</button>
+                    </div>
+                ) : (
+                    <form onSubmit={props.onSignIn}>
+                        <input type="text" name="username" placeholder="Username"/>
+                        <input type="password" name="password" placeholder="Password"/>
+                        <input type="submit" value="Sign In"/>
+                    </form>
                 )}
-            </FlipMove>
-        </aside>
-    </div>
-)
+            </div>
+
+            {props.children}
+
+            <aside className={b("toasts")}>
+                <FlipMove
+                    appearAnimation={toastEnterAnimation}
+                    enterAnimation={toastEnterAnimation}
+                    leaveAnimation={toastLeaveAnimation}
+                    typeName="ul"
+                    duration={150}
+                >
+                    {props.toasts.map((toast) =>
+                        <li className={b("toast-wrapper")} key={toast.id}>
+                            <Toast model={toast} onButtonClick={props.onToastButtonClick}/>
+                        </li>
+                    )}
+                </FlipMove>
+            </aside>
+        </div>
+    )
+})

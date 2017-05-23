@@ -26,10 +26,18 @@ import {StateModel} from "./state/store"
 import {draftsActions} from "./state/drafts"
 import {AuthorModel, ArticleEditModel} from "./state/articles"
 
-import AuthorInput from "./AuthorInput"
-
 import block from "./style/bem"
 import "./ArticleEditPage.scss"
+
+interface AuthorInputProps {
+    index: number
+    model: AuthorModel
+    containerClass: string
+    nameClass: string
+    emailClass: string
+    onChange: (index: number, newModel: AuthorModel) => void
+    onRemove: (index: number) => void
+}
 
 interface StateProps {
     articleId: string
@@ -59,6 +67,42 @@ interface OwnProps extends RouteComponentProps<RouteParams, {}> {
 }
 
 const b = block("ArticleEditPage")
+
+function AuthorInput({model, index, onChange, ...props}: AuthorInputProps) {
+    return (
+        <div className={props.containerClass}>
+            <input
+                className={props.nameClass}
+                name="authorName"
+                type="text"
+                value={model.name}
+                onChange={(ev) => onChange(index, {...model, name: ev.target.value})}
+                placeholder="Author Name"
+                autoComplete="off"
+                autoCapitalize="word"
+            />
+
+            <input
+                className={props.emailClass}
+                name="authorEmail"
+                type="email"
+                value={model.email}
+                onChange={(ev) => onChange(index, {...model, email: ev.target.value})}
+                placeholder="Author Email"
+                autoComplete="off"
+            />
+
+            <button
+                onClick={(ev) => {
+                    ev.preventDefault()
+                    props.onRemove(index)
+                }}
+            >
+                Remove
+            </button>
+        </div>
+    )
+}
 
 export default connect<StateProps, DispatchProps, OwnProps>(
     ({drafts, articles}: StateModel, {params}: OwnProps) => ({
@@ -132,9 +176,9 @@ export default connect<StateProps, DispatchProps, OwnProps>(
             dispatch(draftsActions.discardArticleDraft({id: params.articleId}))
         },
     }),
-
-)(({articleId, model, isSubmitting, ...props}) =>
-    (props.isLoading || !model) ? (
+)
+(function ArticleEditPage({articleId, model, isSubmitting, ...props}) {
+    return (props.isLoading || !model) ? (
         <div className={b("", "loading")}>Loading...</div>
     ) : (
         <form className={b()} onSubmit={props.onSubmit}>
@@ -209,4 +253,4 @@ export default connect<StateProps, DispatchProps, OwnProps>(
             <div hidden={!isSubmitting}>{(articleId ? "Updating" : "Creating")} Article...</div>
         </form>
     )
-)
+})

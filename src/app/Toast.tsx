@@ -32,17 +32,20 @@ interface Props {
 
 const b = block("Toast")
 
-export default ({model, onButtonClick}: Props) =>
-    <div className={b()}>
-        <span className={b("text")}>{model.text}</span>
+export default function Toast({model, onButtonClick}: Props) {
+    return (
+        <div className={b()}>
+            <span className={b("text")}>{model.text}</span>
 
-        {model.buttons.map((button) =>
-            <button
-                key={button.id}
-                className={b("button")}
-                onClick={() => onButtonClick(model.id, button.id)}
-            >
-                {button.text}
-            </button>
-        )}
-    </div>
+            {model.buttons.map((button) =>
+                <button
+                    key={button.id}
+                    className={b("button")}
+                    onClick={() => onButtonClick(model.id, button.id)}
+                >
+                    {button.text}
+                </button>
+            )}
+        </div>
+    )
+}

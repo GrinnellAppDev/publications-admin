@@ -37,7 +37,7 @@ const SHORT_MONTHS = ["Jan", "Feb", "Mar", "April", "May", "June", "July", "Aug"
 
 const b = block("Article")
 
-export default ({model, onDelete}: Props) => {
+export default function Article({model, onDelete}: Props) {
     const authors = model.authors
         .map((author) => author.name)
         .filter((author) => author && author.length !== 0)
@@ -66,7 +66,7 @@ export default ({model, onDelete}: Props) => {
                         {model.datePublished.getDate()}
                     </span>
                     <span>
-                        {(authors.length != 0) ? (
+                        {(authors.length !== 0) ? (
                             " • " + authors.join(", ")
                         ) : (
                             ""

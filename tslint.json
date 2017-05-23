@@ -37,13 +37,7 @@
         "radix": true,
         "semicolon": [true, "never"],
         "triple-equals": [false],
-        "typedef": [
-            true,
-            "call-signature",
-            "parameter",
-            "property-declaration",
-            "member-variable-declaration"
-        ],
+        "typedef": [false],
         "typedef-whitespace": [
             true,
             {

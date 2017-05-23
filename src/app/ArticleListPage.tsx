@@ -83,64 +83,67 @@ export default connect<StateProps, DispatchProps, OwnProps>(
             dispatch(articlesActions.deleteArticle({id}))
         },
     }),
-)(({currentPublication, ...props}) =>
-    <div>
-        <nav>
-            <ul>
-                {props.publications.map((publication) =>
-                    <li key={publication.id}>
-                        <Link
-                            to={`/${publication.id}`}
-                            className={b("publication-link")}
-                            activeClassName={b("publication-link", "active")}
-                        >
-
-                            {publication.name}
-                        </Link>
-                    </li>
-                )}
-            </ul>
-        </nav>
-
-        <header>
-            <h1>
-                {currentPublication && currentPublication.name} Articles
-            </h1>
-        </header>
-
-        <main>
-            {(currentPublication) && (
-                <Link to={`/${currentPublication.id}/new-article`}>
-                    <button>New Article</button>
-                </Link>
-            )}
-
-            {(currentPublication) && (
-                <button onClick={props.onRefresh}>
-                    Refresh
-                </button>
-            )}
-
-            <span hidden={!props.isLoading}>Loading...</span>
-
-            <InfiniteScroller
-                loadMore={props.onLoadNextArticlePage}
-                hasMore={props.articlesHaveNextPage}
-                loader={<span>Loading...</span>}
-                element="section"
-                className={b("articles")}
-            >
-                <FlipMove enterAnimation="fade" leaveAnimation="fade" duration={150}>
-                    {props.articles.map((article) =>
-                        <div key={article.id}>
-                            <Article
-                                model={article}
-                                onDelete={props.onArticleDelete}
-                            />
-                        </div>
-                    )}
-                </FlipMove>
-            </InfiniteScroller>
-        </main>
-    </div>
 )
+(function ArticleListPage({currentPublication, ...props}) {
+    return (
+        <div>
+            <nav>
+                <ul>
+                    {props.publications.map((publication) =>
+                        <li key={publication.id}>
+                            <Link
+                                to={`/${publication.id}`}
+                                className={b("publication-link")}
+                                activeClassName={b("publication-link", "active")}
+                            >
+
+                                {publication.name}
+                            </Link>
+                        </li>
+                    )}
+                </ul>
+            </nav>
+
+            <header>
+                <h1>
+                    {currentPublication && currentPublication.name} Articles
+                </h1>
+            </header>
+
+            <main>
+                {(currentPublication) && (
+                    <Link to={`/${currentPublication.id}/new-article`}>
+                        <button>New Article</button>
+                    </Link>
+                )}
+
+                {(currentPublication) && (
+                    <button onClick={props.onRefresh}>
+                        Refresh
+                    </button>
+                )}
+
+                <span hidden={!props.isLoading}>Loading...</span>
+
+                <InfiniteScroller
+                    loadMore={props.onLoadNextArticlePage}
+                    hasMore={props.articlesHaveNextPage}
+                    loader={<span>Loading...</span>}
+                    element="section"
+                    className={b("articles")}
+                >
+                    <FlipMove enterAnimation="fade" leaveAnimation="fade" duration={150}>
+                        {props.articles.map((article) =>
+                            <div key={article.id}>
+                                <Article
+                                    model={article}
+                                    onDelete={props.onArticleDelete}
+                                />
+                            </div>
+                        )}
+                    </FlipMove>
+                </InfiniteScroller>
+            </main>
+        </div>
+    )
+})

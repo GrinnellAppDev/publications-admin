@@ -40,8 +40,9 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         isLoading: state.publications.isLoadingPublications,
         hasPublications: !!getPublicationsList(state).length,
     }),
-)((props) =>
-    (props.isLoading || props.hasPublications) ? (
+)
+(function IndexPage(props) {
+    return (props.isLoading || props.hasPublications) ? (
         <div>Loading...</div>
     ) : (
         <div>
@@ -49,4 +50,4 @@ export default connect<StateProps, DispatchProps, OwnProps>(
             <p>Couldn't find any publications.</p>
         </div>
     )
-)
+})
