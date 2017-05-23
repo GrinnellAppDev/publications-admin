@@ -32,9 +32,6 @@ import "./ArticleEditPage.scss"
 interface AuthorInputProps {
     index: number
     model: AuthorModel
-    containerClass: string
-    nameClass: string
-    emailClass: string
     onChange: (index: number, newModel: AuthorModel) => void
     onRemove: (index: number) => void
 }
@@ -70,9 +67,9 @@ const b = block("ArticleEditPage")
 
 function AuthorInput({model, index, onChange, ...props}: AuthorInputProps) {
     return (
-        <div className={props.containerClass}>
+        <div className={b("author")}>
             <input
-                className={props.nameClass}
+                className={b("input")}
                 name="authorName"
                 type="text"
                 value={model.name}
@@ -83,7 +80,7 @@ function AuthorInput({model, index, onChange, ...props}: AuthorInputProps) {
             />
 
             <input
-                className={props.emailClass}
+                className={b("input")}
                 name="authorEmail"
                 type="email"
                 value={model.email}
@@ -220,12 +217,9 @@ export default connect<StateProps, DispatchProps, OwnProps>(
             <div className={b("authors")}>
                 {model.authors.map((model, i) =>
                     <AuthorInput
-                        model={model}
-                        index={i}
                         key={i}
-                        containerClass={b("author")}
-                        nameClass={b("input")}
-                        emailClass={b("input")}
+                        index={i}
+                        model={model}
                         onChange={props.onAuthorChange}
                         onRemove={props.onAuthorRemove}
                     />
