@@ -135,7 +135,7 @@ export function responseToPaginatedArray<T>(elementConversion: (element: any) =>
                                      response: any): PaginatedArray<T> {
     return {
         items: responseToArray(elementConversion, response.items),
-        nextPageToken: response.nextPageToken || PaginatedArray.LAST_PAGE_TOKEN
+        nextPageToken: response.nextPageToken || PaginatedArray.LAST_PAGE_TOKEN,
     }
 }
 

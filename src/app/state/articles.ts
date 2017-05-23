@@ -384,7 +384,7 @@ function* deleteArticleSaga(): Iterator<Effect> {
                 const buttonId: string = yield call(createTimedToast, {
                     id: uuid(),
                     text: `Deleting "${title}"`,
-                    buttons: [undoButton, {id: uuid(), text: "Close"}]
+                    buttons: [undoButton, {id: uuid(), text: "Close"}],
                 })
 
                 if (buttonId === undoButton.id) {

@@ -110,7 +110,7 @@ export function* createInfoToast(text: string, duration?: number): Iterator<Effe
             {
                 id: uuid(),
                 text: "Close",
-            }
+            },
         ],
         text,
     }

@@ -35,8 +35,18 @@
         "quotemark": [true, "double"],
         "radix": true,
         "semicolon": [true, "never"],
-        "trailing-comma": [true, {"multiline": "always", "singleline": "never"}],
-        "triple-equals": [false],
+        "trailing-comma": [true, {
+            "multiline": {
+                "arrays": "always",
+                "objects": "always",
+                "functions": "ignore",
+                "imports": "always",
+                "exports": "always",
+                "typeLiterals": "always"
+            },
+            "singleline": "never"
+        }],
+        "triple-equals": [true],
         "typedef": [false],
         "typedef-whitespace": [
             true,

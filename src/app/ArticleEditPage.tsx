@@ -117,7 +117,7 @@ export default connect<StateProps, DispatchProps, OwnProps>(
                 id: params.articleId || "",
                 update: (draft) => ({
                     authors: [...draft.authors, {name: "", email: ""}],
-                })
+                }),
             }))
         },
 
@@ -128,7 +128,7 @@ export default connect<StateProps, DispatchProps, OwnProps>(
                     authors: draft.authors.map((author, index) =>
                         (index === newAuthorIndex) ? newAuthor : author
                     ),
-                })
+                }),
             }))
         },
 
@@ -137,28 +137,28 @@ export default connect<StateProps, DispatchProps, OwnProps>(
                 id: params.articleId || "",
                 update: (draft) => ({
                     authors: draft.authors.filter((author, index) => index !== removeIndex),
-                })
+                }),
             }))
         },
 
         onContentChange: (ev) => {
             dispatch(draftsActions.update({
                 id: params.articleId || "",
-                update: (draft) => ({content: ev.target.value})
+                update: (draft) => ({content: ev.target.value}),
             }))
         },
 
         onHeaderImageChange: (ev) => {
             dispatch(draftsActions.update({
                 id: params.articleId || "",
-                update: (draft) => ({headerImage: ev.target.value})
+                update: (draft) => ({headerImage: ev.target.value}),
             }))
         },
 
         onTitleChange: (ev) => {
             dispatch(draftsActions.update({
                 id: params.articleId || "",
-                update: (draft) => ({title: ev.target.value})
+                update: (draft) => ({title: ev.target.value}),
             }))
         },
 
