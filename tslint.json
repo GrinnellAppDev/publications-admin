@@ -42,7 +42,7 @@
                 "functions": "ignore",
                 "imports": "always",
                 "exports": "always",
-                "typeLiterals": "always"
+                "typeLiterals": "ignore"
             },
             "singleline": "never"
         }],

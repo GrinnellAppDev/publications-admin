@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+@import "style/mixins"
+
 .Toast
     display: inline-block
     margin: 8px
@@ -31,32 +33,6 @@
         margin: 0 8px
 
     &__button
-        position: relative
+        @include button(white, none)
+
         margin-left: 8px
-        padding: 8px
-        text-transform: uppercase
-        color: white
-        background: none
-        border: none
-        outline: none
-
-        &::after
-            content: ""
-            position: absolute
-            display: block
-            top: 0
-            right: 0
-            left: 0
-            bottom: 0
-            pointer-events: none
-            background: rgba(255, 255, 255, 0.3)
-            border-radius: 2px
-            opacity: 0
-            transition: opacity 400ms
-
-        &:hover::after,
-        &:focus::after
-            opacity: 0.5
-
-        &:active::after
-            opacity: 1

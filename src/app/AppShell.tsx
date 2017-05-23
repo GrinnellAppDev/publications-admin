@@ -25,7 +25,7 @@ import {connect} from "react-redux"
 
 import {ToastModel} from "./state/toasts"
 import {StateModel} from "./state/store"
-import {authActions} from "./state/auth"
+import {authActions, ChangePasswordModel} from "./state/auth"
 import {toastsActions} from "./state/toasts"
 
 import Toast from "./Toast"
@@ -37,13 +37,17 @@ interface StateProps {
     isSignedIn: boolean
     isAuthLoading: boolean
     username: string
+    changePassword: ChangePasswordModel
     toasts: ReadonlyArray<ToastModel>
 }
 
 interface DispatchProps {
-    onToastButtonClick: (toastId: string, buttonId: string) => void
     onSignIn: (ev: React.FormEvent<HTMLFormElement>) => void
     onSignOut: () => void
+    onNewPasswordChange: (ev: React.ChangeEvent<HTMLInputElement>) => void
+    onNewPasswordSubmit: (ev: React.FormEvent<HTMLFormElement>) => void
+    onNewPasswordCancel: (ev: React.MouseEvent<HTMLElement>) => void
+    onToastButtonClick: (toastId: string, buttonId: string) => void
 }
 
 interface OwnProps {
@@ -78,6 +82,7 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         isSignedIn: !!auth.token,
         isAuthLoading: auth.isLoading,
         username: auth.username,
+        changePassword: auth.changePassword,
         toasts,
     }),
 
@@ -99,12 +104,44 @@ export default connect<StateProps, DispatchProps, OwnProps>(
             dispatch(authActions.signOut({}))
         },
 
+        onNewPasswordChange: (ev) => {
+            const form = ev.currentTarget.form
+            const input1 = form.querySelector("[name=field1]") as HTMLInputElement
+            const input2 = form.querySelector("[name=field2]") as HTMLInputElement
+
+            dispatch(authActions.newPasswordChange({
+                field1: input1.value,
+                field2: input2.value,
+            }))
+        },
+
+        onNewPasswordSubmit: (ev) => {
+            ev.preventDefault()
+
+            const form = ev.currentTarget
+            const input1 = form.querySelector("[name=field1]") as HTMLInputElement
+            const input2 = form.querySelector("[name=field2]") as HTMLInputElement
+
+            dispatch(authActions.newPasswordSubmit({
+                field1: input1.value,
+                field2: input2.value,
+            }))
+
+            input1.value = ""
+            input2.value = ""
+        },
+
+        onNewPasswordCancel: (ev) => {
+            ev.preventDefault()
+            dispatch(authActions.newPasswordCancel({}))
+        },
+
         onToastButtonClick: (toastId, buttonId) => {
             dispatch(toastsActions.close({toastId, buttonId}))
         },
     }),
 )
-(function AppShell(props) {
+(function AppShell({changePassword, ...props}) {
     return (
         <div className={b()}>
             <div className={b("auth")}>
@@ -124,14 +161,89 @@ export default connect<StateProps, DispatchProps, OwnProps>(
                 )}
             </div>
 
+            {changePassword.isShown &&
+                <div className={b("change-password")}>
+                    <div
+                        className={b("change-password-backdrop")}
+                        onClick={props.onNewPasswordCancel}
+                    />
+
+                    <div className={b("change-password-dialogue")}>
+                        <h2 className={b("change-password-title")}>Change Password</h2>
+
+                        <p>You must create a new password to sign in.</p>
+
+                        <ul>
+                            <li
+                                className={b("change-password-requirement", {
+                                    "valid": changePassword.isCorrectCharacters,
+                                })}
+                            >
+                                Contains capital and lowercase letters
+                            </li>
+                            <li
+                                className={b("change-password-requirement", {
+                                    "valid": changePassword.isCorrectLength,
+                                })}
+                            >
+                                Longer than 16 characters
+                            </li>
+                            <li
+                                className={b("change-password-requirement", {
+                                    "valid": changePassword.isMatching,
+                                })}
+                            >
+                                Passwords match
+                            </li>
+                        </ul>
+
+                        <form onSubmit={props.onNewPasswordSubmit}>
+                            <input
+                                className={b("change-password-input")}
+                                type="password"
+                                name="field1"
+                                placeholder="New Password"
+                                onChange={props.onNewPasswordChange}
+                            />
+                            <input
+                                className={b("change-password-input")}
+                                type="password"
+                                name="field2"
+                                placeholder="Confirm Password"
+                                onChange={props.onNewPasswordChange}
+                            />
+
+                            <button
+                                className={b("change-password-button", "cancel")}
+                                onClick={props.onNewPasswordCancel}
+                            >
+                                Cancel
+                            </button>
+
+                            <input
+                                className={b("change-password-button", "submit")}
+                                type="submit"
+                                value="Change Password"
+                                disabled={
+                                    !changePassword.isCorrectCharacters ||
+                                    !changePassword.isCorrectLength ||
+                                    !changePassword.isMatching
+                                }
+                            />
+                        </form>
+                    </div>
+                </div>
+            }
+
             {props.children}
 
             <aside className={b("toasts")}>
                 <FlipMove
+                    typeName="ul"
+                    className={b("toasts-list")}
                     appearAnimation={toastEnterAnimation}
                     enterAnimation={toastEnterAnimation}
                     leaveAnimation={toastLeaveAnimation}
-                    typeName="ul"
                     duration={150}
                 >
                     {props.toasts.map((toast) =>

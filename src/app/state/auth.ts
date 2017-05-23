@@ -27,11 +27,19 @@ import {getAuth} from "./selectors"
 
 // Model
 
+export interface ChangePasswordModel {
+    readonly isShown: boolean
+    readonly isCorrectLength: boolean
+    readonly isCorrectCharacters: boolean
+    readonly isMatching: boolean
+}
+
 export interface AuthenticationModel {
     readonly username: string
     readonly token: string
     readonly expiration: number
     readonly isLoading: boolean
+    readonly changePassword: ChangePasswordModel
 }
 
 // Actions
@@ -55,15 +63,47 @@ export namespace authActions {
     type ReceiveErrorPayload = {}
     export type ReceiveError = Action<ReceiveErrorPayload>
     export const receiveError = actionCreator<ReceiveErrorPayload>("RECEIVE_AUTH_ERROR")
+
+    type RequestNewPasswordPayload = {}
+    export const requestNewPassword =
+        actionCreator<RequestNewPasswordPayload>("REQUEST_NEW_PASSWORD")
+
+    type NewPasswordChangePayload = {field1: string, field2: string}
+    export type NewPasswordChange = Action<NewPasswordChangePayload>
+    export const newPasswordChange = actionCreator<NewPasswordChangePayload>("NEW_PASSWORD_CHANGE")
+
+    type NewPasswordValidatePayload = {
+        isCorrectLength: boolean,
+        isCorrectCharacters: boolean,
+        isMatching: boolean,
+    }
+    export const newPasswordValidate =
+        actionCreator<NewPasswordValidatePayload>("NEW_PASSWORD_VALIDATE")
+
+    type NewPasswordCancelPayload = {}
+    export type NewPasswordCancel = Action<NewPasswordCancelPayload>
+    export const newPasswordCancel = actionCreator<NewPasswordCancelPayload>("NEW_PASSWORD_CANCEL")
+
+    type NewPasswordSubmitPayload = {field1: string, field2: string}
+    export type NewPasswordSubmit = Action<NewPasswordSubmitPayload>
+    export const newPasswordSubmit = actionCreator<NewPasswordSubmitPayload>("NEW_PASSWORD_SUBMIT")
 }
 
 // Reducer
+
+const emptyNewPassword: ChangePasswordModel = {
+    isShown: false,
+    isCorrectLength: false,
+    isCorrectCharacters: false,
+    isMatching: false,
+}
 
 const emptyAuthModel: AuthenticationModel = {
     username: "",
     token: "",
     expiration: 0,
     isLoading: false,
+    changePassword: emptyNewPassword,
 }
 
 export function authReducer(
@@ -77,7 +117,19 @@ export function authReducer(
     }
 
     if (authActions.receiveInfo.isTypeOf(action)) {
-        return {...action.payload, isLoading: false}
+        return {...state, ...action.payload, isLoading: false}
+    }
+
+    if (authActions.newPasswordValidate.isTypeOf(action)) {
+        return {...state, changePassword: {...state.changePassword, ...action.payload}}
+    }
+
+    if (authActions.requestNewPassword.isTypeOf(action)) {
+        return {...state, changePassword: {...emptyNewPassword, isShown: true}}
+    }
+
+    if (authActions.newPasswordSubmit.isTypeOf(action)) {
+        return {...state, changePassword: {...emptyNewPassword, isShown: false}}
     }
 
     if (authActions.signOut.isTypeOf(action) ||
@@ -109,19 +161,20 @@ type AuthErrorPayload = {err: Error}
 export type AuthError = CustomError<AuthErrorPayload>
 export const AuthError = createErrorClass<AuthErrorPayload>(
     "AUTH_ERROR",
-    (message, {err}) => (message ? message + " " : "") + err.message
+    (message, payload) =>
+        message + (message && payload ? " " : "") + (payload ? payload.err.message : "")
 )
 
-function importCognito(): Promise<typeof cognito> {
+async function importCognito(): Promise<typeof cognito> {
     return System.import(/* webpackChunkName: "aws-cognito" */ "amazon-cognito-identity-js")
 }
 
-function loadUserPool(): Promise<cognito.CognitoUserPool> {
-    return importCognito()
-        .then(({CognitoUserPool}) => new CognitoUserPool({
-            UserPoolId: process.env.COGNITO_USER_POOL_ID,
-            ClientId: process.env.COGNITO_CLIENT_ID,
-        }))
+async function loadUserPool(): Promise<cognito.CognitoUserPool> {
+    const {CognitoUserPool} = await importCognito()
+    return new CognitoUserPool({
+        UserPoolId: process.env.COGNITO_USER_POOL_ID,
+        ClientId: process.env.COGNITO_CLIENT_ID,
+    })
 }
 
 function getAuthenticator(
@@ -189,10 +242,42 @@ function* putAuthData(user: cognito.CognitoUser, authenticate: Authenticator): I
         }))
     } catch (err) {
         if (NewPasswordRequiredError.isTypeOf(err)) {
-            const newPassword = prompt(
-                "Enter new password (must be over 16 characters long and contain both " +
-                "uppercase and lowercase letters)"
-            )
+            yield put(authActions.requestNewPassword({}))
+
+            let newPassword: string
+            while (true) {
+                const action: any = yield take([
+                    authActions.newPasswordChange.type,
+                    authActions.newPasswordSubmit.type,
+                    authActions.newPasswordCancel.type,
+                ])
+
+                if (authActions.newPasswordCancel.isTypeOf(action)) {
+                    throw new AuthError("You must create a new password to sign in.")
+                } else if (
+                    authActions.newPasswordChange.isTypeOf(action) ||
+                    authActions.newPasswordSubmit.isTypeOf(action)
+                ) {
+                    const {field1, field2} = action.payload
+                    const isCorrectLength = field1.length > 16 || field2.length > 16
+                    const isCorrectCharacters = (/[A-Z]/.test(field1) && /[a-z]/.test(field1)) ||
+                                                (/[A-Z]/.test(field2) && /[a-z]/.test(field2))
+                    const isMatching = field1 !== "" && field1 === field2
+
+                    yield put(authActions.newPasswordValidate({
+                        isCorrectLength,
+                        isCorrectCharacters,
+                        isMatching,
+                    }))
+
+                    if (authActions.newPasswordSubmit.isTypeOf(action)) {
+                        if (isCorrectLength && isCorrectCharacters && isMatching) {
+                            newPassword = field1
+                            break
+                        }
+                    }
+                }
+            }
 
             yield call(putAuthData, user, (callbacks: CognitoCallbacks) => {
                 user.completeNewPasswordChallenge(newPassword, {}, callbacks)
@@ -217,7 +302,7 @@ export function* refreshAuth(userPool: cognito.CognitoUserPool | null = null): I
             const user: cognito.CognitoUser = yield call(getCurrentUser, loadedUserPool)
             yield call(putAuthData, user, getAuthenticator((callback) => user.getSession(callback)))
         } else {
-            throw new AuthError("", {err: new Error("Please sign in.")})
+            throw new AuthError("Please sign in.")
         }
     }
 }
@@ -232,33 +317,34 @@ function* authFlowSaga(): Iterator<Effect | Promise<any>> {
 
         const userPool: cognito.CognitoUserPool = yield call(loadUserPool)
 
-        if (authActions.signIn.isTypeOf(signInAction)) {
-            const {username, password} = signInAction.payload
+        try {
+            if (authActions.signIn.isTypeOf(signInAction)) {
+                const {username, password} = signInAction.payload
 
-            const authDetails = new AuthenticationDetails({
-                Username: username,
-                Password: password,
-            })
+                const authDetails = new AuthenticationDetails({
+                    Username: username,
+                    Password: password,
+                })
 
-            const user = new CognitoUser({
-                Username: username,
-                Pool: userPool,
-            })
+                const user = new CognitoUser({
+                    Username: username,
+                    Pool: userPool,
+                })
 
-            const authenticator = (callbacks: CognitoCallbacks) => {
-                user.authenticateUser(authDetails, callbacks)
+                const authenticator = (callbacks: CognitoCallbacks) => {
+                    user.authenticateUser(authDetails, callbacks)
+                }
+
+                yield call(putAuthData, user, authenticator)
+            } else {
+                yield call(refreshAuth, userPool)
             }
 
-            yield call(putAuthData, user, authenticator)
-        } else {
-            yield call(refreshAuth, userPool)
-        }
-
-        try {
             yield call(setLocalStorageHasUser, true)
         } catch (err) {
             if (AuthError.isTypeOf(err)) {
                 yield call(handleAuthError, err)
+                continue
             } else {
                 throw err
             }
