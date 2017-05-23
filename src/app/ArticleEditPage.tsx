@@ -113,7 +113,7 @@ export default connect<StateProps, DispatchProps, OwnProps>(
     (dispatch, {params}) => ({
         onAuthorAdd: (ev) => {
             ev.preventDefault()
-            dispatch(draftsActions.updateArticleDraft({
+            dispatch(draftsActions.update({
                 id: params.articleId || "",
                 update: (draft) => ({
                     authors: [...draft.authors, {name: "", email: ""}],
@@ -122,7 +122,7 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         },
 
         onAuthorChange: (newAuthorIndex, newAuthor) => {
-            dispatch(draftsActions.updateArticleDraft({
+            dispatch(draftsActions.update({
                 id: params.articleId || "",
                 update: (draft) => ({
                     authors: draft.authors.map((author, index) =>
@@ -133,7 +133,7 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         },
 
         onAuthorRemove: (removeIndex) => {
-            dispatch(draftsActions.updateArticleDraft({
+            dispatch(draftsActions.update({
                 id: params.articleId || "",
                 update: (draft) => ({
                     authors: draft.authors.filter((author, index) => index !== removeIndex),
@@ -142,21 +142,21 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         },
 
         onContentChange: (ev) => {
-            dispatch(draftsActions.updateArticleDraft({
+            dispatch(draftsActions.update({
                 id: params.articleId || "",
                 update: (draft) => ({content: ev.target.value})
             }))
         },
 
         onHeaderImageChange: (ev) => {
-            dispatch(draftsActions.updateArticleDraft({
+            dispatch(draftsActions.update({
                 id: params.articleId || "",
                 update: (draft) => ({headerImage: ev.target.value})
             }))
         },
 
         onTitleChange: (ev) => {
-            dispatch(draftsActions.updateArticleDraft({
+            dispatch(draftsActions.update({
                 id: params.articleId || "",
                 update: (draft) => ({title: ev.target.value})
             }))
@@ -165,12 +165,12 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         onSubmit: (ev) => {
             const {publicationId, articleId} = params
             ev.preventDefault()
-            dispatch(draftsActions.submitArticleDraft({publicationId, articleId}))
+            dispatch(draftsActions.submit({publicationId, articleId}))
         },
 
         onDiscard: (ev) => {
             ev.preventDefault()
-            dispatch(draftsActions.discardArticleDraft({id: params.articleId}))
+            dispatch(draftsActions.discard({id: params.articleId}))
         },
     }),
 )

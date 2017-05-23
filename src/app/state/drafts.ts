@@ -40,37 +40,33 @@ export interface DraftsStateModel {
 // Actions
 
 export namespace draftsActions {
-    type LoadArticleDraftPayload = {publicationId: string, articleId: string}
-    export type LoadArticleDraft = Action<LoadArticleDraftPayload>
-    export const loadArticleDraft = actionCreator<LoadArticleDraftPayload>("LOAD_ARTICLE_DRAFT")
+    type LoadPayload = {publicationId: string, articleId: string}
+    export type Load = Action<LoadPayload>
+    export const load = actionCreator<LoadPayload>("LOAD_ARTICLE_DRAFT")
 
-    type CreateArticleDraftPayload = {id: string, item: ArticleEditModel}
-    export const createArticleDraft =
-        actionCreator<CreateArticleDraftPayload>("CREATE_ARTICLE_DRAFT")
+    type CreatePayload = {id: string, item: ArticleEditModel}
+    export const create = actionCreator<CreatePayload>("CREATE_ARTICLE_DRAFT")
 
-    type UpdateArticleDraftPayload = {
+    type UpdatePayload = {
         id: string,
         update: (draft: ArticleEditModel) => Partial<ArticleEditModel>
     }
-    export const updateArticleDraft =
-        actionCreator<UpdateArticleDraftPayload>("UPDATE_ARTICLE_DRAFT")
+    export const update = actionCreator<UpdatePayload>("UPDATE_ARTICLE_DRAFT")
 
-    type DiscardArticleDraftPayload = {id: string}
-    export const discardArticleDraft =
-        actionCreator<DiscardArticleDraftPayload>("DISCARD_ARTICLE_DRAFT")
+    type DiscardPayload = {id: string}
+    export const discard = actionCreator<DiscardPayload>("DISCARD_ARTICLE_DRAFT")
 
-    type SubmitArticleDraftPayload = {publicationId: string, articleId: string}
-    export type SubmitArticleDraft = Action<SubmitArticleDraftPayload>
-    export const submitArticleDraft =
-        actionCreator<SubmitArticleDraftPayload>("SUBMIT_ARTICLE_DRAFT")
+    type SubmitPayload = {publicationId: string, articleId: string}
+    export type Submit = Action<SubmitPayload>
+    export const submit = actionCreator<SubmitPayload>("SUBMIT_ARTICLE_DRAFT")
 
-    type ReceiveArticleSubmitErrorPayload = {id: string}
-    export const receiveArticleSubmitError =
-        actionCreator<ReceiveArticleSubmitErrorPayload>("RECEIVE_ARTICLE_SUBMIT_ERROR")
+    type ReceiveSubmitErrorPayload = {id: string}
+    export const receiveSubmitError =
+        actionCreator<ReceiveSubmitErrorPayload>("RECEIVE_ARTICLE_SUBMIT_ERROR")
 
-    type ReceiveArticleSubmitSuccessPayload = {id: string, item: FullArticleModel, isNew: boolean}
-    export const receiveArticleSubmitSuccess =
-        actionCreator<ReceiveArticleSubmitSuccessPayload>("RECEIVE_ARTICLE_SUBMIT_SUCCESS")
+    type ReceiveSubmitSuccessPayload = {id: string, item: FullArticleModel, isNew: boolean}
+    export const receiveSubmitSuccess =
+        actionCreator<ReceiveSubmitSuccessPayload>("RECEIVE_ARTICLE_SUBMIT_SUCCESS")
 }
 
 // Reducers
@@ -84,7 +80,7 @@ const emptyDraft: ArticleCreateModel = {
 
 function articleDraftsByIdReducer(state: IdMapModel<ArticleCreateModel> = {},
                                   action: Action<any>): IdMapModel<ArticleCreateModel> {
-    if (draftsActions.createArticleDraft.isTypeOf(action)) {
+    if (draftsActions.create.isTypeOf(action)) {
         const {id, item} = action.payload
         if (item) {
             const {title, authors, content, headerImage} = item
@@ -95,18 +91,18 @@ function articleDraftsByIdReducer(state: IdMapModel<ArticleCreateModel> = {},
         }
     }
 
-    if (draftsActions.updateArticleDraft.isTypeOf(action)) {
+    if (draftsActions.update.isTypeOf(action)) {
         const {id, update} = action.payload
         return {...state, [id || ""]: {...state[id || ""], ...update(state[id || ""])}}
     }
 
-    if (draftsActions.discardArticleDraft.isTypeOf(action)) {
+    if (draftsActions.discard.isTypeOf(action)) {
         const {id} = action.payload
         const {[id || ""]: _, ...newState} = state
         return newState
     }
 
-    if (draftsActions.receiveArticleSubmitSuccess.isTypeOf(action)) {
+    if (draftsActions.receiveSubmitSuccess.isTypeOf(action)) {
         const {item, isNew} = action.payload
         const {[isNew ? "" : item.id]: _, ...newState} = state
         return newState
@@ -117,13 +113,13 @@ function articleDraftsByIdReducer(state: IdMapModel<ArticleCreateModel> = {},
 
 function submittingDraftsReducer(state: ReadonlyArray<string> = [],
                                  action: Action<any>): ReadonlyArray<string> {
-    if (draftsActions.submitArticleDraft.isTypeOf(action)) {
+    if (draftsActions.submit.isTypeOf(action)) {
         const {articleId} = action.payload
         return [...state, articleId]
     }
 
-    if (draftsActions.receiveArticleSubmitSuccess.isTypeOf(action) ||
-        draftsActions.receiveArticleSubmitError.isTypeOf(action)) {
+    if (draftsActions.receiveSubmitSuccess.isTypeOf(action) ||
+        draftsActions.receiveSubmitError.isTypeOf(action)) {
 
         const {id} = action.payload
         return state.filter((draftId) => draftId !== id)
@@ -210,8 +206,8 @@ async function editArticle(
 
 function* loadArticleDraftsSaga(): Iterator<Effect> {
     while (true) {
-        const action: any = yield take(draftsActions.loadArticleDraft.type)
-        yield fork(function* (loadAction: draftsActions.LoadArticleDraft): Iterator<Effect> {
+        const action: any = yield take(draftsActions.load.type)
+        yield fork(function* (loadAction: draftsActions.Load): Iterator<Effect> {
             const {publicationId, articleId} = loadAction.payload
 
             const {articleDraftsById}: DraftsStateModel = yield select(getDrafts)
@@ -224,7 +220,7 @@ function* loadArticleDraftsSaga(): Iterator<Effect> {
                     yield call(loadFullArticle, publicationId, articleId)
                 )
 
-                yield put(draftsActions.createArticleDraft({id: articleId, item}))
+                yield put(draftsActions.create({id: articleId, item}))
             } catch (err) {
                 if (FetchError.isTypeOf(err)) {
                     hashHistory.goBack()
@@ -238,8 +234,8 @@ function* loadArticleDraftsSaga(): Iterator<Effect> {
 
 function* submitArticleDraftSaga(): Iterator<Effect> {
     while (true) {
-        const action: any = yield take(draftsActions.submitArticleDraft.type)
-        yield fork(function* (submitAction: draftsActions.SubmitArticleDraft): Iterator<Effect> {
+        const action: any = yield take(draftsActions.submit.type)
+        yield fork(function* (submitAction: draftsActions.Submit): Iterator<Effect> {
             const {publicationId, articleId} = submitAction.payload
             const {articleDraftsById}: DraftsStateModel = yield select(getDrafts)
             const savedToken: string = yield select(getAuthToken)
@@ -260,12 +256,12 @@ function* submitArticleDraftSaga(): Iterator<Effect> {
                         yield call(editArticle, publicationId, articleId, draft, token)
                     )
 
-                    yield put(draftsActions.receiveArticleSubmitSuccess({id: item.id, item, isNew}))
+                    yield put(draftsActions.receiveSubmitSuccess({id: item.id, item, isNew}))
                     hashHistory.goBack()
                 } catch (err) {
                     if (FetchError.isTypeOf(err)) {
                         yield spawn(createInfoToast, "There was a problem submitting your article.")
-                        yield put(draftsActions.receiveArticleSubmitError({id: articleId}))
+                        yield put(draftsActions.receiveSubmitError({id: articleId}))
                     } else if (AuthError.isTypeOf(err)) {
                         yield call(handleAuthError, err)
                     } else {
@@ -279,7 +275,7 @@ function* submitArticleDraftSaga(): Iterator<Effect> {
 
 function* discardArticleDraftSaga(): Iterator<Effect> {
     while (true) {
-        yield take(draftsActions.discardArticleDraft.type)
+        yield take(draftsActions.discard.type)
         hashHistory.goBack()
     }
 }

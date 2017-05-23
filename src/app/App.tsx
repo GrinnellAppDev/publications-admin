@@ -38,18 +38,18 @@ runSaga()
 function onPublicationChange({params: oldParams}: RouterState, {params}: RouterState): void {
     const {publicationId} = params
     if (oldParams.publicationId !== publicationId) {
-        store.dispatch(publicationsActions.selectPublication({publicationId}))
+        store.dispatch(publicationsActions.select({publicationId}))
     }
 }
 
 function onPublicationEnter({params}: RouterState): void {
-    store.dispatch(publicationsActions.selectPublication({publicationId: params.publicationId}))
+    store.dispatch(publicationsActions.select({publicationId: params.publicationId}))
 }
 
 function onNewArticleNavTo(): void {
     const id = ""
     const item = store.getState().drafts.articleDraftsById[id]
-    store.dispatch(draftsActions.createArticleDraft({id, item}))
+    store.dispatch(draftsActions.create({id, item}))
 }
 
 function onArticleChange({params: oldParams}: RouterState,
@@ -58,7 +58,7 @@ function onArticleChange({params: oldParams}: RouterState,
     if (oldParams.publicationId !== publicationId ||
         oldParams.articleId !== articleId) {
 
-        store.dispatch(draftsActions.loadArticleDraft({publicationId, articleId}))
+        store.dispatch(draftsActions.load({publicationId, articleId}))
     }
 }
 

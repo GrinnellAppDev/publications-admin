@@ -41,20 +41,20 @@ export namespace authActions {
     export type SignIn = Action<SignInPayload>
     export const signIn = actionCreator<SignInPayload>("SIGN_IN")
 
-    type LoadAuthInfoPayload = {}
-    export type LoadAuthInfo = Action<LoadAuthInfoPayload>
-    export const loadAuthInfo = actionCreator<LoadAuthInfoPayload>("LOAD_AUTH_INFO")
+    type LoadInfoPayload = {}
+    export type LoadInfo = Action<LoadInfoPayload>
+    export const loadInfo = actionCreator<LoadInfoPayload>("LOAD_AUTH_INFO")
 
     type SignOutPayload = {}
     export type SignOut = Action<SignOutPayload>
     export const signOut = actionCreator<SignOutPayload>("SIGN_OUT")
 
-    type ReceiveAuthInfoPayload = {username: string, token: string, expiration: number}
-    export const receiveAuthInfo = actionCreator<ReceiveAuthInfoPayload>("RECEIVE_AUTH_INFO")
+    type ReceiveInfoPayload = {username: string, token: string, expiration: number}
+    export const receiveInfo = actionCreator<ReceiveInfoPayload>("RECEIVE_AUTH_INFO")
 
-    type ReceiveAuthErrorPayload = {}
-    export type ReceiveAuthError = Action<ReceiveAuthErrorPayload>
-    export const receiveAuthError = actionCreator<ReceiveAuthErrorPayload>("RECEIVE_AUTH_ERROR")
+    type ReceiveErrorPayload = {}
+    export type ReceiveError = Action<ReceiveErrorPayload>
+    export const receiveError = actionCreator<ReceiveErrorPayload>("RECEIVE_AUTH_ERROR")
 }
 
 // Reducer
@@ -71,17 +71,17 @@ export function authReducer(
     action: Action<any>,
 ): AuthenticationModel {
     if (authActions.signIn.isTypeOf(action) ||
-        authActions.loadAuthInfo.isTypeOf(action)) {
+        authActions.loadInfo.isTypeOf(action)) {
 
         return {...state, isLoading: true}
     }
 
-    if (authActions.receiveAuthInfo.isTypeOf(action)) {
+    if (authActions.receiveInfo.isTypeOf(action)) {
         return {...action.payload, isLoading: false}
     }
 
     if (authActions.signOut.isTypeOf(action) ||
-        authActions.receiveAuthError.isTypeOf(action)) {
+        authActions.receiveError.isTypeOf(action)) {
 
         return emptyAuthModel
     }
@@ -182,7 +182,7 @@ function* putAuthData(user: cognito.CognitoUser, authenticate: Authenticator): I
         const session: cognito.CognitoUserSession =
             yield call(getSessionFromAuthenticator, authenticate)
 
-        yield put(authActions.receiveAuthInfo({
+        yield put(authActions.receiveInfo({
             username: user.getUsername(),
             token: session.getAccessToken().getJwtToken(),
             expiration: session.getAccessToken().getExpiration(),
@@ -205,7 +205,7 @@ function* putAuthData(user: cognito.CognitoUser, authenticate: Authenticator): I
 
 export function* handleAuthError(err: AuthError): Iterable<Effect> {
     yield spawn(createInfoToast, err.message)
-    yield put(authActions.receiveAuthError({}))
+    yield put(authActions.receiveError({}))
     yield call(setLocalStorageHasUser, false)
 }
 
@@ -224,8 +224,8 @@ export function* refreshAuth(userPool: cognito.CognitoUserPool | null = null): I
 
 function* authFlowSaga(): Iterator<Effect | Promise<any>> {
     while (true) {
-        const signInAction: authActions.SignIn | authActions.LoadAuthInfo =
-            yield take([authActions.signIn.type, authActions.loadAuthInfo.type])
+        const signInAction: authActions.SignIn | authActions.LoadInfo =
+            yield take([authActions.signIn.type, authActions.loadInfo.type])
 
         const {AuthenticationDetails, CognitoUser}: typeof cognito =
             yield call(importCognito)
@@ -264,8 +264,8 @@ function* authFlowSaga(): Iterator<Effect | Promise<any>> {
             }
         }
 
-        const signOutAction: authActions.SignOut | authActions.ReceiveAuthError =
-            yield take([authActions.signOut.type, authActions.receiveAuthError.type])
+        const signOutAction: authActions.SignOut | authActions.ReceiveError =
+            yield take([authActions.signOut.type, authActions.receiveError.type])
 
         if (authActions.signOut.isTypeOf(signOutAction)) {
             const user: cognito.CognitoUser = yield call(getCurrentUser, userPool)
@@ -278,7 +278,7 @@ function* authFlowSaga(): Iterator<Effect | Promise<any>> {
 
 function* initialLoadSaga(): Iterable<Effect> {
     if (yield call(localStorageHasUser)) {
-        yield put(authActions.loadAuthInfo({}))
+        yield put(authActions.loadInfo({}))
     }
 }
 

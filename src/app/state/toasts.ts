@@ -40,24 +40,24 @@ export interface ToastModel {
 // Actions
 
 export namespace toastsActions {
-    type CreateToastPayload = {item: ToastModel}
-    export const createToast = actionCreator<CreateToastPayload>("CREATE_TOAST")
+    type CreatePayload = {item: ToastModel}
+    export const create = actionCreator<CreatePayload>("CREATE_TOAST")
 
-    type CloseToastPayload = {toastId: string, buttonId?: string}
-    export type CloseToast = Action<CloseToastPayload>
-    export const closeToast = actionCreator<CloseToastPayload>("CLOSE_TOAST")
+    type ClosePayload = {toastId: string, buttonId?: string}
+    export type Close = Action<ClosePayload>
+    export const close = actionCreator<ClosePayload>("CLOSE_TOAST")
 }
 
 // Reducer
 
 export function toastsReducer(state: ReadonlyArray<ToastModel> = [],
                               action: Action<any>): ReadonlyArray<ToastModel> {
-    if (toastsActions.closeToast.isTypeOf(action)) {
+    if (toastsActions.close.isTypeOf(action)) {
         const {toastId} = action.payload
         return state.filter((toast) => toast.id !== toastId)
     }
 
-    if (toastsActions.createToast.isTypeOf(action)) {
+    if (toastsActions.create.isTypeOf(action)) {
         const {item} = action.payload
         return [...state, item]
     }
@@ -71,17 +71,17 @@ const DEFAULT_TOAST_DURATION = 4000
 
 export function* createToast(item: ToastModel): Iterator<Effect> {
     try {
-        yield put(toastsActions.createToast({item}))
+        yield put(toastsActions.create({item}))
 
-        const closeAction: toastsActions.CloseToast = yield take((action: any) =>
-            toastsActions.closeToast.isTypeOf(action) && action.payload.toastId === item.id
+        const closeAction: toastsActions.Close = yield take((action: any) =>
+            toastsActions.close.isTypeOf(action) && action.payload.toastId === item.id
         )
         const {buttonId} = closeAction.payload
 
         return buttonId
     } finally {
         if (yield cancelled()) {
-            yield put(toastsActions.closeToast({toastId: item.id}))
+            yield put(toastsActions.close({toastId: item.id}))
         }
     }
 
@@ -91,7 +91,7 @@ export function* createTimedToast(item: ToastModel,
                            duration: number = DEFAULT_TOAST_DURATION): Iterator<Effect> {
     const delayTask: Task = yield fork(function* (): Iterator<Effect> {
         yield call(delay, duration)
-        yield put(toastsActions.closeToast({toastId: item.id}))
+        yield put(toastsActions.close({toastId: item.id}))
     })
 
     const buttonId: string = yield call(createToast, item)

@@ -70,45 +70,43 @@ export interface ArticlesStateModel {
 // Actions
 
 export namespace articlesActions {
-    type LoadNextArticlesPayload = {publicationId: string}
-    export type LoadNextArticles = Action<LoadNextArticlesPayload>
-    export const loadNextArticles = actionCreator<LoadNextArticlesPayload>("LOAD_NEXT_ARTICLES")
+    type LoadNextPayload = {publicationId: string}
+    export type LoadNext = Action<LoadNextPayload>
+    export const loadNext = actionCreator<LoadNextPayload>("LOAD_NEXT_ARTICLES")
 
-    type ReceiveArticlesPayload = {publicationId: string, page: PaginatedArray<ShortArticleModel>}
-    export const receiveArticles = actionCreator<ReceiveArticlesPayload>("RECIEVE_ARTICLES")
+    type ReceivePagePayload = {publicationId: string, page: PaginatedArray<ShortArticleModel>}
+    export const receivePage = actionCreator<ReceivePagePayload>("RECIEVE_ARTICLES")
 
-    type ClearArticlesPayload = {publicationId: string}
-    export const clearArticles = actionCreator<ClearArticlesPayload>("CLEAR_ARTICLES")
+    type ClearPayload = {publicationId: string}
+    export const clear = actionCreator<ClearPayload>("CLEAR_ARTICLES")
 
-    type RefreshArticlesPayload = {publicationId: string}
-    export type RefreshArticles = Action<RefreshArticlesPayload>
-    export const refreshArticles = actionCreator<RefreshArticlesPayload>("REFRESH_ARTICLES")
+    type RefreshPayload = {publicationId: string}
+    export type Refresh = Action<RefreshPayload>
+    export const refresh = actionCreator<RefreshPayload>("REFRESH_ARTICLES")
 
-    type LoadFullArticlePayload = {publicationId: string, articleId: string}
-    export type LoadFullArticle = Action<LoadFullArticlePayload>
-    export const loadFullArticle = actionCreator<LoadFullArticlePayload>("LOAD_FULL_ARTICLE")
+    type LoadFullPayload = {publicationId: string, articleId: string}
+    export type LoadFull = Action<LoadFullPayload>
+    export const loadFull = actionCreator<LoadFullPayload>("LOAD_FULL_ARTICLE")
 
-    type ReceiveFullArticlePayload = {item: FullArticleModel}
-    export const recieveFullArticle =
-        actionCreator<ReceiveFullArticlePayload>("RECIEVE_FULL_ARTICLE")
+    type ReceiveFullPayload = {item: FullArticleModel}
+    export const recieveFull = actionCreator<ReceiveFullPayload>("RECIEVE_FULL_ARTICLE")
 
     type DeleteArticlePayload = {id: string}
     export type DeleteArticle = Action<DeleteArticlePayload>
     export const deleteArticle = actionCreator<DeleteArticlePayload>("DELETE_ARTICLE")
 
-    type DeleteLocalArticlePayload = {id: string}
-    export const deleteLocalArticle =
-        actionCreator<DeleteLocalArticlePayload>("DELETE_LOCAL_ARTICLE")
+    type DeleteLocalPayload = {id: string}
+    export const deleteLocal = actionCreator<DeleteLocalPayload>("DELETE_LOCAL_ARTICLE")
 
-    type UndeleteArticlePayload = {item: ShortArticleModel}
-    export const undeleteArticle = actionCreator<UndeleteArticlePayload>("UNDELETE_ARTICLE")
+    type UndeletePayload = {item: ShortArticleModel}
+    export const undelete = actionCreator<UndeletePayload>("UNDELETE_ARTICLE")
 }
 
 // Reducers
 
 function articlesByIdReducer(state: IdMapModel<ShortArticleModel> = {},
                              action: Action<any>): IdMapModel<ShortArticleModel> {
-    if (articlesActions.receiveArticles.isTypeOf(action)) {
+    if (articlesActions.receivePage.isTypeOf(action)) {
         const {page} = action.payload
         const newState = {...state} as Mutable<IdMapModel<ShortArticleModel>>
         page.items.forEach((article) => {
@@ -122,21 +120,21 @@ function articlesByIdReducer(state: IdMapModel<ShortArticleModel> = {},
         return newState
     }
 
-    if (articlesActions.deleteLocalArticle.isTypeOf(action)) {
+    if (articlesActions.deleteLocal.isTypeOf(action)) {
         const {id} = action.payload
         const {[id]: _, ...newState} = state
         return newState
     }
 
-    if (articlesActions.recieveFullArticle.isTypeOf(action) ||
-        articlesActions.undeleteArticle.isTypeOf(action) ||
-        draftsActions.receiveArticleSubmitSuccess.isTypeOf(action)) {
+    if (articlesActions.recieveFull.isTypeOf(action) ||
+        articlesActions.undelete.isTypeOf(action) ||
+        draftsActions.receiveSubmitSuccess.isTypeOf(action)) {
 
         const {item} = action.payload
         return {...state, [item.id]: item}
     }
 
-    if (articlesActions.clearArticles.isTypeOf(action)) {
+    if (articlesActions.clear.isTypeOf(action)) {
         const {publicationId} = action.payload
         const newState = {} as Mutable<IdMapModel<ShortArticleModel>>
         Object.keys(state).forEach((articleId) => {
@@ -153,7 +151,7 @@ function articlesByIdReducer(state: IdMapModel<ShortArticleModel> = {},
 
 function articlesPageTokensByParentIdReducer(state: IdMapModel<string> = {},
                                              action: Action<any>): IdMapModel<string> {
-    if (articlesActions.receiveArticles.isTypeOf(action)) {
+    if (articlesActions.receivePage.isTypeOf(action)) {
         const {publicationId, page} = action.payload
         return {
             ...state,
@@ -161,7 +159,7 @@ function articlesPageTokensByParentIdReducer(state: IdMapModel<string> = {},
         }
     }
 
-    if (articlesActions.clearArticles.isTypeOf(action)) {
+    if (articlesActions.clear.isTypeOf(action)) {
         const {publicationId} = action.payload
         const {[publicationId]: _, ...newState} = state
         return newState
@@ -172,14 +170,14 @@ function articlesPageTokensByParentIdReducer(state: IdMapModel<string> = {},
 
 function loadingPublicationsReducer(state: ReadonlyArray<string> = [],
                                     action: Action<any>): ReadonlyArray<string> {
-    if (articlesActions.refreshArticles.isTypeOf(action) ||
-        articlesActions.loadNextArticles.isTypeOf(action)) {
+    if (articlesActions.refresh.isTypeOf(action) ||
+        articlesActions.loadNext.isTypeOf(action)) {
 
         const {publicationId} = action.payload
         return [...state, publicationId]
     }
 
-    if (articlesActions.receiveArticles.isTypeOf(action)) {
+    if (articlesActions.receivePage.isTypeOf(action)) {
         const {publicationId} = action.payload
         return state.filter((id) => id !== publicationId)
     }
@@ -189,12 +187,12 @@ function loadingPublicationsReducer(state: ReadonlyArray<string> = [],
 
 function loadingArticlesReducer(state: ReadonlyArray<string> = [],
                                 action: Action<any>): ReadonlyArray<string> {
-    if (articlesActions.loadFullArticle.isTypeOf(action)) {
+    if (articlesActions.loadFull.isTypeOf(action)) {
         const {articleId} = action.payload
         return [...state, articleId]
     }
 
-    if (articlesActions.recieveFullArticle.isTypeOf(action)) {
+    if (articlesActions.recieveFull.isTypeOf(action)) {
         const {item} = action.payload
         return state.filter((id) => id !== item.id)
     }
@@ -300,7 +298,7 @@ async function deleteArticle(publicationId: string, articleId: string,
 export function* loadFullArticle(publicationId: string, articleId: string): Iterator<Effect> {
     try {
         const item: FullArticleModel = yield call(getArticle, publicationId, articleId)
-        yield put(articlesActions.recieveFullArticle({item}))
+        yield put(articlesActions.recieveFull({item}))
         return item
     } catch (err) {
         if (FetchError.isTypeOf(err)) {
@@ -313,16 +311,16 @@ export function* loadFullArticle(publicationId: string, articleId: string): Iter
 
 function* refreshArticlesSaga(): Iterator<Effect> {
     while (true) {
-        const refreshAction: articlesActions.RefreshArticles =
-            yield take(articlesActions.refreshArticles.type)
+        const refreshAction: articlesActions.Refresh =
+            yield take(articlesActions.refresh.type)
 
         const {publicationId} = refreshAction.payload
         try {
             const page: PaginatedArray<ShortArticleModel> =
                 yield call(listArticles, publicationId, null)
 
-            yield put(articlesActions.clearArticles({publicationId}))
-            yield put(articlesActions.receiveArticles({publicationId, page}))
+            yield put(articlesActions.clear({publicationId}))
+            yield put(articlesActions.receivePage({publicationId, page}))
         } catch (err) {
             if (FetchError.isTypeOf(err)) {
                 yield spawn(createInfoToast, "There was a problem refreshing articles.")
@@ -335,8 +333,8 @@ function* refreshArticlesSaga(): Iterator<Effect> {
 
 function* loadNextArticlesSaga(): Iterator<Effect> {
     while (true) {
-        const loadAction: articlesActions.LoadNextArticles =
-            yield take(articlesActions.loadNextArticles.type)
+        const loadAction: articlesActions.LoadNext =
+            yield take(articlesActions.loadNext.type)
 
         const {publicationId} = loadAction.payload
         const {articlesPageTokensByParentId}: ArticlesStateModel = yield select(getArticles)
@@ -346,7 +344,7 @@ function* loadNextArticlesSaga(): Iterator<Effect> {
             const page: PaginatedArray<ShortArticleModel> =
                 yield call(listArticles, publicationId, pageToken)
 
-            yield put(articlesActions.receiveArticles({publicationId, page}))
+            yield put(articlesActions.receivePage({publicationId, page}))
         } catch (err) {
             if (FetchError.isTypeOf(err)) {
                 yield spawn(createInfoToast, "There was a problem loading articles.")
@@ -368,7 +366,7 @@ function* deleteArticleSaga(): Iterator<Effect> {
                 yield spawn(createInfoToast, "You must be signed in to delete articles.")
             } else {
                 const {id} = deleteAction.payload
-                yield put(articlesActions.deleteLocalArticle({id}))
+                yield put(articlesActions.deleteLocal({id}))
 
                 const article = articlesById[id]
                 const title = ((article.title || "").length > 20) ? (
@@ -390,7 +388,7 @@ function* deleteArticleSaga(): Iterator<Effect> {
                 })
 
                 if (buttonId === undoButton.id) {
-                    yield put(articlesActions.undeleteArticle({item: article}))
+                    yield put(articlesActions.undelete({item: article}))
                 } else {
                     try {
                         yield call(refreshAuth)
@@ -400,7 +398,7 @@ function* deleteArticleSaga(): Iterator<Effect> {
                         if (FetchError.isTypeOf(err)) {
                             yield spawn(createInfoToast,
                                         "There was a problem deleting the article.")
-                            yield put(articlesActions.undeleteArticle({item: article}))
+                            yield put(articlesActions.undelete({item: article}))
                         } else if (AuthError.isTypeOf(err)) {
                             yield call(handleAuthError, err)
                         } else {

@@ -100,7 +100,7 @@ export default connect<StateProps, DispatchProps, OwnProps>(
         },
 
         onToastButtonClick: (toastId, buttonId) => {
-            dispatch(toastsActions.closeToast({toastId, buttonId}))
+            dispatch(toastsActions.close({toastId, buttonId}))
         },
     }),
 

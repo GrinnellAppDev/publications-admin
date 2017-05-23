@@ -72,15 +72,15 @@ export default connect<StateProps, DispatchProps, OwnProps>(
 
     (dispatch, {params}) => ({
         onRefresh: () => {
-            dispatch(articlesActions.refreshArticles({publicationId: params.publicationId}))
+            dispatch(articlesActions.refresh({publicationId: params.publicationId}))
         },
 
         onLoadNextArticlePage: () => {
-            dispatch(articlesActions.loadNextArticles({publicationId: params.publicationId}))
+            dispatch(articlesActions.loadNext({publicationId: params.publicationId}))
         },
 
         onArticleDelete: (id) => {
-            dispatch(articlesActions.deleteArticle({id}))
+            dispatch(articlesActions.delete({id}))
         },
     }),
 )

@@ -44,24 +44,22 @@ export interface PublicationsStateModel {
 // Actions
 
 export namespace publicationsActions {
-    type SelectPublicationPayload = {publicationId: string}
-    export type SelectPublication = Action<SelectPublicationPayload>
-    export const selectPublication = actionCreator<SelectPublicationPayload>("SELECT_PUBLICATION")
+    type SelectPayload = {publicationId: string}
+    export type Select = Action<SelectPayload>
+    export const select = actionCreator<SelectPayload>("SELECT_PUBLICATION")
 
-    type StartLoadingPublicationsPayload = {}
-    export const startLoadingPublications =
-        actionCreator<StartLoadingPublicationsPayload>("START_LOADING_PUBLICATIONS")
+    type StartLoadingPayload = {}
+    export const startLoading = actionCreator<StartLoadingPayload>("START_LOADING_PUBLICATIONS")
 
-    type ReceivePublicationsPayload = {page: PaginatedArray<PublicationModel>}
-    export const receivePublications =
-        actionCreator<ReceivePublicationsPayload>("RECIEVE_PUBLICATIONS")
+    type ReceivePayload = {page: PaginatedArray<PublicationModel>}
+    export const receive = actionCreator<ReceivePayload>("RECIEVE_PUBLICATIONS")
 }
 
 // Reducer
 
 function publicationsByIdReducer(state: IdMapModel<PublicationModel> = {},
                                  action: Action<any>): IdMapModel<PublicationModel> {
-    if (publicationsActions.receivePublications.isTypeOf(action)) {
+    if (publicationsActions.receive.isTypeOf(action)) {
         const {page} = action.payload
         const newState = {...state} as Mutable<IdMapModel<PublicationModel>>
         page.items.forEach((publication) => {
@@ -75,11 +73,11 @@ function publicationsByIdReducer(state: IdMapModel<PublicationModel> = {},
 }
 
 function isLoadingPublicationsReducer(state: boolean = false, action: Action<any>): boolean {
-    if (publicationsActions.startLoadingPublications.isTypeOf(action)) {
+    if (publicationsActions.startLoading.isTypeOf(action)) {
         return true
     }
 
-    if (publicationsActions.receivePublications.isTypeOf(action)) {
+    if (publicationsActions.receive.isTypeOf(action)) {
         return false
     }
 
@@ -131,17 +129,17 @@ async function listPublicatons(
 // Saga
 
 export function* loadPublicationsSaga(): Iterator<Effect> {
-    const selectAction: publicationsActions.SelectPublication =
-        yield take(publicationsActions.selectPublication.type)
+    const selectAction: publicationsActions.Select =
+        yield take(publicationsActions.select.type)
     const {publicationId} = selectAction.payload
 
     try {
         let pageToken: string | null = null
         while (pageToken !== PaginatedArray.LAST_PAGE_TOKEN) {
-            yield put(publicationsActions.startLoadingPublications({}))
+            yield put(publicationsActions.startLoading({}))
             const page: PaginatedArray<PublicationModel> =
                 yield call(listPublicatons, pageToken)
-            yield put(publicationsActions.receivePublications({page}))
+            yield put(publicationsActions.receive({page}))
 
             pageToken = page.nextPageToken
         }
